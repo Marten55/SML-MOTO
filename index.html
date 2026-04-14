@@ -84,6 +84,72 @@
       color: #fff;
     }
 
+    /* ── INTRO SECTION ── */
+    .intro {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      padding: 64px 60px;
+      background: var(--darker);
+      border-top: 1px solid #1a2535;
+      border-bottom: 1px solid #1a2535;
+      overflow: hidden;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .intro-img {
+      width: 420px;
+      min-width: 420px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #1e2a38;
+      animation: slideInLeft 0.9s ease forwards;
+    }
+
+    .intro-text {
+      animation: slideInRight 0.9s ease 0.2s forwards;
+      opacity: 0;
+    }
+
+    .intro-text h2 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .intro-text h3 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+
+    .intro-text p {
+      font-size: 0.95rem;
+      color: #8a9bb0;
+      line-height: 1.8;
+      max-width: 480px;
+    }
+
+    @media (max-width: 700px) {
+      .intro { flex-direction: column; padding: 40px 20px; }
+      .intro-img { width: 100%; min-width: unset; }
+    }
+
     /* ── MAP SECTION ── */
     .map-section {
       position: relative;
@@ -334,6 +400,23 @@
   <!-- HERO -->
   <section class="hero">
     <h1>The Art of Simple Riding.</h1>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro">
+    <img
+      class="intro-img"
+      src="https://images.unsplash.com/photo-1547549082-6bc09f2049ae?w=900&q=80"
+      alt="Horská cesta"
+    />
+    <div class="intro-text">
+      <h2>Objavuj trasy</h2>
+      <h3>Každá cesta<br>má svoj príbeh.</h3>
+      <p>
+        Horské priechody, kľukaté cesty, mlčiace údolia.
+        Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.
+      </p>
+    </div>
   </section>
 
   <!-- MAP -->
