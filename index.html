@@ -145,12 +145,18 @@
     .pop-clothes {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid rgba(0,180,216,.2);
     }
-    .pop-clothes-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .pop-clothes-img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: invert(1) brightness(0.85);
+    }
     .pop-clothes-text {
       font-size: 0.7rem;
       color: #c8d8e8;
@@ -162,6 +168,12 @@
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .pop-clothes-name {
+      font-weight: 700;
+      color: #fff;
       display: block;
       margin-bottom: 2px;
     }
@@ -359,13 +371,44 @@
       maxZoom: 19
     }).addTo(map);
 
+    // Clothing config — ordered coldest → warmest.
+    // Each entry: maxTemp (inclusive upper bound), icon path, display name, extra tip.
+    const CLOTHES_CONFIG = [
+      {
+        maxTemp: 5,
+        icon: 'Ikony/down-jacket-svgrepo-com.png',
+        name: 'Zimná páperová bunda',
+        tip:  'Termo spodky, nepremokavé návleky, vyhrievané rukavice'
+      },
+      {
+        maxTemp: 9,
+        icon: 'Ikony/rain-jacket-svgrepo-com.png',
+        name: 'Nepremokavá bunda s kapucňou',
+        tip:  'Moto bunda s podšívkou, teplé rukavice'
+      },
+      {
+        maxTemp: 13,
+        icon: 'Ikony/jerkin-boy-svgrepo-com.png',
+        name: 'Vesta + fleece vrstva',
+        tip:  'Ľahšia bunda, štandardné rukavice'
+      },
+      {
+        maxTemp: 17,
+        icon: 'Ikony/sweater-boy-svgrepo-com.png',
+        name: 'Sveter / mikina',
+        tip:  'Vetrovka v batôžku pre istotu'
+      },
+      {
+        maxTemp: Infinity,
+        icon: 'Ikony/shirt-sleeved-svgrepo-com.png',
+        name: 'Ľahká košeľa / tričko',
+        tip:  'Mesh bunda alebo ľahká vrstva'
+      }
+    ];
+
     function getClothes(tempStr) {
       const t = parseInt(tempStr);
-      if (t <= 5)  return { icon: "🧥", text: "Zimná moto bunda, termo spodky, nepremokavé návleky, vyhrievané rukavice" };
-      if (t <= 9)  return { icon: "🧥", text: "Moto bunda s podšívkou, nepremokavá vrstva, teplé rukavice" };
-      if (t <= 13) return { icon: "🥼", text: "Ľahšia moto bunda, fleece vrstva, štandardné rukavice" };
-      if (t <= 17) return { icon: "🦺", text: "Moto bunda bez podšívky, vetrovka v batôžku" };
-      return               { icon: "👕", text: "Ľahká moto bunda alebo mesh bunda, vzdušné rukavice" };
+      return CLOTHES_CONFIG.find(c => t <= c.maxTemp);
     }
 
     passes.forEach(p => {
@@ -388,10 +431,11 @@
         </div>
         <div class="pop-info">${p.info}</div>
         <div class="pop-clothes">
-          <span class="pop-clothes-icon">${clothes.icon}</span>
+          <img class="pop-clothes-img" src="${clothes.icon}" alt="${clothes.name}" />
           <span class="pop-clothes-text">
             <span class="pop-clothes-label">Odporúčané oblečenie</span>
-            ${clothes.text}
+            <span class="pop-clothes-name">${clothes.name}</span>
+            ${clothes.tip}
           </span>
         </div>`;
 
