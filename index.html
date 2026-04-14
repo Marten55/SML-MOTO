@@ -142,6 +142,29 @@
     .pop-info {
       font-size: 0.72rem; color: #8a9bb0; text-align: center; margin-top: 8px;
     }
+    .pop-clothes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0,180,216,.2);
+    }
+    .pop-clothes-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .pop-clothes-text {
+      font-size: 0.7rem;
+      color: #c8d8e8;
+      line-height: 1.4;
+    }
+    .pop-clothes-label {
+      font-size: 0.6rem;
+      color: #00b4d8;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
 
     /* ── ROUTE CARDS ── */
     .routes {
@@ -336,6 +359,15 @@
       maxZoom: 19
     }).addTo(map);
 
+    function getClothes(tempStr) {
+      const t = parseInt(tempStr);
+      if (t <= 5)  return { icon: "🧥", text: "Zimná moto bunda, termo spodky, nepremokavé návleky, vyhrievané rukavice" };
+      if (t <= 9)  return { icon: "🧥", text: "Moto bunda s podšívkou, nepremokavá vrstva, teplé rukavice" };
+      if (t <= 13) return { icon: "🥼", text: "Ľahšia moto bunda, fleece vrstva, štandardné rukavice" };
+      if (t <= 17) return { icon: "🦺", text: "Moto bunda bez podšívky, vetrovka v batôžku" };
+      return               { icon: "👕", text: "Ľahká moto bunda alebo mesh bunda, vzdušné rukavice" };
+    }
+
     passes.forEach(p => {
       const icon = L.divIcon({
         className: '',
@@ -346,6 +378,7 @@
         iconAnchor: [7, 7]
       });
 
+      const clothes = getClothes(p.temp);
       const popup = `
         <div class="pop-name">${p.name}</div>
         <div class="pop-alt">${p.alt} m n. m.</div>
@@ -353,11 +386,18 @@
           <span class="pop-icon">${p.icon}</span>
           <span class="pop-temp">${p.temp}</span>
         </div>
-        <div class="pop-info">${p.info}</div>`;
+        <div class="pop-info">${p.info}</div>
+        <div class="pop-clothes">
+          <span class="pop-clothes-icon">${clothes.icon}</span>
+          <span class="pop-clothes-text">
+            <span class="pop-clothes-label">Odporúčané oblečenie</span>
+            ${clothes.text}
+          </span>
+        </div>`;
 
       L.marker([p.lat, p.lng], { icon })
         .addTo(map)
-        .bindPopup(popup, { maxWidth: 200 });
+        .bindPopup(popup, { maxWidth: 220 });
     });
   </script>
 
