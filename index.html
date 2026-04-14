@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SML – Moto Life Simplified</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -41,15 +40,8 @@
       text-decoration: none;
     }
     .nav-logo img {
-      height: 54px;
+      height: 48px;
       width: auto;
-      filter: drop-shadow(0 0 8px rgba(0,180,216,.35));
-    }
-    .nav-logo-text {
-      font-size: 1.6rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: var(--blue);
     }
 
     .nav-tagline {
@@ -94,63 +86,70 @@
     /* ── MAP SECTION ── */
     .map-section {
       position: relative;
-      height: 480px;
+      height: 360px;
+      background:
+        linear-gradient(to bottom, rgba(10,20,35,.5) 0%, rgba(10,20,35,.7) 100%),
+        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    #swiss-map {
-      width: 100%;
-      height: 100%;
-    }
-    /* custom Leaflet pin */
-    .pass-marker {
+
+    /* location pins */
+    .pin {
+      position: absolute;
       display: flex;
       flex-direction: column;
       align-items: center;
-      pointer-events: none;
+      font-size: 0.7rem;
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
-    .pass-marker-dot {
+    .pin::after {
+      content: '';
       width: 14px; height: 14px;
       border-radius: 50%;
       background: var(--blue);
       border: 2px solid #fff;
-      box-shadow: 0 0 12px var(--blue), 0 0 24px rgba(0,180,216,.4);
-    }
-    .pass-marker-label {
       margin-top: 4px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #fff;
-      background: rgba(13,17,23,.75);
-      padding: 1px 5px;
-      border-radius: 3px;
-      white-space: nowrap;
-      letter-spacing: 0.5px;
+      box-shadow: 0 0 10px var(--blue);
     }
-    /* Leaflet popup override */
-    .leaflet-popup-content-wrapper {
-      background: rgba(13,25,45,.95) !important;
-      border: 1px solid rgba(0,180,216,.4) !important;
-      border-radius: 10px !important;
-      box-shadow: 0 4px 30px rgba(0,0,0,.7) !important;
-      color: #e8edf2 !important;
+    .pin-stelvio   { top: 55%; left: 20%; }
+    .pin-furka     { top: 30%; left: 45%; }
+    .pin-isran     { top: 42%; left: 62%; }
+    .pin-gross     { top: 38%; right: 12%; }
+
+    /* weather widget */
+    .weather-widget {
+      background: rgba(13, 25, 45, 0.88);
+      border: 1px solid rgba(0,180,216,.35);
+      border-radius: 12px;
+      padding: 18px 28px;
+      text-align: center;
       backdrop-filter: blur(6px);
+      box-shadow: 0 4px 30px rgba(0,0,0,.5);
+      min-width: 180px;
     }
-    .leaflet-popup-tip { background: rgba(13,25,45,.95) !important; }
-    .leaflet-popup-close-button { color: #00b4d8 !important; font-size: 1.1rem !important; }
-    .pop-name {
-      font-size: 1rem; font-weight: 800; color: #00b4d8;
-      letter-spacing: 1px; text-align: center; margin-bottom: 2px;
+    .weather-widget .pass-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 1px;
     }
-    .pop-alt {
-      font-size: 0.7rem; color: #6c8099; text-align: center; margin-bottom: 10px;
+    .weather-widget .pass-alt {
+      font-size: 0.72rem;
+      color: #6c8099;
+      margin-bottom: 8px;
     }
-    .pop-row {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+    .weather-widget .w-icon { font-size: 2.2rem; }
+    .weather-widget .w-temp {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 4px;
     }
-    .pop-icon { font-size: 2rem; }
-    .pop-temp { font-size: 1.8rem; font-weight: 800; color: #fff; }
-    .pop-info {
-      font-size: 0.72rem; color: #8a9bb0; text-align: center; margin-top: 8px;
-    }
+    .weather-widget .w-arrow { color: var(--blue); font-size: 1.1rem; }
 
     /* ── ROUTE CARDS ── */
     .routes {
@@ -258,11 +257,9 @@
       gap: 14px;
     }
 
-    .footer-logo {
-      font-size: 1.5rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: var(--blue);
+    .footer-logo img {
+      height: 44px;
+      width: auto;
     }
 
     .social-links {
@@ -291,6 +288,7 @@
       .route-card { border-right: none; border-bottom: 1px solid #1a2535; }
       .about { flex-direction: column; padding: 32px 20px; }
       .about-img { width: 100%; min-width: unset; }
+      .pin { display: none; }
     }
   </style>
 </head>
@@ -298,10 +296,7 @@
 
   <!-- NAV -->
   <nav>
-    <a class="nav-logo" href="#">
-      <img src="logo.png" alt="SML Tour Guide" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/>
-      <span class="nav-logo-text" style="display:none">SML</span>
-    </a>
+    <a class="nav-logo" href="#"><img src="logo/logo.jpg" alt="SML Moto logo" /></a>
     <span class="nav-tagline">Moto Life Simplified</span>
     <div class="nav-links">
       <a href="#kontakt">Kontakt</a>
@@ -317,63 +312,18 @@
 
   <!-- MAP -->
   <section class="map-section">
-    <div id="swiss-map"></div>
+    <div class="pin pin-stelvio">STELVIO</div>
+    <div class="pin pin-furka">FURKA</div>
+    <div class="pin pin-isran">ISRAN</div>
+    <div class="pin pin-gross">GROSSGLOCKNER</div>
+
+    <div class="weather-widget">
+      <div class="pass-name">Furkapass 2429m</div>
+      <div class="pass-alt">2 429 m n. m.</div>
+      <div class="w-icon">⛅</div>
+      <div class="w-temp">11°C <span class="w-arrow">↑</span></div>
+    </div>
   </section>
-
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
-  <script>
-    const passes = [
-      { name: "Furkapass",      alt: 2429, lat: 46.5725, lng: 8.4158,  icon: "⛅", temp: "11°C", info: "Clasic Bond route – Goldfinger" },
-      { name: "Grimselpass",    alt: 2165, lat: 46.5671, lng: 8.3363,  icon: "🌤", temp: "9°C",  info: "Krásna priehrada pri vrchole" },
-      { name: "Sustenpass",     alt: 2224, lat: 46.7268, lng: 8.4508,  icon: "⛅", temp: "8°C",  info: "Najkrajší pohľad na ľadovec" },
-      { name: "Gotthard",       alt: 2106, lat: 46.5559, lng: 8.5672,  icon: "🌥", temp: "7°C",  info: "Historický alpský priechod" },
-      { name: "Malojapass",     alt: 1815, lat: 46.4064, lng: 9.6944,  icon: "☀️", temp: "14°C", info: "Engadin – dlhý zvrat dolu" },
-      { name: "Julierpass",     alt: 2284, lat: 46.4703, lng: 9.7258,  icon: "⛅", temp: "10°C", info: "Rímske stĺpy pri vrchole" },
-      { name: "Flüelapass",     alt: 2383, lat: 46.7558, lng: 9.9478,  icon: "🌤", temp: "8°C",  info: "Rýchly priechod do Davosu" },
-      { name: "Berninapass",    alt: 2328, lat: 46.4097, lng: 10.0264, icon: "☀️", temp: "12°C", info: "Vlak Bernina Express prechádza cez" },
-      { name: "Ofenpass",       alt: 2149, lat: 46.6258, lng: 10.2928, icon: "🌤", temp: "9°C",  info: "Vstup do Národného parku" },
-      { name: "Umbrailpass",    alt: 2501, lat: 46.5364, lng: 10.4308, icon: "⛅", temp: "6°C",  info: "Najvyšší asfaltový priechod CH" },
-      { name: "Splügenpass",    alt: 2113, lat: 46.5050, lng: 9.3408,  icon: "🌥", temp: "10°C", info: "Talianska hranica, serpentíny" },
-      { name: "Lukmanierpass",  alt: 1914, lat: 46.5803, lng: 8.7894,  icon: "🌤", temp: "11°C", info: "Najnižší transverzálny priechod" },
-      { name: "San Bernardino", alt: 2065, lat: 46.4939, lng: 9.1744,  icon: "⛅", temp: "10°C", info: "Dlhá špirálovitá cesta hore" },
-      { name: "Wolfssprungpass",alt: 1631, lat: 46.8667, lng: 8.6167,  icon: "🌥", temp: "12°C", info: "Cesta pri jazere Vierwaldstätter" },
-    ];
-
-    const map = L.map('swiss-map', {
-      center: [46.55, 9.1],
-      zoom: 8,
-      zoomControl: true,
-      attributionControl: false
-    });
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19
-    }).addTo(map);
-
-    passes.forEach(p => {
-      const icon = L.divIcon({
-        className: '',
-        html: `<div class="pass-marker">
-                 <div class="pass-marker-dot"></div>
-                 <div class="pass-marker-label">${p.name}</div>
-               </div>`,
-        iconAnchor: [7, 7]
-      });
-
-      const popup = `
-        <div class="pop-name">${p.name}</div>
-        <div class="pop-alt">${p.alt} m n. m.</div>
-        <div class="pop-row">
-          <span class="pop-icon">${p.icon}</span>
-          <span class="pop-temp">${p.temp}</span>
-        </div>
-        <div class="pop-info">${p.info}</div>`;
-
-      L.marker([p.lat, p.lng], { icon })
-        .addTo(map)
-        .bindPopup(popup, { maxWidth: 200 });
-    });
-  </script>
 
   <!-- ROUTE CARDS -->
   <section class="routes" id="trasy">
@@ -435,7 +385,7 @@
 
   <!-- FOOTER -->
   <footer id="kontakt">
-    <div class="footer-logo">SML</div>
+    <div class="footer-logo"><img src="logo/logo.jpg" alt="SML Moto logo" /></div>
     <div class="social-links">
       <a class="social-fb"   href="#" title="Facebook">f</a>
       <a class="social-ig"   href="#" title="Instagram">&#9679;</a>
