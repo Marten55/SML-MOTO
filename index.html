@@ -24,9 +24,9 @@
 
     /* ── NAV ── */
     nav {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: space-between;
       padding: 20px 44px;
       background: rgba(7,10,15,0.92);
       position: sticky;
@@ -50,6 +50,10 @@
       font-style: italic;
       color: #8a9bb0;
       letter-spacing: 1px;
+    }
+
+    .nav-links {
+      justify-self: center;
     }
 
     .nav-links a {
@@ -143,11 +147,6 @@
       color: #8a9bb0;
       line-height: 1.8;
       max-width: 480px;
-    }
-
-    @media (max-width: 700px) {
-      .intro { flex-direction: column; padding: 40px 20px; }
-      .intro-img { width: 100%; min-width: unset; }
     }
 
     /* ── MAP SECTION ── */
@@ -377,6 +376,8 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       nav { flex-direction: column; gap: 8px; text-align: center; }
+      .intro { flex-direction: column; padding: 40px 20px; }
+      .intro-img { width: 100%; min-width: unset; }
       .routes { grid-template-columns: 1fr; }
       .route-card { border-right: none; border-bottom: 1px solid #1a2535; }
       .about { flex-direction: column; padding: 32px 20px; }
@@ -454,8 +455,6 @@
       maxZoom: 19
     }).addTo(map);
 
-    // Clothing config — ordered coldest → warmest.
-    // Each entry: maxTemp (inclusive upper bound), icon path, display name, extra tip.
     const CLOTHES_CONFIG = [
       {
         maxTemp: 5,
