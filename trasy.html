@@ -59,6 +59,22 @@
     .nav-links a:hover { color: var(--blue); }
     .nav-links a.active { color: var(--blue); }
 
+    .nav-contact {
+      justify-self: end;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .nav-contact a {
+      color: #6c8099;
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.3px;
+      transition: color .2s;
+    }
+    .nav-contact a:hover { color: var(--blue); }
+
     /* ── HERO ── */
     .hero {
       position: relative;
@@ -548,6 +564,11 @@
       <a href="index.html#kontakt">Kontakt</a>
       <a href="trasy.html" class="active">Trasy</a>
       <a href="index.html#omne">O mne</a>
+    </div>
+
+    <div class="nav-contact">
+      <a href="mailto:sml@moto.com">sml@moto.com</a>
+      <a href="tel:+41111111111">+41 111 111 111</a>
     </div>
   </nav>
 
