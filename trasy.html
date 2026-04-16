@@ -441,18 +441,34 @@
     }
 
     /* ── RESPONSIVE ── */
+
+    /* Tablet */
     @media (max-width: 900px) {
-      .routes-grid { grid-template-columns: repeat(2, 1fr); }
       .featured { grid-template-columns: 1fr; }
       .featured-img { height: 260px; }
+      .featured-content { padding: 32px 36px; }
+      .routes-grid { grid-template-columns: repeat(2, 1fr); }
+      .routes-section { padding: 40px 28px; }
+      .filter-bar { padding: 16px 28px; }
+      .map-header { padding: 20px 28px; }
+      #trasy-map { height: 360px; }
     }
+
+    /* Mobile */
     @media (max-width: 600px) {
-      nav { flex-direction: column; gap: 8px; }
+      .hero { height: 240px; }
+      .hero h1 { letter-spacing: 2px; }
+      .filter-bar { padding: 12px 16px; gap: 8px; }
+      .sort-select { margin-left: 0; width: 100%; }
+      .featured { grid-template-columns: 1fr; }
+      .featured-img { height: 200px; }
+      .featured-content { padding: 24px 20px; gap: 12px; }
+      .stats-row { gap: 16px; }
       .routes-grid { grid-template-columns: 1fr; }
-      .routes-section { padding: 32px 20px; }
-      .filter-bar { padding: 14px 20px; }
-      .map-header { padding: 20px; }
-      .featured-content { padding: 28px 24px; }
+      .routes-section { padding: 28px 16px; }
+      .map-header { padding: 16px 20px; flex-wrap: wrap; gap: 6px; }
+      .map-header p { margin-left: 0; }
+      #trasy-map { height: 280px; }
     }
   </style>
 </head>
