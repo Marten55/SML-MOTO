@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SML – Moto Life Simplified</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:   #00b4d8;
+      --dark:   #0d1117;
+      --darker: #070a0f;
+      --light:  #e8edf2;
+      --card-bg: #141b26;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--dark);
+      color: var(--light);
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 20px 44px;
+      background: rgba(7,10,15,0.92);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #1e2a38;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      height: 67px;
+      width: auto;
+    }
+
+    .nav-links { justify-self: center; }
+    .nav-links a {
+      color: var(--light);
+      text-decoration: none;
+      margin-left: 22px;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--blue); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 420px;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,.35) 0%, rgba(0,0,0,.6) 100%),
+        url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1400&q=80') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-align: center;
+      text-shadow: 0 2px 18px rgba(0,0,0,.7);
+      color: #fff;
+    }
+
+    /* ── INTRO ── */
+    .intro {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      padding: 64px 60px;
+      background: var(--darker);
+      border-top: 1px solid #1a2535;
+      border-bottom: 1px solid #1a2535;
+      overflow: hidden;
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .intro-img {
+      width: 420px;
+      min-width: 420px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #1e2a38;
+      animation: slideInLeft 0.9s ease forwards;
+    }
+    .intro-text {
+      animation: slideInRight 0.9s ease 0.2s forwards;
+      opacity: 0;
+    }
+    .intro-text h2 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+    .intro-text h3 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .intro-text p {
+      font-size: 0.95rem;
+      color: #8a9bb0;
+      line-height: 1.8;
+      max-width: 480px;
+    }
+
+    /* ── SWISS PASS MAP ── */
+    .map-section { position: relative; height: 480px; }
+    #swiss-map   { width: 100%; height: 100%; }
+
+    .pass-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+    .pass-marker-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--blue);
+      border: 2px solid #fff;
+      box-shadow: 0 0 12px var(--blue), 0 0 24px rgba(0,180,216,.4);
+    }
+    .pass-marker-label {
+      margin-top: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(13,17,23,.75);
+      padding: 1px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(13,25,45,.95) !important;
+      border: 1px solid rgba(0,180,216,.4) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 4px 30px rgba(0,0,0,.7) !important;
+      color: #e8edf2 !important;
+      backdrop-filter: blur(6px);
+    }
+    .leaflet-popup-tip { background: rgba(13,25,45,.95) !important; }
+    .leaflet-popup-close-button { color: #00b4d8 !important; font-size: 1.1rem !important; }
+    .pop-name  { font-size: 1rem; font-weight: 800; color: #00b4d8; letter-spacing: 1px; text-align: center; margin-bottom: 2px; }
+    .pop-alt   { font-size: 0.7rem; color: #6c8099; text-align: center; margin-bottom: 10px; }
+    .pop-row   { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .pop-icon  { font-size: 2rem; }
+    .pop-temp  { font-size: 1.8rem; font-weight: 800; color: #fff; }
+    .pop-info  { font-size: 0.72rem; color: #8a9bb0; text-align: center; margin-top: 8px; }
+    .pop-clothes {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 10px; padding-top: 10px;
+      border-top: 1px solid rgba(0,180,216,.2);
+    }
+    .pop-clothes-img   { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; filter: invert(1) brightness(0.85); }
+    .pop-clothes-text  { font-size: 0.7rem; color: #c8d8e8; line-height: 1.4; }
+    .pop-clothes-label { font-size: 0.6rem; color: #00b4d8; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+    .pop-clothes-name  { font-weight: 700; color: #fff; display: block; margin-bottom: 2px; }
+
+    /* ── ROUTES SECTION ── */
+    .routes-section {
+      padding: 56px 40px;
+      border-top: 2px solid #1a2535;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 28px;
+      margin-top: 52px;
+    }
+    .section-header:first-child { margin-top: 0; }
+    .section-header h2 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+    .section-header span { font-size: 0.75rem; color: #4a6080; }
+
+    .routes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .route-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid #1a2535;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+    .route-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,180,216,.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    }
+
+    /* ── CARD THUMB: dual-layer photo ↔ map ── */
+    .card-thumb {
+      position: relative;
+      height: 180px;
+      overflow: hidden;
+    }
+    .card-photo {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: opacity .45s;
+      z-index: 1;
+    }
+    .card-map {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity .45s;
+      z-index: 1;
+    }
+    .route-card:hover .card-photo { opacity: 0; }
+    .route-card:hover .card-map   { opacity: 1; }
+
+    .card-country {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(7,10,15,.75);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      backdrop-filter: blur(4px);
+      z-index: 3;
+    }
+    .card-difficulty {
+      position: absolute;
+      top: 10px; left: 10px;
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 3;
+    }
+    .diff-easy   { background: rgba(39,174,96,.25);  color: #27ae60; border: 1px solid rgba(39,174,96,.4); }
+    .diff-medium { background: rgba(241,196,15,.2);  color: #f1c40f; border: 1px solid rgba(241,196,15,.4); }
+    .diff-hard   { background: rgba(231,76,60,.2);   color: #e74c3c; border: 1px solid rgba(231,76,60,.4); }
+
+    .card-body { padding: 20px; }
+    .card-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .card-desc  { font-size: 0.8rem; color: #8a9bb0; line-height: 1.6; margin-bottom: 14px; }
+    .card-stats { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+    .card-stat  { font-size: 0.75rem; color: #6c8099; display: flex; align-items: center; gap: 4px; }
+    .card-stat strong { color: var(--light); font-weight: 700; }
+    .card-footer { display: flex; gap: 8px; border-top: 1px solid #1a2535; padding-top: 14px; }
+
+    .btn-gpx {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: rgba(0,180,216,.1);
+      color: var(--blue);
+      border: 1px solid rgba(0,180,216,.25);
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-gpx:hover { background: rgba(0,180,216,.2); }
+
+    .btn-detail {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      background: transparent;
+      color: #8a9bb0;
+      border: 1px solid #1e2a38;
+      border-radius: 5px;
+      padding: 8px 14px;
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-detail:hover { color: #fff; border-color: #4a6080; }
+
+    /* ── ABOUT ── */
+    .about {
+      display: flex; gap: 32px; align-items: center;
+      padding: 48px 40px;
+      background: #10161f;
+      border-top: 2px solid #1a2535;
+    }
+    .about-img { width: 220px; min-width: 220px; height: 260px; object-fit: cover; border-radius: 10px; border: 2px solid #1e2a38; }
+    .about-text h2 { font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+    .about-text .tagline { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 14px; }
+    .about-text p { font-size: 0.92rem; color: #8a9bb0; line-height: 1.7; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--darker);
+      border-top: 1px solid #1a2535;
+      padding: 48px 32px;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 24px;
+    }
+    .footer-logo img { height: 80px; width: auto; }
+    .social-links { display: flex; gap: 14px; }
+    .social-links a {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; text-decoration: none;
+      transition: transform .2s, opacity .2s;
+    }
+    .social-links a:hover { transform: scale(1.15); opacity: .85; }
+    .social-fb   { background: #1877f2; color: #fff; }
+    .social-ig   { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); color: #fff; }
+    .social-yt   { background: #ff0000; color: #fff; }
+    .social-tt   { background: #010101; color: #fff; border: 1px solid #333; }
+    .social-mail { background: #2e7d32; color: #fff; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .routes-grid    { grid-template-columns: repeat(2, 1fr); }
+      .routes-section { padding: 40px 28px; }
+    }
+    @media (max-width: 700px) {
+      nav { flex-direction: column; gap: 8px; text-align: center; }
+      .intro { flex-direction: column; padding: 40px 20px; }
+      .intro-img { width: 100%; min-width: unset; }
+      .about { flex-direction: column; padding: 32px 20px; }
+      .about-img { width: 100%; min-width: unset; }
+    }
+    @media (max-width: 600px) {
+      .routes-grid    { grid-template-columns: 1fr; }
+      .routes-section { padding: 28px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#"><img src="logo/logo.png" alt="SML Moto logo" /></a>
+    <div class="nav-links">
+      <a href="#kontakt">Kontakt</a>
+      <a href="#trasy">Trasy</a>
+      <a href="#omne">O mne</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>The Art of Simple Riding.</h1>
+  </section>
+
+  <!-- INTRO -->
+  <section class="intro">
+    <img class="intro-img" src="https://images.unsplash.com/photo-1547549082-6bc09f2049ae?w=900&q=80" alt="Horská cesta" />
+    <div class="intro-text">
+      <h2>Objavuj trasy</h2>
+      <h3>Každá cesta<br>má svoj príbeh.</h3>
+      <p>Horské priechody, kľukaté cesty, mlčiace údolia. Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.</p>
+    </div>
+  </section>
+
+  <!-- SWISS PASS MAP -->
+  <section class="map-section">
+    <div id="swiss-map"></div>
+  </section>
+
+  <!-- ROUTES -->
+  <section class="routes-section" id="trasy">
+
+    <!-- Švajčiarsko -->
+    <div class="section-header">
+      <h2>🇨🇭 Švajčiarsko</h2><span>preview</span>
+    </div>
+    <div class="routes-grid">
+
+      <div class="route-card">
+        <div class="card-thumb">
+          <img class="card-photo" src="https://images.unsplash.com/photo-1519583272095-6433daf26b6e?w=600&q=80" alt="Furka Grimsel Susten" />
+          <div class="card-map" id="map-ch-1"></div>
+          <span class="card-country">🇨🇭 Švajčiarsko</span>
+          <span class="card-difficulty diff-hard">Náročná</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Furka · Grimsel · Susten</div>
+          <div class="card-desc">Tri legendárne priechody na jednej trase. Každý kilometer prináša nové výhľady a nezabudnuteľné serpentíny.</div>
+          <div class="card-stats">
+            <span class="card-stat">🛣 <strong>310 km</strong></span>
+            <span class="card-stat">⛰ <strong>2 429 m</strong></span>
+            <span class="card-stat">⏱ <strong>7–9 h</strong></span>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn-gpx">&#11123; GPX</a>
+            <a href="#" class="btn-detail">Detail ›</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Taliansko -->
+    <div class="section-header">
+      <h2>🇮🇹 Taliansko</h2><span>preview</span>
+    </div>
+    <div class="routes-grid">
+
+      <div class="route-card">
+        <div class="card-thumb">
+          <img class="card-photo" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Stelvio" />
+          <div class="card-map" id="map-it-1"></div>
+          <span class="card-country">🇮🇹 Taliansko</span>
+          <span class="card-difficulty diff-hard">Náročná</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Passo dello Stelvio</div>
+          <div class="card-desc">Druhý najvyšší horský priechod v Alpách. 75 serpentín na talianskej strane – legenda motocyklového sveta.</div>
+          <div class="card-stats">
+            <span class="card-stat">🛣 <strong>180 km</strong></span>
+            <span class="card-stat">⛰ <strong>2 758 m</strong></span>
+            <span class="card-stat">⏱ <strong>4–5 h</strong></span>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn-gpx">&#11123; GPX</a>
+            <a href="#" class="btn-detail">Detail ›</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Francúzsko -->
+    <div class="section-header">
+      <h2>🇫🇷 Francúzsko</h2><span>preview</span>
+    </div>
+    <div class="routes-grid">
+
+      <div class="route-card">
+        <div class="card-thumb">
+          <img class="card-photo" src="https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=600&q=80" alt="Galibier" />
+          <div class="card-map" id="map-fr-1"></div>
+          <span class="card-country">🇫🇷 Francúzsko</span>
+          <span class="card-difficulty diff-medium">Stredná</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Col du Galibier & Télégraphe</div>
+          <div class="card-desc">Kultová trasa Tour de France. Dva priechody za sebou s výhľadmi na Mont Blanc a masív Écrins.</div>
+          <div class="card-stats">
+            <span class="card-stat">🛣 <strong>185 km</strong></span>
+            <span class="card-stat">⛰ <strong>2 642 m</strong></span>
+            <span class="card-stat">⏱ <strong>3–4 h</strong></span>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn-gpx">&#11123; GPX</a>
+            <a href="#" class="btn-detail">Detail ›</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Random -->
+    <div class="section-header">
+      <h2>&#127922; Random / Expedície</h2><span>preview</span>
+    </div>
+    <div class="routes-grid">
+
+      <div class="route-card">
+        <div class="card-thumb">
+          <img class="card-photo" src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80" alt="Transfagarasan" />
+          <div class="card-map" id="map-rnd-1"></div>
+          <span class="card-country">🇷🇴 Rumunsko</span>
+          <span class="card-difficulty diff-medium">Stredná</span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Transfăgărășan</div>
+          <div class="card-desc">Top Gear ju vyhlásil za najkrajšiu cestu sveta. Dramatické serpentíny cez Karpaty s jazerom Bâlea na vrchole.</div>
+          <div class="card-stats">
+            <span class="card-stat">🛣 <strong>150 km</strong></span>
+            <span class="card-stat">⛰ <strong>2 042 m</strong></span>
+            <span class="card-stat">⏱ <strong>3–4 h</strong></span>
+          </div>
+          <div class="card-footer">
+            <a href="#" class="btn-gpx">&#11123; GPX</a>
+            <a href="#" class="btn-detail">Detail ›</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="omne">
+    <img class="about-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Rider" />
+    <div class="about-text">
+      <h2>O mne:</h2>
+      <div class="tagline">Simple Life, Safe Rides!</div>
+      <p>
+        Motocykel pre mňa znamená <strong>slobodu</strong> a jednoduchosť života.
+        Jazdím s dôrazom na bezpečnosť a <strong>pohodu</strong> na cestách.
+        Vyhľadávam horské priechody, tiché cesty a miesta, kde sa čas spomaľuje.
+        Každá cesta je príbeh – a ja ich rád zdieľam s vami.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="kontakt">
+    <div class="footer-logo"><img src="logo/logo.png" alt="SML Moto logo" /></div>
+    <div class="social-links">
+      <a class="social-fb"   href="#" title="Facebook">f</a>
+      <a class="social-ig"   href="#" title="Instagram">&#9679;</a>
+      <a class="social-yt"   href="#" title="YouTube">&#9654;</a>
+      <a class="social-tt"   href="#" title="TikTok">&#9835;</a>
+      <a class="social-mail" href="mailto:info@sml.sk" title="Email">&#9993;</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+  <script>
+    // ── SWISS PASS MAP ──
+    const passes = [
+      { name: "Furkapass",      alt: 2429, lat: 46.5725, lng: 8.4158,  icon: "⛅", temp: "11°C", info: "Classic Bond route – Goldfinger" },
+      { name: "Grimselpass",    alt: 2165, lat: 46.5671, lng: 8.3363,  icon: "🌤", temp: "9°C",  info: "Krásna priehrada pri vrchole" },
+      { name: "Sustenpass",     alt: 2224, lat: 46.7268, lng: 8.4508,  icon: "⛅", temp: "8°C",  info: "Najkrajší pohľad na ľadovec" },
+      { name: "Gotthard",       alt: 2106, lat: 46.5559, lng: 8.5672,  icon: "🌥", temp: "7°C",  info: "Historický alpský priechod" },
+      { name: "Malojapass",     alt: 1815, lat: 46.4064, lng: 9.6944,  icon: "☀️", temp: "14°C", info: "Engadin – dlhý zvrat dolu" },
+      { name: "Julierpass",     alt: 2284, lat: 46.4703, lng: 9.7258,  icon: "⛅", temp: "10°C", info: "Rímske stĺpy pri vrchole" },
+      { name: "Flüelapass",     alt: 2383, lat: 46.7558, lng: 9.9478,  icon: "🌤", temp: "8°C",  info: "Rýchly priechod do Davosu" },
+      { name: "Berninapass",    alt: 2328, lat: 46.4097, lng: 10.0264, icon: "☀️", temp: "12°C", info: "Vlak Bernina Express prechádza cez" },
+      { name: "Ofenpass",       alt: 2149, lat: 46.6258, lng: 10.2928, icon: "🌤", temp: "9°C",  info: "Vstup do Národného parku" },
+      { name: "Umbrailpass",    alt: 2501, lat: 46.5364, lng: 10.4308, icon: "⛅", temp: "6°C",  info: "Najvyšší asfaltový priechod CH" },
+      { name: "Splügenpass",    alt: 2113, lat: 46.5050, lng: 9.3408,  icon: "🌥", temp: "10°C", info: "Talianska hranica, serpentíny" },
+      { name: "Lukmanierpass",  alt: 1914, lat: 46.5803, lng: 8.7894,  icon: "🌤", temp: "11°C", info: "Najnižší transverzálny priechod" },
+      { name: "San Bernardino", alt: 2065, lat: 46.4939, lng: 9.1744,  icon: "⛅", temp: "10°C", info: "Dlhá špirálovitá cesta hore" },
+      { name: "Wolfssprungpass",alt: 1631, lat: 46.8667, lng: 8.6167,  icon: "🌥", temp: "12°C", info: "Cesta pri jazere Vierwaldstätter" },
+    ];
+
+    const mainMap = L.map('swiss-map', { center: [46.55, 9.1], zoom: 8, zoomControl: true, attributionControl: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(mainMap);
+
+    const CLOTHES_CONFIG = [
+      { maxTemp: 5,        icon: 'Ikony/down-jacket-svgrepo-com.png',  name: 'Zimná páperová bunda',       tip: 'Termo spodky, nepremokavé návleky, vyhrievané rukavice' },
+      { maxTemp: 9,        icon: 'Ikony/rain-jacket-svgrepo-com.png',  name: 'Nepremokavá bunda s kapucňou', tip: 'Moto bunda s podšívkou, teplé rukavice' },
+      { maxTemp: 13,       icon: 'Ikony/jerkin-boy-svgrepo-com.png',   name: 'Vesta + fleece vrstva',       tip: 'Ľahšia bunda, štandardné rukavice' },
+      { maxTemp: 17,       icon: 'Ikony/sweater-boy-svgrepo-com.png',  name: 'Sveter / mikina',             tip: 'Vetrovka v batôžku pre istotu' },
+      { maxTemp: Infinity, icon: 'Ikony/shirt-sleeved-svgrepo-com.png',name: 'Ľahká košeľa / tričko',      tip: 'Mesh bunda alebo ľahká vrstva' },
+    ];
+    function getClothes(tempStr) {
+      const t = parseInt(tempStr);
+      return CLOTHES_CONFIG.find(c => t <= c.maxTemp);
+    }
+    passes.forEach(p => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="pass-marker"><div class="pass-marker-dot"></div><div class="pass-marker-label">${p.name}</div></div>`,
+        iconAnchor: [7, 7]
+      });
+      const clothes = getClothes(p.temp);
+      L.marker([p.lat, p.lng], { icon }).addTo(mainMap).bindPopup(`
+        <div class="pop-name">${p.name}</div>
+        <div class="pop-alt">${p.alt} m n. m.</div>
+        <div class="pop-row"><span class="pop-icon">${p.icon}</span><span class="pop-temp">${p.temp}</span></div>
+        <div class="pop-info">${p.info}</div>
+        <div class="pop-clothes">
+          <img class="pop-clothes-img" src="${clothes.icon}" alt="${clothes.name}" />
+          <span class="pop-clothes-text">
+            <span class="pop-clothes-label">Odporúčané oblečenie</span>
+            <span class="pop-clothes-name">${clothes.name}</span>
+            ${clothes.tip}
+          </span>
+        </div>`, { maxWidth: 220 });
+    });
+
+    // ── ROUTE CARD MINI-MAPS ──
+    // Polyline coords [lat, lng] for each route
+    const ROUTES = {
+      'ch-1': {  // Furka · Grimsel · Susten (z Google Maps URL)
+        pts: [
+          [47.087, 9.014],  // Obersee / Glarus štart
+          [46.960, 8.920],
+          [46.850, 8.740],
+          [46.727, 8.450],  // Sustenpass
+          [46.712, 8.335],  // Meiringen
+          [46.617, 8.290],
+          [46.568, 8.336],  // Grimselpass
+          [46.572, 8.416],  // Furkapass
+          [46.635, 8.617],  // Andermatt
+          [46.750, 8.780],
+          [46.900, 8.900],
+          [47.040, 9.025],
+          [47.087, 9.014],
+        ],
+        center: [46.78, 8.65], zoom: 9
+      },
+      'it-1': {  // Passo dello Stelvio
+        pts: [
+          [46.471, 10.372],
+          [46.500, 10.412],
+          [46.529, 10.454],
+          [46.558, 10.501],
+          [46.629, 10.661],
+        ],
+        center: [46.52, 10.48], zoom: 10
+      },
+      'fr-1': {  // Col du Galibier
+        pts: [
+          [45.278, 6.352],
+          [45.230, 6.400],
+          [45.194, 6.442],
+          [45.140, 6.425],
+          [45.101, 6.413],
+          [45.059, 6.634],
+        ],
+        center: [45.16, 6.46], zoom: 10
+      },
+      'rnd-1': {  // Transfăgărășan
+        pts: [
+          [45.139, 24.681],
+          [45.250, 24.660],
+          [45.355, 24.623],
+          [45.480, 24.618],
+          [45.601, 24.616],
+          [45.674, 24.557],
+        ],
+        center: [45.43, 24.62], zoom: 10
+      },
+    };
+
+    const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+    Object.entries(ROUTES).forEach(([id, route]) => {
+      const el = document.getElementById('map-' + id);
+      if (!el) return;
+
+      const card = el.closest('.route-card');
+      let initialized = false;
+
+      card.addEventListener('mouseenter', () => {
+        if (initialized) return;
+        initialized = true;
+
+        const m = L.map(el, {
+          center: route.center,
+          zoom: route.zoom,
+          zoomControl: false,
+          dragging: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false,
+          touchZoom: false,
+          boxZoom: false,
+          keyboard: false,
+          attributionControl: false,
+        });
+
+        L.tileLayer(TILE_URL, { maxZoom: 19 }).addTo(m);
+
+        const line = L.polyline(route.pts, {
+          color: '#ff2222',
+          weight: 3,
+          opacity: 0.9,
+          lineJoin: 'round',
+        }).addTo(m);
+
+        m.fitBounds(line.getBounds(), { padding: [14, 14] });
+        setTimeout(() => m.invalidateSize(), 50);
+      });
+    });
+  </script>
+</body>
+</html>
