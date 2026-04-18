@@ -503,12 +503,39 @@
       .db-columns { grid-template-columns: 1fr; }
       .db-section { padding: 40px 28px; }
     }
-    @media (max-width: 700px) {
-      nav { flex-direction: column; gap: 8px; text-align: center; }
+    @media (max-width: 768px) {
+      /* Topbar – iba vlajky, bez textu */
+      .topbar { padding: 0 8px; gap: 0; }
+      .lang-btn { padding: 6px 7px; }
+      .lang-btn .lang-label { display: none; }
+      .lang-btn .flag { font-size: 1.15rem; }
+      .lang-sep { height: 12px; }
+
+      /* Nav – logo + kontakt na 1. riadku, linky na 2. */
+      nav {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        padding: 10px 16px;
+        gap: 6px 0;
+      }
+      .nav-logo { grid-column: 1; grid-row: 1; }
+      .nav-logo img { height: 48px; }
+      .nav-contact { grid-column: 2; grid-row: 1; justify-self: end; gap: 10px; }
+      .nav-contact a { font-size: 0.68rem; }
+      .nav-links { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+      .nav-links a { margin-left: 14px; font-size: 0.82rem; }
+      .nav-links a:first-child { margin-left: 0; }
+
       .intro { flex-direction: column; padding: 40px 20px; }
       .intro-img { width: 100%; min-width: unset; }
       .about { flex-direction: column; padding: 32px 20px; }
       .about-img { width: 100%; min-width: unset; }
+    }
+    @media (max-width: 480px) {
+      .nav-contact { display: none; }
+      nav { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+      .nav-logo { justify-self: center; }
+      .nav-links { justify-self: center; }
     }
     @media (max-width: 600px) {
       .db-section { padding: 28px 16px; }
@@ -520,15 +547,15 @@
   <!-- NAV -->
   <!-- TOPBAR -->
   <div class="topbar">
-    <button class="lang-btn active" data-lang="sk"><span class="flag">🇸🇰</span> Slovenčina</button>
+    <button class="lang-btn active" data-lang="sk"><span class="flag">🇸🇰</span><span class="lang-label"> Slovenčina</span></button>
     <div class="lang-sep"></div>
-    <button class="lang-btn" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+    <button class="lang-btn" data-lang="en"><span class="flag">🇬🇧</span><span class="lang-label"> English</span></button>
     <div class="lang-sep"></div>
-    <button class="lang-btn" data-lang="de"><span class="flag">🇩🇪</span> Deutsch</button>
+    <button class="lang-btn" data-lang="de"><span class="flag">🇩🇪</span><span class="lang-label"> Deutsch</span></button>
     <div class="lang-sep"></div>
-    <button class="lang-btn" data-lang="hu"><span class="flag">🇭🇺</span> Magyar</button>
+    <button class="lang-btn" data-lang="hu"><span class="flag">🇭🇺</span><span class="lang-label"> Magyar</span></button>
     <div class="lang-sep"></div>
-    <button class="lang-btn" data-lang="pl"><span class="flag">🇵🇱</span> Polski</button>
+    <button class="lang-btn" data-lang="pl"><span class="flag">🇵🇱</span><span class="lang-label"> Polski</span></button>
   </div>
 
   <!-- NAV -->
