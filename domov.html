@@ -74,17 +74,26 @@
       align-items: center;
       justify-content: center;
     }
-    .hero-vid {
+    .yt-wrap {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      overflow: hidden;
       opacity: 0;
       transition: opacity 1.2s ease;
       pointer-events: none;
     }
-    .hero-vid.active { opacity: 1; }
+    .yt-wrap.active { opacity: 1; }
+    .yt-wrap iframe {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100vw;
+      height: 56.25vw;
+      min-height: 100vh;
+      min-width: 177.78vh;
+      transform: translate(-50%, -50%);
+      border: none;
+      pointer-events: none;
+    }
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -467,8 +476,8 @@
 
   <!-- HERO -->
   <section class="hero">
-    <video class="hero-vid active" id="hvid-0" src="Videa/Video1.MP4" muted playsinline autoplay></video>
-    <video class="hero-vid"        id="hvid-1" src="Videa/Video2.MP4" muted playsinline></video>
+    <div class="yt-wrap active"><div id="yt-0"></div></div>
+    <div class="yt-wrap"><div id="yt-1"></div></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <h1>The Art of Simple Riding.</h1>
@@ -826,18 +835,34 @@
       navEl.classList.toggle('nav-solid', window.scrollY > 60);
     }, { passive: true });
 
-    // ── HERO VIDEO LOOP ──
-    const heroVids = Array.from(document.querySelectorAll('.hero-vid'));
-    let currentVid = 0;
-    heroVids[0].play().catch(() => {});
-    setInterval(() => {
-      const next = (currentVid + 1) % heroVids.length;
-      heroVids[next].currentTime = 0;
-      heroVids[next].play().catch(() => {});
-      heroVids[next].classList.add('active');
-      heroVids[currentVid].classList.remove('active');
-      currentVid = next;
-    }, 20000);
+    // ── HERO YOUTUBE LOOP ──
+    const YT_IDS = ['zn-YwIemAus', '8zWSY4LYMlI'];
+    const ytWraps = document.querySelectorAll('.yt-wrap');
+    const ytPlayers = [];
+    let ytCurrent = 0;
+
+    const ytTag = document.createElement('script');
+    ytTag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(ytTag);
+
+    const YT_PARAMS = { controls: 0, showinfo: 0, rel: 0, modestbranding: 1, iv_load_policy: 3, disablekb: 1, mute: 1, loop: 1 };
+
+    window.onYouTubeIframeAPIReady = function () {
+      YT_IDS.forEach((id, i) => {
+        ytPlayers[i] = new YT.Player('yt-' + i, {
+          videoId: id,
+          playerVars: { ...YT_PARAMS, playlist: id, autoplay: i === 0 ? 1 : 0 },
+        });
+      });
+      setInterval(() => {
+        const next = (ytCurrent + 1) % YT_IDS.length;
+        ytPlayers[next].seekTo(0);
+        ytPlayers[next].playVideo();
+        ytWraps[next].classList.add('active');
+        ytWraps[ytCurrent].classList.remove('active');
+        ytCurrent = next;
+      }, 20000);
+    };
 
     // ── SWISS PASS MAP ──
     const passes = [
