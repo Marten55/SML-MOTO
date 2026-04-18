@@ -28,11 +28,19 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       padding: 20px 44px;
-      background: rgba(7,10,15,0.92);
-      position: sticky;
+      background: transparent;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
+      border-bottom: 1px solid transparent;
+      transition: background .35s, border-color .35s, backdrop-filter .35s;
+    }
+    nav.nav-solid {
+      background: rgba(7,10,15,0.92);
       border-bottom: 1px solid #1e2a38;
+      backdrop-filter: blur(8px);
     }
 
     .nav-logo {
@@ -59,21 +67,41 @@
     /* ── HERO ── */
     .hero {
       position: relative;
-      height: 420px;
-      background:
-        linear-gradient(to bottom, rgba(0,0,0,.35) 0%, rgba(0,0,0,.6) 100%),
-        url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1400&q=80') center/cover no-repeat;
+      height: 100vh;
+      min-height: 520px;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .hero h1 {
-      font-size: clamp(1.8rem, 5vw, 3.2rem);
-      font-weight: 900;
-      letter-spacing: 4px;
-      text-transform: uppercase;
+    .hero-vid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+      pointer-events: none;
+    }
+    .hero-vid.active { opacity: 1; }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, rgba(0,0,0,.65) 100%);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
       text-align: center;
-      text-shadow: 0 2px 18px rgba(0,0,0,.7);
+    }
+    .hero-content h1 {
+      font-size: clamp(2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 24px rgba(0,0,0,.8);
       color: #fff;
     }
 
@@ -439,7 +467,12 @@
 
   <!-- HERO -->
   <section class="hero">
-    <h1>The Art of Simple Riding.</h1>
+    <video class="hero-vid active" id="hvid-0" src="Videa/Video1.MP4" muted playsinline autoplay></video>
+    <video class="hero-vid"        id="hvid-1" src="Videa/Video2.MP4" muted playsinline></video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>The Art of Simple Riding.</h1>
+    </div>
   </section>
 
   <!-- INTRO -->
@@ -787,6 +820,25 @@
 
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
   <script>
+    // ── NAV scroll ──
+    const navEl = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      navEl.classList.toggle('nav-solid', window.scrollY > 60);
+    }, { passive: true });
+
+    // ── HERO VIDEO LOOP ──
+    const heroVids = Array.from(document.querySelectorAll('.hero-vid'));
+    let currentVid = 0;
+    heroVids[0].play().catch(() => {});
+    setInterval(() => {
+      const next = (currentVid + 1) % heroVids.length;
+      heroVids[next].currentTime = 0;
+      heroVids[next].play().catch(() => {});
+      heroVids[next].classList.add('active');
+      heroVids[currentVid].classList.remove('active');
+      currentVid = next;
+    }, 20000);
+
     // ── SWISS PASS MAP ──
     const passes = [
       { name: "Furkapass",      alt: 2429, lat: 46.5725, lng: 8.4158,  icon: "⛅", temp: "11°C", info: "Classic Bond route – Goldfinger" },
