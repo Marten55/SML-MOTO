@@ -27,10 +27,10 @@
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      padding: 20px 44px;
+      padding: 14px 44px;
       background: transparent;
       position: fixed;
-      top: 0;
+      top: 38px;
       left: 0;
       right: 0;
       z-index: 100;
@@ -74,26 +74,17 @@
       align-items: center;
       justify-content: center;
     }
-    .yt-wrap {
+    .hero-vid {
       position: absolute;
       inset: 0;
-      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       opacity: 0;
       transition: opacity 1.2s ease;
       pointer-events: none;
     }
-    .yt-wrap.active { opacity: 1; }
-    .yt-wrap iframe {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 100vw;
-      height: 56.25vw;
-      min-height: 100vh;
-      min-width: 177.78vh;
-      transform: translate(-50%, -50%);
-      border: none;
-      pointer-events: none;
-    }
+    .hero-vid.active { opacity: 1; }
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -445,6 +436,59 @@
     .social-tt   { background: #010101; color: #fff; border: 1px solid #333; }
     .social-mail { background: #2e7d32; color: #fff; }
 
+    /* ── TOPBAR (lang) ── */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 101;
+      height: 38px;
+      background: rgba(5,8,13,0.97);
+      border-bottom: 1px solid #1a2535;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 0 44px;
+    }
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: #4a6080;
+      padding: 6px 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color .2s, background .2s;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+    .lang-btn:hover { color: var(--light); background: rgba(255,255,255,.05); }
+    .lang-btn.active { color: var(--blue); }
+    .lang-btn .flag { font-size: 1rem; line-height: 1; }
+    .lang-sep { width: 1px; height: 14px; background: #1e2a38; flex-shrink: 0; }
+
+    /* ── NAV CONTACT ── */
+    .nav-contact {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .nav-contact a {
+      color: #6c8099;
+      text-decoration: none;
+      font-size: 0.78rem;
+      transition: color .2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-contact a:hover { color: var(--blue); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .db-columns { grid-template-columns: 1fr; }
@@ -465,19 +509,37 @@
 <body>
 
   <!-- NAV -->
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="lang-btn active" data-lang="sk"><span class="flag">🇸🇰</span> Slovenčina</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="en"><span class="flag">🇬🇧</span> English</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="de"><span class="flag">🇩🇪</span> Deutsch</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="hu"><span class="flag">🇭🇺</span> Magyar</button>
+    <div class="lang-sep"></div>
+    <button class="lang-btn" data-lang="pl"><span class="flag">🇵🇱</span> Polski</button>
+  </div>
+
+  <!-- NAV -->
   <nav>
     <a class="nav-logo" href="#"><img src="logo/logo.png" alt="SML Moto logo" /></a>
     <div class="nav-links">
-      <a href="#kontakt">Kontakt</a>
-      <a href="#trasy">Trasy</a>
-      <a href="#omne">O mne</a>
+      <a href="#kontakt" data-i18n="nav_kontakt">Kontakt</a>
+      <a href="#trasy"   data-i18n="nav_trasy">Trasy</a>
+      <a href="#omne"    data-i18n="nav_omne">O mne</a>
+    </div>
+    <div class="nav-contact">
+      <a href="tel:+000000000">📞 +00 000 000 000</a>
+      <a href="mailto:info@sml.sk">✉ info@sml.sk</a>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="yt-wrap active"><div id="yt-0"></div></div>
-    <div class="yt-wrap"><div id="yt-1"></div></div>
+    <video class="hero-vid active" src="Videa/Video1.MP4" muted playsinline autoplay></video>
+    <video class="hero-vid"        src="Videa/Video2.MP4" muted playsinline></video>
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <h1>The Art of Simple Riding.</h1>
@@ -488,9 +550,9 @@
   <section class="intro">
     <img class="intro-img" src="https://images.unsplash.com/photo-1547549082-6bc09f2049ae?w=900&q=80" alt="Horská cesta" />
     <div class="intro-text">
-      <h2>Objavuj trasy</h2>
-      <h3>Každá cesta<br>má svoj príbeh.</h3>
-      <p>Horské priechody, kľukaté cesty, mlčiace údolia. Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.</p>
+      <h2 data-i18n="intro_label">Objavuj trasy</h2>
+      <h3 data-i18n="intro_h3">Každá cesta<br>má svoj príbeh.</h3>
+      <p data-i18n="intro_p">Horské priechody, kľukaté cesty, mlčiace údolia. Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.</p>
     </div>
   </section>
 
@@ -502,8 +564,8 @@
   <!-- DATABASE -->
   <section class="db-section" id="trasy">
     <div class="db-section-title">
-      <h2>Databáza trás</h2>
-      <p>Overené &nbsp;·&nbsp; Premyslené &nbsp;·&nbsp; Pripravené na stiahnutie</p>
+      <h2 data-i18n="db_title">Databáza trás</h2>
+      <p data-i18n="db_sub">Overené &nbsp;·&nbsp; Premyslené &nbsp;·&nbsp; Pripravené na stiahnutie</p>
     </div>
 
     <div class="db-columns">
@@ -521,7 +583,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 1 / 3</div>
+            <div class="db-route-num" data-i18n="route_1of3">Trasa 1 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80" alt="Furka Grimsel Susten" loading="lazy" />
               <div class="db-rmap" id="dbmap-1"></div>
@@ -532,8 +594,8 @@
               <span class="db-stat">⏱ <strong>7–9 h</strong></span>
               <span class="db-stat">🌡 <strong>8 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Zimná moto bunda · vyhrievané rukavice · vodonepriepustné návleky</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(jún – október)</div>
+            <div class="db-route-equip" data-i18n="ch1_equip">🧥 Zimná moto bunda · vyhrievané rukavice · vodonepriepustné návleky</div>
+            <div class="db-passable passable-yes" data-i18n="ch1_pass">✔ Prejazdná &nbsp;(jún – október)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Furka · Grimsel · Susten" data-flag="vlajky/Svajciarsko.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Furka · Grimsel · Susten" data-flag="vlajky/Svajciarsko.png">PayPal · 5 CHF</button>
@@ -547,7 +609,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 2 / 3</div>
+            <div class="db-route-num" data-i18n="route_2of3">Trasa 2 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1531761535209-180857e963b9?w=600&q=80" alt="Berninapass Malojapass" loading="lazy" />
               <div class="db-rmap" id="dbmap-2"></div>
@@ -558,8 +620,8 @@
               <span class="db-stat">⏱ <strong>4–5 h</strong></span>
               <span class="db-stat">🌡 <strong>10 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Letná moto bunda s podšívkou · štandardné rukavice</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(máj – november)</div>
+            <div class="db-route-equip" data-i18n="ch2_equip">🧥 Letná moto bunda s podšívkou · štandardné rukavice</div>
+            <div class="db-passable passable-yes" data-i18n="ch2_pass">✔ Prejazdná &nbsp;(máj – november)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Berninapass & Malojapass" data-flag="vlajky/Svajciarsko.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Berninapass & Malojapass" data-flag="vlajky/Svajciarsko.png">PayPal · 5 CHF</button>
@@ -573,7 +635,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 3 / 3</div>
+            <div class="db-route-num" data-i18n="route_3of3">Trasa 3 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80" alt="Julierpass Flüelapass" loading="lazy" />
               <div class="db-rmap" id="dbmap-3"></div>
@@ -584,8 +646,8 @@
               <span class="db-stat">⏱ <strong>4–5 h</strong></span>
               <span class="db-stat">🌡 <strong>9 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Letná bunda + fleece vrstva · štandardné rukavice</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(máj – november)</div>
+            <div class="db-route-equip" data-i18n="ch3_equip">🧥 Letná bunda + fleece vrstva · štandardné rukavice</div>
+            <div class="db-passable passable-yes" data-i18n="ch3_pass">✔ Prejazdná &nbsp;(máj – november)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Julierpass & Flüelapass" data-flag="vlajky/Svajciarsko.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Julierpass & Flüelapass" data-flag="vlajky/Svajciarsko.png">PayPal · 5 CHF</button>
@@ -608,7 +670,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 1 / 3</div>
+            <div class="db-route-num" data-i18n="route_1of3">Trasa 1 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&q=80" alt="Passo dello Stelvio" loading="lazy" />
               <div class="db-rmap" id="dbmap-4"></div>
@@ -619,8 +681,8 @@
               <span class="db-stat">⏱ <strong>4–5 h</strong></span>
               <span class="db-stat">🌡 <strong>7 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Zimná moto výbava · vyhrievané rukavice · termo spodky</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(jún – september)</div>
+            <div class="db-route-equip" data-i18n="it1_equip">🧥 Zimná moto výbava · vyhrievané rukavice · termo spodky</div>
+            <div class="db-passable passable-yes" data-i18n="it1_pass">✔ Prejazdná &nbsp;(jún – september)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Passo dello Stelvio" data-flag="vlajky/Talianska.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Passo dello Stelvio" data-flag="vlajky/Talianska.png">PayPal · 5 CHF</button>
@@ -634,7 +696,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 2 / 3</div>
+            <div class="db-route-num" data-i18n="route_2of3">Trasa 2 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80" alt="Passo Pordoi Sella Ronda" loading="lazy" />
               <div class="db-rmap" id="dbmap-5"></div>
@@ -645,8 +707,8 @@
               <span class="db-stat">⏱ <strong>2–3 h</strong></span>
               <span class="db-stat">🌡 <strong>12 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Letná moto výbava · štandardné rukavice</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(máj – október)</div>
+            <div class="db-route-equip" data-i18n="it2_equip">🧥 Letná moto výbava · štandardné rukavice</div>
+            <div class="db-passable passable-yes" data-i18n="it2_pass">✔ Prejazdná &nbsp;(máj – október)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Passo Pordoi & Sella Ronda" data-flag="vlajky/Talianska.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Passo Pordoi & Sella Ronda" data-flag="vlajky/Talianska.png">PayPal · 5 CHF</button>
@@ -660,7 +722,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 3 / 3</div>
+            <div class="db-route-num" data-i18n="route_3of3">Trasa 3 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80" alt="Col du Galibier Télégraphe" loading="lazy" />
               <div class="db-rmap" id="dbmap-6"></div>
@@ -671,8 +733,8 @@
               <span class="db-stat">⏱ <strong>3–4 h</strong></span>
               <span class="db-stat">🌡 <strong>10 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Letná bunda s membránou · rukavice do dažďa</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(jún – október)</div>
+            <div class="db-route-equip" data-i18n="fr1_equip">🧥 Letná bunda s membránou · rukavice do dažďa</div>
+            <div class="db-passable passable-yes" data-i18n="fr1_pass">✔ Prejazdná &nbsp;(jún – október)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Col du Galibier & Télégraphe" data-flag="vlajky/Francuzko.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Col du Galibier & Télégraphe" data-flag="vlajky/Francuzko.png">PayPal · 5 CHF</button>
@@ -694,7 +756,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 1 / 3</div>
+            <div class="db-route-num" data-i18n="route_1of3">Trasa 1 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1597149304-c36ed36a43e3?w=600&q=80" alt="Transfăgărășan" loading="lazy" />
               <div class="db-rmap" id="dbmap-7"></div>
@@ -705,8 +767,8 @@
               <span class="db-stat">⏱ <strong>3–4 h</strong></span>
               <span class="db-stat">🌡 <strong>15 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Letná moto výbava · ľahká vetrovka do batôžka</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(júl – október) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara</div>
+            <div class="db-route-equip" data-i18n="rx1_equip">🧥 Letná moto výbava · ľahká vetrovka do batôžka</div>
+            <div class="db-passable passable-yes" data-i18n="rx1_pass">✔ Prejazdná &nbsp;(júl – október) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Transfăgărășan" data-flag="vlajky/Rumunsko.svg">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Transfăgărășan" data-flag="vlajky/Rumunsko.svg">PayPal · 5 CHF</button>
@@ -720,7 +782,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 2 / 3</div>
+            <div class="db-route-num" data-i18n="route_2of3">Trasa 2 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=600&q=80" alt="Trollstigen Nórsko" loading="lazy" />
               <div class="db-rmap" id="dbmap-8"></div>
@@ -731,8 +793,8 @@
               <span class="db-stat">⏱ <strong>1–2 h</strong></span>
               <span class="db-stat">🌡 <strong>8 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Nepremokavá bunda · teplé rukavice · štítok s potlačou</div>
-            <div class="db-passable passable-yes">✔ Prejazdná &nbsp;(máj – október) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal</div>
+            <div class="db-route-equip" data-i18n="rx2_equip">🧥 Nepremokavá bunda · teplé rukavice · štítok s potlačou</div>
+            <div class="db-passable passable-yes" data-i18n="rx2_pass">✔ Prejazdná &nbsp;(máj – október) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Trollstigen – Nórsko" data-flag="">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Trollstigen – Nórsko" data-flag="">PayPal · 5 CHF</button>
@@ -746,7 +808,7 @@
             <button class="btn-expand">Rozbaliť ▾</button>
           </div>
           <div class="db-route-body">
-            <div class="db-route-num">Trasa 3 / 3</div>
+            <div class="db-route-num" data-i18n="route_3of3">Trasa 3 / 3</div>
             <div class="db-thumb">
               <img class="db-photo" src="https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?w=600&q=80" alt="Col de la Bonette" loading="lazy" />
               <div class="db-rmap" id="dbmap-9"></div>
@@ -757,8 +819,8 @@
               <span class="db-stat">⏱ <strong>4–5 h</strong></span>
               <span class="db-stat">🌡 <strong>5 °C</strong></span>
             </div>
-            <div class="db-route-equip">🧥 Zimná moto bunda · vyhrievané rukavice · termo vrstva</div>
-            <div class="db-passable passable-no">✘ Neprejazdná &nbsp;(otvorenie jún)</div>
+            <div class="db-route-equip" data-i18n="rx3_equip">🧥 Zimná moto bunda · vyhrievané rukavice · termo vrstva</div>
+            <div class="db-passable passable-no" data-i18n="rx3_pass">✘ Neprejazdná &nbsp;(otvorenie jún)</div>
             <div class="db-buy">
               <button class="btn-twint-sm"  data-route="Col de la Bonette" data-flag="vlajky/Francuzko.png">TWINT · 5 CHF</button>
               <button class="btn-paypal-sm" data-route="Col de la Bonette" data-flag="vlajky/Francuzko.png">PayPal · 5 CHF</button>
@@ -777,7 +839,7 @@
       <div class="modal-header">
         <img class="modal-header-flag" id="modal-flag" src="" alt="" style="display:none" />
         <div>
-          <div class="modal-label">Stiahnutie GPX trasy</div>
+          <div class="modal-label" data-i18n="modal_label">Stiahnutie GPX trasy</div>
           <div class="modal-title" id="modal-title"></div>
         </div>
       </div>
@@ -786,14 +848,14 @@
         <span class="price-val">5.00</span>
         <span class="price-cur">CHF</span>
       </div>
-      <div class="modal-desc">Jednorázová platba &nbsp;·&nbsp; Okamžité stiahnutie GPX súboru</div>
+      <div class="modal-desc" data-i18n="modal_desc">Jednorázová platba &nbsp;·&nbsp; Okamžité stiahnutie GPX súboru</div>
       <div class="modal-methods">
         <button class="btn-twint">
-          <span>TWINT<br/><span class="method-sub">Zaplať cez Twint</span></span>
+          <span>TWINT<br/><span class="method-sub" data-i18n="twint_sub">Zaplať cez Twint</span></span>
           <span class="method-arrow">›</span>
         </button>
         <button class="btn-paypal">
-          <span>PayPal<br/><span class="method-sub">Zaplať cez PayPal</span></span>
+          <span>PayPal<br/><span class="method-sub" data-i18n="paypal_sub">Zaplať cez PayPal</span></span>
           <span class="method-arrow">›</span>
         </button>
       </div>
@@ -804,14 +866,9 @@
   <section class="about" id="omne">
     <img class="about-img" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Rider" />
     <div class="about-text">
-      <h2>O mne:</h2>
-      <div class="tagline">Simple Life, Safe Rides!</div>
-      <p>
-        Motocykel pre mňa znamená <strong>slobodu</strong> a jednoduchosť života.
-        Jazdím s dôrazom na bezpečnosť a <strong>pohodu</strong> na cestách.
-        Vyhľadávam horské priechody, tiché cesty a miesta, kde sa čas spomaľuje.
-        Každá cesta je príbeh – a ja ich rád zdieľam s vami.
-      </p>
+      <h2 data-i18n="about_title">O mne:</h2>
+      <div class="tagline" data-i18n="about_tagline">Simple Life, Safe Rides!</div>
+      <p data-i18n="about_p">Motocykel pre mňa znamená <strong>slobodu</strong> a jednoduchosť života. Jazdím s dôrazom na bezpečnosť a <strong>pohodu</strong> na cestách. Vyhľadávam horské priechody, tiché cesty a miesta, kde sa čas spomaľuje. Každá cesta je príbeh – a ja ich rád zdieľam s vami.</p>
     </div>
   </section>
 
@@ -835,34 +892,18 @@
       navEl.classList.toggle('nav-solid', window.scrollY > 60);
     }, { passive: true });
 
-    // ── HERO YOUTUBE LOOP ──
-    const YT_IDS = ['zn-YwIemAus', '8zWSY4LYMlI'];
-    const ytWraps = document.querySelectorAll('.yt-wrap');
-    const ytPlayers = [];
-    let ytCurrent = 0;
-
-    const ytTag = document.createElement('script');
-    ytTag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(ytTag);
-
-    const YT_PARAMS = { controls: 0, showinfo: 0, rel: 0, modestbranding: 1, iv_load_policy: 3, disablekb: 1, mute: 1, loop: 1 };
-
-    window.onYouTubeIframeAPIReady = function () {
-      YT_IDS.forEach((id, i) => {
-        ytPlayers[i] = new YT.Player('yt-' + i, {
-          videoId: id,
-          playerVars: { ...YT_PARAMS, playlist: id, autoplay: i === 0 ? 1 : 0 },
-        });
-      });
-      setInterval(() => {
-        const next = (ytCurrent + 1) % YT_IDS.length;
-        ytPlayers[next].seekTo(0);
-        ytPlayers[next].playVideo();
-        ytWraps[next].classList.add('active');
-        ytWraps[ytCurrent].classList.remove('active');
-        ytCurrent = next;
-      }, 20000);
-    };
+    // ── HERO VIDEO LOOP ──
+    const heroVids = Array.from(document.querySelectorAll('.hero-vid'));
+    let currentVid = 0;
+    heroVids[0].play().catch(() => {});
+    setInterval(() => {
+      const next = (currentVid + 1) % heroVids.length;
+      heroVids[next].currentTime = 0;
+      heroVids[next].play().catch(() => {});
+      heroVids[next].classList.add('active');
+      heroVids[currentVid].classList.remove('active');
+      currentVid = next;
+    }, 20000);
 
     // ── SWISS PASS MAP ──
     const passes = [
@@ -918,19 +959,156 @@
         </div>`, { maxWidth: 220 });
     });
 
+    // ── i18n TRANSLATIONS ──
+    const T = {
+      sk: {
+        nav_kontakt:'Kontakt', nav_trasy:'Trasy', nav_omne:'O mne',
+        intro_label:'Objavuj trasy',
+        intro_h3:'Každá cesta<br>má svoj príbeh.',
+        intro_p:'Horské priechody, kľukaté cesty, mlčiace údolia. Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.',
+        db_title:'Databáza trás', db_sub:'Overené &nbsp;·&nbsp; Premyslené &nbsp;·&nbsp; Pripravené na stiahnutie',
+        btn_expand:'Rozbaliť ▾', btn_collapse:'Zabaliť ▴',
+        route_1of3:'Trasa 1 / 3', route_2of3:'Trasa 2 / 3', route_3of3:'Trasa 3 / 3',
+        ch1_equip:'🧥 Zimná moto bunda · vyhrievané rukavice · vodonepriepustné návleky', ch1_pass:'✔ Prejazdná &nbsp;(jún – október)',
+        ch2_equip:'🧥 Letná moto bunda s podšívkou · štandardné rukavice', ch2_pass:'✔ Prejazdná &nbsp;(máj – november)',
+        ch3_equip:'🧥 Letná bunda + fleece vrstva · štandardné rukavice', ch3_pass:'✔ Prejazdná &nbsp;(máj – november)',
+        it1_equip:'🧥 Zimná moto výbava · vyhrievané rukavice · termo spodky', it1_pass:'✔ Prejazdná &nbsp;(jún – september)',
+        it2_equip:'🧥 Letná moto výbava · štandardné rukavice', it2_pass:'✔ Prejazdná &nbsp;(máj – október)',
+        fr1_equip:'🧥 Letná bunda s membránou · rukavice do dažďa', fr1_pass:'✔ Prejazdná &nbsp;(jún – október)',
+        rx1_equip:'🧥 Letná moto výbava · ľahká vetrovka do batôžka', rx1_pass:'✔ Prejazdná &nbsp;(júl – október) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara',
+        rx2_equip:'🧥 Nepremokavá bunda · teplé rukavice · štítok s potlačou', rx2_pass:'✔ Prejazdná &nbsp;(máj – október) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal',
+        rx3_equip:'🧥 Zimná moto bunda · vyhrievané rukavice · termo vrstva', rx3_pass:'✘ Neprejazdná &nbsp;(otvorenie jún)',
+        modal_label:'Stiahnutie GPX trasy', modal_desc:'Jednorázová platba &nbsp;·&nbsp; Okamžité stiahnutie GPX súboru',
+        twint_sub:'Zaplať cez Twint', paypal_sub:'Zaplať cez PayPal',
+        about_title:'O mne:', about_tagline:'Simple Life, Safe Rides!',
+        about_p:'Motocykel pre mňa znamená <strong>slobodu</strong> a jednoduchosť života. Jazdím s dôrazom na bezpečnosť a <strong>pohodu</strong> na cestách. Vyhľadávam horské priechody, tiché cesty a miesta, kde sa čas spomaľuje. Každá cesta je príbeh – a ja ich rád zdieľam s vami.',
+      },
+      en: {
+        nav_kontakt:'Contact', nav_trasy:'Routes', nav_omne:'About',
+        intro_label:'Explore routes',
+        intro_h3:'Every road<br>tells a story.',
+        intro_p:'Mountain passes, winding roads, silent valleys. Here you\'ll find routes worth riding — verified, planned, and ready to download.',
+        db_title:'Route Database', db_sub:'Verified &nbsp;·&nbsp; Planned &nbsp;·&nbsp; Ready to download',
+        btn_expand:'Expand ▾', btn_collapse:'Collapse ▴',
+        route_1of3:'Route 1 / 3', route_2of3:'Route 2 / 3', route_3of3:'Route 3 / 3',
+        ch1_equip:'🧥 Winter moto jacket · heated gloves · waterproof overboots', ch1_pass:'✔ Open &nbsp;(June – October)',
+        ch2_equip:'🧥 Summer moto jacket with lining · standard gloves', ch2_pass:'✔ Open &nbsp;(May – November)',
+        ch3_equip:'🧥 Summer jacket + fleece layer · standard gloves', ch3_pass:'✔ Open &nbsp;(May – November)',
+        it1_equip:'🧥 Winter moto gear · heated gloves · thermal pants', it1_pass:'✔ Open &nbsp;(June – September)',
+        it2_equip:'🧥 Summer moto gear · standard gloves', it2_pass:'✔ Open &nbsp;(May – October)',
+        fr1_equip:'🧥 Summer jacket with membrane · rain gloves', fr1_pass:'✔ Open &nbsp;(June – October)',
+        rx1_equip:'🧥 Summer moto gear · light windbreaker in pack', rx1_pass:'✔ Open &nbsp;(July – October) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara',
+        rx2_equip:'🧥 Waterproof jacket · warm gloves · tinted visor', rx2_pass:'✔ Open &nbsp;(May – October) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal',
+        rx3_equip:'🧥 Winter moto jacket · heated gloves · thermal layer', rx3_pass:'✘ Closed &nbsp;(opens June)',
+        modal_label:'GPX Route Download', modal_desc:'One-time payment &nbsp;·&nbsp; Instant GPX file download',
+        twint_sub:'Pay via Twint', paypal_sub:'Pay via PayPal',
+        about_title:'About me:', about_tagline:'Simple Life, Safe Rides!',
+        about_p:'For me, the motorcycle means <strong>freedom</strong> and simplicity of life. I ride with an emphasis on safety and <strong>comfort</strong> on the road. I seek out mountain passes, quiet roads, and places where time slows down. Every journey is a story — and I love sharing them with you.',
+      },
+      de: {
+        nav_kontakt:'Kontakt', nav_trasy:'Routen', nav_omne:'Über mich',
+        intro_label:'Routen entdecken',
+        intro_h3:'Jede Straße<br>erzählt eine Geschichte.',
+        intro_p:'Bergpässe, kurvenreiche Straßen, stille Täler. Hier findest du Routen, die es wert sind — geprüft, durchdacht und zum Download bereit.',
+        db_title:'Routendatenbank', db_sub:'Geprüft &nbsp;·&nbsp; Durchdacht &nbsp;·&nbsp; Zum Download bereit',
+        btn_expand:'Erweitern ▾', btn_collapse:'Einklappen ▴',
+        route_1of3:'Route 1 / 3', route_2of3:'Route 2 / 3', route_3of3:'Route 3 / 3',
+        ch1_equip:'🧥 Wintermotojacke · beheizte Handschuhe · wasserdichte Überschuhe', ch1_pass:'✔ Geöffnet &nbsp;(Juni – Oktober)',
+        ch2_equip:'🧥 Sommermotojacke mit Futter · Standardhandschuhe', ch2_pass:'✔ Geöffnet &nbsp;(Mai – November)',
+        ch3_equip:'🧥 Sommerjacke + Fleeceschicht · Standardhandschuhe', ch3_pass:'✔ Geöffnet &nbsp;(Mai – November)',
+        it1_equip:'🧥 Wintermotoausrüstung · beheizte Handschuhe · Thermohose', it1_pass:'✔ Geöffnet &nbsp;(Juni – September)',
+        it2_equip:'🧥 Sommermotoausrüstung · Standardhandschuhe', it2_pass:'✔ Geöffnet &nbsp;(Mai – Oktober)',
+        fr1_equip:'🧥 Sommerjacke mit Membran · Regenhandschuhe', fr1_pass:'✔ Geöffnet &nbsp;(Juni – Oktober)',
+        rx1_equip:'🧥 Sommermotoausrüstung · leichte Windjacke im Rucksack', rx1_pass:'✔ Geöffnet &nbsp;(Juli – Oktober) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara',
+        rx2_equip:'🧥 Wasserdichte Jacke · warme Handschuhe · getöntes Visier', rx2_pass:'✔ Geöffnet &nbsp;(Mai – Oktober) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal',
+        rx3_equip:'🧥 Wintermotojacke · beheizte Handschuhe · Thermolage', rx3_pass:'✘ Gesperrt &nbsp;(Öffnung Juni)',
+        modal_label:'GPX-Route herunterladen', modal_desc:'Einmalige Zahlung &nbsp;·&nbsp; Sofortiger GPX-Download',
+        twint_sub:'Per Twint bezahlen', paypal_sub:'Per PayPal bezahlen',
+        about_title:'Über mich:', about_tagline:'Simple Life, Safe Rides!',
+        about_p:'Das Motorrad bedeutet für mich <strong>Freiheit</strong> und Einfachheit des Lebens. Ich fahre mit Schwerpunkt auf Sicherheit und <strong>Komfort</strong> auf den Straßen. Ich suche Bergpässe, stille Wege und Orte, wo die Zeit langsamer wird. Jede Reise ist eine Geschichte – und ich teile sie gerne mit euch.',
+      },
+      hu: {
+        nav_kontakt:'Kapcsolat', nav_trasy:'Útvonalak', nav_omne:'Rólam',
+        intro_label:'Fedezd fel az útvonalakat',
+        intro_h3:'Minden útnak<br>megvan a maga története.',
+        intro_p:'Hágók, kanyargós utak, csendes völgyek. Itt megtalálod az érdemes útvonalakat — ellenőrzött, átgondolt és letöltésre kész.',
+        db_title:'Útvonal Adatbázis', db_sub:'Ellenőrzött &nbsp;·&nbsp; Átgondolt &nbsp;·&nbsp; Letöltésre kész',
+        btn_expand:'Kibontás ▾', btn_collapse:'Összecsukás ▴',
+        route_1of3:'1. útvonal / 3', route_2of3:'2. útvonal / 3', route_3of3:'3. útvonal / 3',
+        ch1_equip:'🧥 Téli motorosdzseki · fűthető kesztyű · vízálló cipővédő', ch1_pass:'✔ Nyitva &nbsp;(június – október)',
+        ch2_equip:'🧥 Nyári motorosdzseki béléssel · normál kesztyű', ch2_pass:'✔ Nyitva &nbsp;(május – november)',
+        ch3_equip:'🧥 Nyári dzseki + fleece réteg · normál kesztyű', ch3_pass:'✔ Nyitva &nbsp;(május – november)',
+        it1_equip:'🧥 Téli motorosfelszerelés · fűthető kesztyű · termóalsó', it1_pass:'✔ Nyitva &nbsp;(június – szeptember)',
+        it2_equip:'🧥 Nyári motorosfelszerelés · normál kesztyű', it2_pass:'✔ Nyitva &nbsp;(május – október)',
+        fr1_equip:'🧥 Nyári dzseki membránnal · esőkesztyű', fr1_pass:'✔ Nyitva &nbsp;(június – október)',
+        rx1_equip:'🧥 Nyári motorosfelszerelés · könnyű széldzseki a táskában', rx1_pass:'✔ Nyitva &nbsp;(július – október) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara',
+        rx2_equip:'🧥 Vízálló dzseki · meleg kesztyű · színezett plexi', rx2_pass:'✔ Nyitva &nbsp;(május – október) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal',
+        rx3_equip:'🧥 Téli motorosdzseki · fűthető kesztyű · termoréteg', rx3_pass:'✘ Zárva &nbsp;(nyitás június)',
+        modal_label:'GPX Útvonal Letöltés', modal_desc:'Egyszeri fizetés &nbsp;·&nbsp; Azonnali GPX letöltés',
+        twint_sub:'Fizetés Twinttel', paypal_sub:'Fizetés PayPallal',
+        about_title:'Rólam:', about_tagline:'Simple Life, Safe Rides!',
+        about_p:'A motor számomra a <strong>szabadságot</strong> és az élet egyszerűségét jelenti. Biztonsággal és <strong>kényelemmel</strong> vezetek az utakon. Hegyeket, csendes utakat és helyeket keresek, ahol az idő lassabban telik. Minden utazás egy történet — és szívesen megosztom veletek.',
+      },
+      pl: {
+        nav_kontakt:'Kontakt', nav_trasy:'Trasy', nav_omne:'O mnie',
+        intro_label:'Odkrywaj trasy',
+        intro_h3:'Każda droga<br>ma swoją historię.',
+        intro_p:'Przełęcze górskie, kręte drogi, ciche doliny. Tu znajdziesz trasy warte przejechania — sprawdzone, przemyślane i gotowe do pobrania.',
+        db_title:'Baza Tras', db_sub:'Sprawdzone &nbsp;·&nbsp; Przemyślane &nbsp;·&nbsp; Gotowe do pobrania',
+        btn_expand:'Rozwiń ▾', btn_collapse:'Zwiń ▴',
+        route_1of3:'Trasa 1 / 3', route_2of3:'Trasa 2 / 3', route_3of3:'Trasa 3 / 3',
+        ch1_equip:'🧥 Zimowa kurtka motocyklowa · ogrzewane rękawice · wodoodporne ochraniacze', ch1_pass:'✔ Otwarta &nbsp;(czerwiec – październik)',
+        ch2_equip:'🧥 Letnia kurtka motocyklowa z podszewką · standardowe rękawice', ch2_pass:'✔ Otwarta &nbsp;(maj – listopad)',
+        ch3_equip:'🧥 Letnia kurtka + warstwa polarowa · standardowe rękawice', ch3_pass:'✔ Otwarta &nbsp;(maj – listopad)',
+        it1_equip:'🧥 Zimowy ekwipunek motocyklowy · ogrzewane rękawice · kalesony termiczne', it1_pass:'✔ Otwarta &nbsp;(czerwiec – wrzesień)',
+        it2_equip:'🧥 Letni ekwipunek motocyklowy · standardowe rękawice', it2_pass:'✔ Otwarta &nbsp;(maj – październik)',
+        fr1_equip:'🧥 Letnia kurtka z membraną · rękawice przeciwdeszczowe', fr1_pass:'✔ Otwarta &nbsp;(czerwiec – październik)',
+        rx1_equip:'🧥 Letni ekwipunek motocyklowy · lekka kurtka wiatrówka w plecaku', rx1_pass:'✔ Otwarta &nbsp;(lipiec – październik) &nbsp;·&nbsp; 📍 Curtea de Argeș → Cârțișoara',
+        rx2_equip:'🧥 Kurtka przeciwdeszczowa · ciepłe rękawice · przyciemniana przyłbica', rx2_pass:'✔ Otwarta &nbsp;(maj – październik) &nbsp;·&nbsp; 📍 Åndalsnes → Valldal',
+        rx3_equip:'🧥 Zimowa kurtka motocyklowa · ogrzewane rękawice · warstwa termiczna', rx3_pass:'✘ Zamknięta &nbsp;(otwarcie czerwiec)',
+        modal_label:'Pobieranie trasy GPX', modal_desc:'Jednorazowa płatność &nbsp;·&nbsp; Natychmiastowe pobranie GPX',
+        twint_sub:'Zapłać przez Twint', paypal_sub:'Zapłać przez PayPal',
+        about_title:'O mnie:', about_tagline:'Simple Life, Safe Rides!',
+        about_p:'Motocykl dla mnie oznacza <strong>wolność</strong> i prostotę życia. Jeżdżę z naciskiem na bezpieczeństwo i <strong>komfort</strong> na drogach. Szukam górskich przełęczy, cichych dróg i miejsc, gdzie czas zwalnia. Każda podróż to historia — i chętnie się nimi z wami dzielę.',
+      },
+    };
+
+    let currentLang = localStorage.getItem('sml-lang') || 'sk';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      localStorage.setItem('sml-lang', lang);
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+      const t = T[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const v = t[el.dataset.i18n];
+        if (v !== undefined) el.innerHTML = v;
+      });
+      document.querySelectorAll('.btn-expand').forEach(btn => {
+        const isOpen = btn.closest('.db-route').classList.contains('open');
+        btn.textContent = isOpen ? t.btn_collapse : t.btn_expand;
+      });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+    });
+
+    applyLang(currentLang);
+
     // ── ACCORDION ──
     document.querySelectorAll('.btn-expand').forEach(btn => {
       btn.addEventListener('click', () => {
         const route = btn.closest('.db-route');
         const isOpen = route.classList.contains('open');
-        // zavrieť všetky v tom istom stĺpci
         route.closest('.db-col').querySelectorAll('.db-route').forEach(r => {
           r.classList.remove('open');
-          r.querySelector('.btn-expand').textContent = 'Rozbaliť ▾';
+          r.querySelector('.btn-expand').textContent = T[currentLang].btn_expand;
         });
         if (!isOpen) {
           route.classList.add('open');
-          btn.textContent = 'Zabaliť ▴';
+          btn.textContent = T[currentLang].btn_collapse;
         }
       });
     });
