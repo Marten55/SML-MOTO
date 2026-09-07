@@ -11,17 +11,53 @@
     "curviness": 5,
     "seasonFrom": 6,
     "seasonTo": 10,
-    "start": { "lat": 46.6863, "lng": 8.5944, "name": "Andermatt" },
-    "finish": { "lat": 46.6863, "lng": 8.5944, "name": "Andermatt" },
+    "start": {
+      "lat": 46.6863,
+      "lng": 8.5944,
+      "name": "Andermatt"
+    },
+    "finish": {
+      "lat": 46.6863,
+      "lng": 8.5944,
+      "name": "Andermatt"
+    },
     "via": [
-      { "lat": 46.5725, "lng": 8.4147, "name": "Furkapass" },
-      { "lat": 46.5614, "lng": 8.3372, "name": "Gletsch" },
-      { "lat": 46.5606, "lng": 8.3369, "name": "Grimselpass" },
-      { "lat": 46.7156, "lng": 8.2361, "name": "Innertkirchen" },
-      { "lat": 46.7275, "lng": 8.4453, "name": "Sustenpass" },
-      { "lat": 46.7364, "lng": 8.6289, "name": "Wassen" }
+      {
+        "lat": 46.5725,
+        "lng": 8.4147,
+        "name": "Furkapass"
+      },
+      {
+        "lat": 46.5614,
+        "lng": 8.3372,
+        "name": "Gletsch"
+      },
+      {
+        "lat": 46.5606,
+        "lng": 8.3369,
+        "name": "Grimselpass"
+      },
+      {
+        "lat": 46.7156,
+        "lng": 8.2361,
+        "name": "Innertkirchen"
+      },
+      {
+        "lat": 46.7275,
+        "lng": 8.4453,
+        "name": "Sustenpass"
+      },
+      {
+        "lat": 46.7364,
+        "lng": 8.6289,
+        "name": "Wassen"
+      }
     ],
-    "weatherPoint": { "lat": 46.5606, "lng": 8.3369, "name": "Grimselpass" },
+    "weatherPoint": {
+      "lat": 46.5606,
+      "lng": 8.3369,
+      "name": "Grimselpass"
+    },
     "title": {
       "de": "Central Alps Trilogy — Furka, Grimsel, Susten",
       "en": "Central Alps Trilogy — Furka, Grimsel, Susten",
@@ -61,10 +97,10 @@
       }
     ],
     "assets": {
-      "track": "central-alps-trilogy-track.gpx",
-      "navigation": "central-alps-trilogy-navigation.gpx",
-      "poi": "central-alps-trilogy-poi.gpx",
-      "roadbook": "central-alps-trilogy-roadbook.pdf"
+      "track": "example-central-alps-trilogy-track.gpx",
+      "navigation": "example-central-alps-trilogy-navigation.gpx",
+      "poi": "example-central-alps-trilogy-poi.gpx",
+      "roadbook": "example-central-alps-trilogy-roadbook.pdf"
     },
     "isExample": true
   }

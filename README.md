@@ -77,6 +77,36 @@ feature/faza-1-web            ●──●──●
 
 Vetva sa volá podľa fázy z ponuky, aby sa dalo dohľadať, čo bolo za čo zaplatené.
 
+## Predávaný obsah nepatrí do gitu
+
+Repo je **verejný**. Skutočné GPX a roadbooky by si ktokoľvek stiahol priamo
+z GitHubu a platený produkt by stratil zmysel. `.gitignore` preto pustí do repa
+len súbory s predponou `example-`; všetko ostatné v `content/gpx/` ignoruje.
+
+Ukážkové súbory sa dajú kedykoľvek pregenerovať:
+
+```bash
+node scripts/generate-example-content.mjs
+```
+
+Stopa je v nich priamkovo interpolovaná medzi priesmykmi, takže **nekopíruje
+skutočné cesty** — slúžia na test doručovania, nie na navigáciu.
+
 ## Stav
 
-Fáza 0 — rozpracované.
+**Fáza 0 hotová.** Celý tok od zobrazenia trasy po stiahnutie GPX beží
+a je otestovaný. Chýbajú už len prístupy:
+
+| Čo | Kým chýba |
+|---|---|
+| `STRIPE_SECRET_KEY` + TWINT v Dashboarde | checkout vráti 503, tlačidlo hlási „platby nie sú nastavené" |
+| `STRIPE_WEBHOOK_SECRET` | webhook vráti 503 |
+| `RESEND_API_KEY` + `MAIL_FROM` | mail sa nepošle, len zaloguje — trasu jazdec aj tak vidí na obrazovke |
+| `DOWNLOAD_SIGNING_SECRET` | sťahovanie vráti 503 |
+
+Otestované: podpísané odkazy (platný token 200, podvrhnutý 403, žiadny 400,
+cudzia trasa 404), GPX nie je dostupné bez tokenu, doručovacia stránka,
+všetky štyri jazyky a presmerovanie podľa `Accept-Language`.
+
+Neotestované: **skutočná platba cez TWINT** a **import GPX do Garmin Zumo XT**
+— oboje čaká na prístupy a na prístroj.

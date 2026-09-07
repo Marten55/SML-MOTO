@@ -42,3 +42,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --------------------------------------------------------------------------
+# Predávaný obsah sa NIKDY necommituje.
+# Repo je verejný — skutočné GPX a roadbooky by si ktokoľvek stiahol zadarmo
+# priamo z GitHubu a platený produkt by stratil zmysel.
+# Do gitu smú len ukážkové súbory s predponou example-.
+# --------------------------------------------------------------------------
+content/gpx/*
+!content/gpx/example-*
