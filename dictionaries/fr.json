@@ -1,0 +1,78 @@
+{
+  "brand": {
+    "name": "SML — Simply Moto Life",
+    "tagline": "The Art of Simple Riding",
+    "claim": "Pas d'appli. Pas d'inscription. Juste le col."
+  },
+  "nav": {
+    "routes": "Itinéraires",
+    "planner": "Planificateur",
+    "guide": "Mode d'emploi",
+    "legal": "Mentions légales"
+  },
+  "home": {
+    "title": "Des routes que quelqu'un a vraiment parcourues.",
+    "subtitle": "Pas d'algorithme, pas de trait au hasard sur une carte. Chaque itinéraire a été roulé en personne, vérifié et préparé pour que votre GPS ne le recalcule pas en route.",
+    "browse": "Voir les itinéraires",
+    "planFree": "Créer votre itinéraire — gratuit"
+  },
+  "tiers": {
+    "bronze": {
+      "name": "Bronze",
+      "short": "Composé par vous, lien vers Google Maps",
+      "cta": "Planifier gratuitement"
+    },
+    "silver": {
+      "name": "Silver",
+      "short": "Un GPX prêt à l'emploi qui ne se recalcule pas",
+      "cta": "Débloquer l'itinéraire"
+    },
+    "gold": {
+      "name": "Gold",
+      "short": "Roulé sur place, avec RoadBook et vidéos POV",
+      "cta": "Débloquer l'itinéraire"
+    }
+  },
+  "route": {
+    "length": "Distance",
+    "ascent": "Dénivelé",
+    "difficulty": "Difficulté",
+    "curviness": "Sinuosité",
+    "canton": "Canton",
+    "season": "Praticable",
+    "highlights": "Ce qui vous attend",
+    "included": "Contenu du pack",
+    "backToRoutes": "Retour aux itinéraires"
+  },
+  "difficulty": {
+    "easy": "Tranquille",
+    "medium": "Moyen",
+    "hard": "Exigeant"
+  },
+  "checkout": {
+    "unlock": "Débloquer l'itinéraire",
+    "processing": "Un instant…",
+    "unavailable": "Les paiements ne sont pas encore configurés.",
+    "methods": "TWINT ou carte — cinq secondes, sans compte.",
+    "error": "Le paiement n'a pas pu démarrer. Merci de réessayer."
+  },
+  "delivery": {
+    "title": "Bonne route.",
+    "subtitle": "Votre itinéraire est prêt. Le lien est aussi dans votre boîte mail — il n'expire pas.",
+    "track": "Télécharger la trace (GPX)",
+    "trackHint": "La ligne exacte. L'appareil ne la recalcule pas.",
+    "navigation": "Version navigation (GPX)",
+    "navigationHint": "Pour le guidage vocal virage après virage.",
+    "poi": "Points d'intérêt (GPX)",
+    "poiHint": "Carburant, restaurants, points de vue.",
+    "roadbook": "RoadBook (PDF)",
+    "maps": "Ouvrir dans Google Maps",
+    "howto": "Charger l'itinéraire sur votre téléphone en deux minutes"
+  },
+  "common": {
+    "free": "gratuit",
+    "from": "dès",
+    "soon": "Bientôt",
+    "example": "Contenu d'exemple"
+  }
+}

@@ -1,0 +1,71 @@
+[
+  {
+    "id": "r001",
+    "slug": "central-alps-trilogy",
+    "tier": "gold",
+    "priceChf": 19,
+    "canton": "UR / VS / BE",
+    "distanceKm": 168,
+    "ascentM": 4200,
+    "difficulty": "medium",
+    "curviness": 5,
+    "seasonFrom": 6,
+    "seasonTo": 10,
+    "start": { "lat": 46.6863, "lng": 8.5944, "name": "Andermatt" },
+    "finish": { "lat": 46.6863, "lng": 8.5944, "name": "Andermatt" },
+    "via": [
+      { "lat": 46.5725, "lng": 8.4147, "name": "Furkapass" },
+      { "lat": 46.5614, "lng": 8.3372, "name": "Gletsch" },
+      { "lat": 46.5606, "lng": 8.3369, "name": "Grimselpass" },
+      { "lat": 46.7156, "lng": 8.2361, "name": "Innertkirchen" },
+      { "lat": 46.7275, "lng": 8.4453, "name": "Sustenpass" },
+      { "lat": 46.7364, "lng": 8.6289, "name": "Wassen" }
+    ],
+    "weatherPoint": { "lat": 46.5606, "lng": 8.3369, "name": "Grimselpass" },
+    "title": {
+      "de": "Central Alps Trilogy — Furka, Grimsel, Susten",
+      "en": "Central Alps Trilogy — Furka, Grimsel, Susten",
+      "fr": "Central Alps Trilogy — Furka, Grimsel, Susten",
+      "sk": "Central Alps Trilogy — Furka, Grimsel, Susten"
+    },
+    "summary": {
+      "de": "Die drei grossen Pässe an einem Tag, als Runde ab Andermatt. Furka mit den engen Kehren und dem Blick auf das Belvédère, Grimsel mit Granit und Stauseen, Susten als der fahrerisch schönste der drei. Wer früh startet, hat die Pässe fast für sich.",
+      "en": "The three great passes in one day, as a loop from Andermatt. Furka with its tight hairpins and the view of the Belvédère, Grimsel with granite and reservoirs, Susten the finest of the three to ride. Start early and you get the passes almost to yourself.",
+      "fr": "Les trois grands cols en une journée, en boucle depuis Andermatt. Le Furka et ses lacets serrés face au Belvédère, le Grimsel entre granit et barrages, le Susten, le plus beau des trois à rouler. Partez tôt et les cols sont presque à vous.",
+      "sk": "Tri veľké priesmyky za jeden deň, ako okruh z Andermattu. Furka s ostrými vracákmi a výhľadom na Belvédère, Grimsel s žulou a priehradnými jazerami, Susten jazdecky najkrajší z trojice. Kto vyrazí skoro ráno, má priesmyky takmer pre seba."
+    },
+    "highlights": [
+      {
+        "de": "Die Kehren am Belvédère — der Blick, den alle vom Furka kennen",
+        "en": "The hairpins at the Belvédère — the view everyone knows the Furka for",
+        "fr": "Les lacets du Belvédère — la vue qui a fait la réputation du Furka",
+        "sk": "Vracáky pri Belvédère — výhľad, ktorý z Furky pozná každý"
+      },
+      {
+        "de": "Granitwände und Stauseen auf der Grimsel-Nordseite",
+        "en": "Granite walls and reservoirs on the north side of the Grimsel",
+        "fr": "Parois de granit et lacs de barrage sur le versant nord du Grimsel",
+        "sk": "Žulové steny a priehradné jazerá na severnej strane Grimselu"
+      },
+      {
+        "de": "Susten mit Blick auf den Steingletscher — breite, fliessende Kurven",
+        "en": "Susten with the Stein glacier in sight — wide, flowing corners",
+        "fr": "Le Susten face au glacier du Stein — de larges courbes fluides",
+        "sk": "Susten s výhľadom na ľadovec Stein — široké, plynulé zákruty"
+      },
+      {
+        "de": "Postautos haben überall Vorrang — in engen Kurven hupen sie",
+        "en": "PostBuses have right of way everywhere — they sound their horn in blind corners",
+        "fr": "Les cars postaux sont prioritaires partout — ils klaxonnent dans les virages",
+        "sk": "Poštové autobusy majú všade prednosť — v ostrých zákrutách trúbia"
+      }
+    ],
+    "assets": {
+      "track": "central-alps-trilogy-track.gpx",
+      "navigation": "central-alps-trilogy-navigation.gpx",
+      "poi": "central-alps-trilogy-poi.gpx",
+      "roadbook": "central-alps-trilogy-roadbook.pdf"
+    },
+    "isExample": true
+  }
+]

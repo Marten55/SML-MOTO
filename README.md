@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SML Moto — Simply Moto Life
 
-## Getting Started
+Web a e-shop na predaj overených motorkárskych trás po švajčiarskych Alpách.
 
-First, run the development server:
+> „Keine App. Keine Anmeldung. Nur der Pass."
+
+Návrh riešenia a odsúhlasený rozsah: [artefakt v3](https://claude.ai/code/artifact/1fd826fe-b2fd-4a13-a4a8-c4900903b51d)
+
+---
+
+## Čo to je
+
+Jazdec si buď zadarmo vyskladá vlastnú trasu (Bronze), alebo si kúpi hotovú od SML —
+ako GPX, ktoré sa v navigácii neprepočíta (Silver), prípadne aj s roadbookom
+a POV videami z jednotlivých bodov (Gold). Bez registrácie, platba cez TWINT alebo kartu.
+
+| Vrstva | Cena | Obsah |
+|---|---|---|
+| Bronze | zadarmo | Vlastná trasa z plánovača → odkaz do Google Maps |
+| Silver | 9 CHF | GPX (stopa + verzia na navigovanie) + body záujmu |
+| Gold | 19 CHF | Silver + topografia + RoadBook + POV z bodov |
+| Sezónny pas | 89 CHF | Celý archív Silver na 12 mesiacov |
+
+## Technológie
+
+- **Next.js 16** (App Router) + TypeScript
+- **Tailwind CSS v4** — tokeny v `app/globals.css`
+- **Stripe Checkout** — TWINT + karta (TWINT sa zapína v Stripe Dashboarde, nemá vlastný kľúč)
+- Dáta trás v **JSON**, žiadna databáza
+
+Jazyky: **EN · DE · FR · SK**
+
+## Spustenie
 
 ```bash
+npm install
+cp .env.example .env.local   # doplniť kľúče
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Bez Stripe kľúčov web beží normálne, len sa nedá zaplatiť — platobné tlačidlo
+oznámi, že platby nie sú nakonfigurované.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Štruktúra
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/[lang]/          stránky, jedna sada pre všetky štyri jazyky
+app/api/             Stripe checkout, webhook, chránené stiahnutie GPX
+data/routes.json     jediný zdroj pravdy o trasách
+content/gpx/         GPX súbory — MIMO public/, chodia cez API po overení
+dictionaries/        preklady rozhraní
+lib/                 i18n, načítanie trás, Stripe
+```
 
-## Learn More
+**GPX nikdy nepatrí do `public/`.** Čokoľvek v `public/` je verejné bez overenia,
+takže by sa platený produkt dal stiahnuť zadarmo.
 
-To learn more about Next.js, take a look at the following resources:
+## Vetvenie
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GitHub Flow — `main` je vždy funkčný a nasaditeľný, práca ide vo vetvách
+a spája sa cez pull request.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+main                ●──────────●──────────●
+                     \        /          /
+feature/faza-0-pilot  ●──●──●           /
+                                       /
+feature/faza-1-web            ●──●──●
+```
 
-## Deploy on Vercel
+| Vetva | Čo v nej vzniká |
+|---|---|
+| `main` | Vždy funkčný stav |
+| `feature/faza-0-pilot` | Dizajn a prvá trasa od zobrazenia po doručenie |
+| `feature/faza-1-web` | Katalóg, mapa, štyri jazyky, právne texty |
+| `feature/faza-1b-planovac` | Bronze plánovač trás |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Vetva sa volá podľa fázy z ponuky, aby sa dalo dohľadať, čo bolo za čo zaplatené.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Stav
+
+Fáza 0 — rozpracované.
