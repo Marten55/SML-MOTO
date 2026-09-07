@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env.example je šablóna bez tajomstiev a patrí do repa —
+# bez nej nikto nevie, ktoré premenné treba doplniť.
+!.env.example
 
 # vercel
 .vercel
