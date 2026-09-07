@@ -38,11 +38,14 @@
     "ascent": "Prevýšenie",
     "difficulty": "Obtiažnosť",
     "curviness": "Kľukatosť",
-    "canton": "Kantón",
     "season": "Prejazdné",
     "highlights": "Čo ťa tam čaká",
     "included": "Čo je v balíčku",
-    "backToRoutes": "Späť na trasy"
+    "backToRoutes": "Späť na trasy",
+    "region": "Kraj",
+    "duration": "Trvanie",
+    "temp": "Teplota hore",
+    "gear": "Odporúčaná výbava"
   },
   "difficulty": {
     "easy": "Pohodová",
@@ -74,5 +77,11 @@
     "from": "od",
     "soon": "Pripravujeme",
     "example": "Ukážkový obsah"
+  },
+  "status": {
+    "open": "Prejazdná",
+    "closed": "Zavretá",
+    "openHint": "Priesmyk je otvorený",
+    "closedHint": "Priesmyk je momentálne zavretý"
   }
 }

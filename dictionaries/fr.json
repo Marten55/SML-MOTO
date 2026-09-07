@@ -38,11 +38,14 @@
     "ascent": "Dénivelé",
     "difficulty": "Difficulté",
     "curviness": "Sinuosité",
-    "canton": "Canton",
     "season": "Praticable",
     "highlights": "Ce qui vous attend",
     "included": "Contenu du pack",
-    "backToRoutes": "Retour aux itinéraires"
+    "backToRoutes": "Retour aux itinéraires",
+    "region": "Région",
+    "duration": "Durée",
+    "temp": "Température au sommet",
+    "gear": "Équipement conseillé"
   },
   "difficulty": {
     "easy": "Tranquille",
@@ -74,5 +77,11 @@
     "from": "dès",
     "soon": "Bientôt",
     "example": "Contenu d'exemple"
+  },
+  "status": {
+    "open": "Ouvert",
+    "closed": "Fermé",
+    "openHint": "Le col est ouvert",
+    "closedHint": "Le col est fermé actuellement"
   }
 }

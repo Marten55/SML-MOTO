@@ -32,9 +32,22 @@ export interface Route {
   slug: string;
   tier: Tier;
   priceChf: number;
-  canton: string;
+  /** Kraj alebo kantón. Vlastné meno, neprekladá sa. */
+  region: string;
+  /** ISO kód krajiny — podľa neho sa zoskupuje katalóg. */
+  country: 'CH' | 'IT' | 'FR' | 'RO' | 'NO';
   distanceKm: number;
   ascentM: number;
+  /** Koľko to reálne zaberie aj so zastávkami, napr. „7–9". */
+  durationHours: string;
+  /** Priemerná teplota na vrchole v sezóne. Rozhoduje o výbave. */
+  avgTempC: number;
+  /**
+   * Či je priesmyk práve otvorený. Na starom webe to bolo „Prejazdná /
+   * Neprejazdná" a je to jedna z mála vecí, ktorá jazdcovi ušetrí zbytočnú
+   * cestu — preto to prežíva aj sem.
+   */
+  passable: boolean;
   difficulty: Difficulty;
   /** 1 = pohodová kochačka, 5 = samá zákruta. Prevzaté od Calimota. */
   curviness: 1 | 2 | 3 | 4 | 5;
@@ -53,6 +66,8 @@ export interface Route {
   title: LocalizedText;
   summary: LocalizedText;
   highlights: LocalizedText[];
+  /** Čo si obliecť. Prevzaté zo starého webu — jazdci si to tam všímali. */
+  gear: LocalizedText;
   assets: RouteAssets;
   /**
    * Ukážkový obsah, kým nedorazia skutočné podklady. V rozhraní sa označuje,

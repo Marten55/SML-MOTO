@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Trollstigen — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Trollstigen</name>
+    <rtept lat="62.567000" lon="7.683000"><name>Trollstigen — štart</name></rtept>
+    <rtept lat="62.520000" lon="7.690000"><name>Trollstigen 1</name></rtept>
+    <rtept lat="62.480000" lon="7.670000"><name>Trollstigen 2</name></rtept>
+    <rtept lat="62.456000" lon="7.662000"><name>Trollstigen 3</name></rtept>
+    <rtept lat="62.420000" lon="7.600000"><name>Trollstigen 4</name></rtept>
+    <rtept lat="62.350000" lon="7.480000"><name>Trollstigen 5</name></rtept>
+    <rtept lat="62.301000" lon="7.419000"><name>Trollstigen — cieľ</name></rtept>
+  </rte>
+</gpx>

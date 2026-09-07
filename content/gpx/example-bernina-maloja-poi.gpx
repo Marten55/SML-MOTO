@@ -4,31 +4,31 @@
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
   <metadata>
-    <name>Central Alps Trilogy — Furka, Grimsel, Susten — points of interest</name>
+    <name>Bernina Pass &amp; Maloja Pass — points of interest</name>
     <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
   </metadata>
-  <wpt lat="46.572500" lon="8.414700">
-    <name>Furkapass</name>
+  <wpt lat="46.711000" lon="9.583000">
+    <name>Bernina 1</name>
     <sym>Summit</sym>
   </wpt>
-  <wpt lat="46.561400" lon="8.337200">
-    <name>Gletsch</name>
+  <wpt lat="46.490000" lon="9.700000">
+    <name>Bernina 2</name>
     <sym>Summit</sym>
   </wpt>
-  <wpt lat="46.560600" lon="8.336900">
-    <name>Grimselpass</name>
+  <wpt lat="46.406000" lon="9.694000">
+    <name>Bernina 3</name>
     <sym>Summit</sym>
   </wpt>
-  <wpt lat="46.715600" lon="8.236100">
-    <name>Innertkirchen</name>
+  <wpt lat="46.316000" lon="9.502000">
+    <name>Bernina 4</name>
     <sym>Summit</sym>
   </wpt>
-  <wpt lat="46.727500" lon="8.445300">
-    <name>Sustenpass</name>
+  <wpt lat="46.490000" lon="9.700000">
+    <name>Bernina 5</name>
     <sym>Summit</sym>
   </wpt>
-  <wpt lat="46.736400" lon="8.628900">
-    <name>Wassen</name>
+  <wpt lat="46.410000" lon="10.026000">
+    <name>Bernina 6</name>
     <sym>Summit</sym>
   </wpt>
 </gpx>

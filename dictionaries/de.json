@@ -38,11 +38,14 @@
     "ascent": "Höhenmeter",
     "difficulty": "Schwierigkeit",
     "curviness": "Kurvenfaktor",
-    "canton": "Kanton",
     "season": "Befahrbar",
     "highlights": "Was dich erwartet",
     "included": "Im Paket enthalten",
-    "backToRoutes": "Zurück zu den Routen"
+    "backToRoutes": "Zurück zu den Routen",
+    "region": "Region",
+    "duration": "Dauer",
+    "temp": "Temperatur oben",
+    "gear": "Empfohlene Ausrüstung"
   },
   "difficulty": {
     "easy": "Entspannt",
@@ -74,5 +77,11 @@
     "from": "ab",
     "soon": "In Vorbereitung",
     "example": "Beispielinhalt"
+  },
+  "status": {
+    "open": "Befahrbar",
+    "closed": "Gesperrt",
+    "openHint": "Pass ist offen",
+    "closedHint": "Pass ist derzeit zu"
   }
 }

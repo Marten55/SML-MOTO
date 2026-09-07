@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Bernina Pass &amp; Maloja Pass — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Bernina Pass &amp; Maloja Pass</name>
+    <rtept lat="46.850000" lon="9.533000"><name>Bernina — štart</name></rtept>
+    <rtept lat="46.711000" lon="9.583000"><name>Bernina 1</name></rtept>
+    <rtept lat="46.490000" lon="9.700000"><name>Bernina 2</name></rtept>
+    <rtept lat="46.406000" lon="9.694000"><name>Bernina 3</name></rtept>
+    <rtept lat="46.316000" lon="9.502000"><name>Bernina 4</name></rtept>
+    <rtept lat="46.490000" lon="9.700000"><name>Bernina 5</name></rtept>
+    <rtept lat="46.410000" lon="10.026000"><name>Bernina 6</name></rtept>
+    <rtept lat="46.323000" lon="10.147000"><name>Bernina — cieľ</name></rtept>
+  </rte>
+</gpx>

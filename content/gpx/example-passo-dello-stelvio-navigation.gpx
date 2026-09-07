@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Passo dello Stelvio — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Passo dello Stelvio</name>
+    <rtept lat="46.499000" lon="11.355000"><name>Stelvio — štart</name></rtept>
+    <rtept lat="46.672000" lon="11.160000"><name>Stelvio 1</name></rtept>
+    <rtept lat="46.588000" lon="10.889000"><name>Stelvio 2</name></rtept>
+    <rtept lat="46.525000" lon="10.453000"><name>Stelvio 3</name></rtept>
+    <rtept lat="46.471000" lon="10.373000"><name>Stelvio 4</name></rtept>
+    <rtept lat="46.337000" lon="10.411000"><name>Stelvio — cieľ</name></rtept>
+  </rte>
+</gpx>

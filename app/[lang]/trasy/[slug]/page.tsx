@@ -43,7 +43,9 @@ export default async function RouteDetailPage({
   const facts = [
     { label: dict.route.length, value: `${route.distanceKm} km` },
     { label: dict.route.ascent, value: `${route.ascentM} m` },
-    { label: dict.route.canton, value: route.canton },
+    { label: dict.route.duration, value: `${route.durationHours} h` },
+    { label: dict.route.temp, value: `${route.avgTempC} °C` },
+    { label: dict.route.region, value: route.region },
     { label: dict.route.difficulty, value: dict.difficulty[route.difficulty] },
     { label: dict.route.curviness, value: '▲'.repeat(route.curviness) },
     {
@@ -78,6 +80,20 @@ export default async function RouteDetailPage({
             {route.title[lang]}
           </h1>
 
+          {/* Zavretý priesmyk je jediná vec, ktorá jazdcovi ušetrí zbytočnú cestu */}
+          <p
+            className={`mt-4 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm ${
+              route.passable
+                ? 'bg-accent-soft text-accent'
+                : 'bg-[color:var(--crit-soft)] text-crit'
+            }`}
+          >
+            <span aria-hidden className="font-mono">
+              {route.passable ? '✓' : '✕'}
+            </span>
+            {route.passable ? dict.status.openHint : dict.status.closedHint}
+          </p>
+
           <div className="mt-8 flex aspect-video items-center justify-center rounded-sm border border-line bg-surface-2">
             <span className="font-mono text-xs text-ink-3">POV</span>
           </div>
@@ -95,6 +111,9 @@ export default async function RouteDetailPage({
               </li>
             ))}
           </ul>
+
+          <h2 className="mt-12 font-display text-2xl font-semibold">{dict.route.gear}</h2>
+          <p className="mt-3 max-w-[60ch] text-ink-2">{route.gear[lang]}</p>
         </div>
 
         <aside className="lg:sticky lg:top-8 lg:self-start">

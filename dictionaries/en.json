@@ -38,11 +38,14 @@
     "ascent": "Ascent",
     "difficulty": "Difficulty",
     "curviness": "Curviness",
-    "canton": "Canton",
     "season": "Open",
     "highlights": "What you get out there",
     "included": "What is in the package",
-    "backToRoutes": "Back to routes"
+    "backToRoutes": "Back to routes",
+    "region": "Region",
+    "duration": "Time",
+    "temp": "Temperature up top",
+    "gear": "Recommended gear"
   },
   "difficulty": {
     "easy": "Relaxed",
@@ -74,5 +77,11 @@
     "from": "from",
     "soon": "Coming soon",
     "example": "Example content"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed",
+    "openHint": "Pass is open",
+    "closedHint": "Pass is closed right now"
   }
 }

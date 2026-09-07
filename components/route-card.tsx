@@ -41,6 +41,13 @@ export function RouteCard({
           {route.title[lang]}
         </h3>
 
+        <p className="mt-1 text-sm text-ink-3">
+          {route.region}
+          {!route.passable && (
+            <span className="text-crit"> · {dict.status.closed}</span>
+          )}
+        </p>
+
         <dl className="mt-4 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-ink-3 tabular-nums">
           <div className="flex gap-1.5">
             <dt>{dict.route.length}</dt>
