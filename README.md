@@ -55,6 +55,44 @@ lib/                 i18n, načítanie trás, Stripe
 **GPX nikdy nepatrí do `public/`.** Čokoľvek v `public/` je verejné bez overenia,
 takže by sa platený produkt dal stiahnuť zadarmo.
 
+## V repe stoja dve veci vedľa seba
+
+Prechodný stav, kým nie je nová aplikácia nasadená:
+
+| Čo | Kde | Beží na |
+|---|---|---|
+| **Starý statický web** | `index.html`, `style.css`, `cookies.js`, `Videa/`, `Ikony/`, `vlajky/` | GitHub Pages — [živý](https://marten55.github.io/SML-MOTO/) |
+| **Nová aplikácia** | `app/`, `lib/`, `components/`, `content/`, `data/` | zatiaľ nikde, čaká na Vercel |
+
+Pages servírujú `index.html` z koreňa a o zvyšok sa nestarajú, takže sa
+nerozbíja. `.nojekyll` je tam preto, aby sa Jekyll nepokúšal spracovať zdrojáky.
+
+**Keď bude Vercel živý:** zmazať `index.html`, `style.css`, `cookies.js`
+a mediálne priečinky starého webu, vypnúť Pages v nastaveniach repa.
+Dovtedy sa starého webu nedotýkať inak než cez vetvu a PR — je to to,
+čo klient práve ukazuje.
+
+## Nasadenie na Vercel
+
+Next.js na Vercel nepotrebuje konfiguračný súbor, ale **potrebuje premenné
+prostredia** — bez nich sa web postaví a pobeží, len nepredá:
+
+```bash
+npx vercel login
+npx vercel link          # pripojí tento priečinok k projektu
+npx vercel env add STRIPE_SECRET_KEY production
+npx vercel env add STRIPE_WEBHOOK_SECRET production
+npx vercel env add DOWNLOAD_SIGNING_SECRET production
+npx vercel env add RESEND_API_KEY production
+npx vercel env add MAIL_FROM production
+npx vercel --prod
+```
+
+`DOWNLOAD_SIGNING_SECRET` vygeneruješ cez `openssl rand -hex 32`.
+
+Po nasadení treba v Stripe Dashboarde pridať webhook endpoint na
+`https://<doména>/api/webhook` a udalosť `checkout.session.completed`.
+
 ## Vetvenie
 
 GitHub Flow — `main` je vždy funkčný a nasaditeľný, práca ide vo vetvách
