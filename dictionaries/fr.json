@@ -83,5 +83,24 @@
     "closed": "Fermé",
     "openHint": "Le col est ouvert",
     "closedHint": "Le col est fermé actuellement"
+  },
+  "filters": {
+    "all": "Tous",
+    "count": "itinéraires",
+    "country": "Pays",
+    "length": "Distance",
+    "long": "plus de 200 km",
+    "medium": "100–200 km",
+    "none": "Aucun itinéraire ne correspond à cette sélection.",
+    "reset": "Réinitialiser",
+    "short": "jusqu'à 100 km",
+    "tier": "Niveau"
+  },
+  "countries": {
+    "CH": "Suisse",
+    "FR": "France",
+    "IT": "Italie",
+    "NO": "Norvège",
+    "RO": "Roumanie"
   }
 }

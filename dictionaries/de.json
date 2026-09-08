@@ -83,5 +83,24 @@
     "closed": "Gesperrt",
     "openHint": "Pass ist offen",
     "closedHint": "Pass ist derzeit zu"
+  },
+  "filters": {
+    "all": "Alle",
+    "count": "Routen",
+    "country": "Land",
+    "length": "Länge",
+    "long": "über 200 km",
+    "medium": "100–200 km",
+    "none": "Keine Route passt zu dieser Auswahl.",
+    "reset": "Filter zurücksetzen",
+    "short": "bis 100 km",
+    "tier": "Stufe"
+  },
+  "countries": {
+    "CH": "Schweiz",
+    "FR": "Frankreich",
+    "IT": "Italien",
+    "NO": "Norwegen",
+    "RO": "Rumänien"
   }
 }

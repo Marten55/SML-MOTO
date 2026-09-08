@@ -83,5 +83,24 @@
     "closed": "Closed",
     "openHint": "Pass is open",
     "closedHint": "Pass is closed right now"
+  },
+  "filters": {
+    "all": "All",
+    "count": "routes",
+    "country": "Country",
+    "length": "Distance",
+    "long": "over 200 km",
+    "medium": "100–200 km",
+    "none": "No route matches this selection.",
+    "reset": "Clear filters",
+    "short": "up to 100 km",
+    "tier": "Tier"
+  },
+  "countries": {
+    "CH": "Switzerland",
+    "FR": "France",
+    "IT": "Italy",
+    "NO": "Norway",
+    "RO": "Romania"
   }
 }

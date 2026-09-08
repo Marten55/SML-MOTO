@@ -83,5 +83,24 @@
     "closed": "Zavretá",
     "openHint": "Priesmyk je otvorený",
     "closedHint": "Priesmyk je momentálne zavretý"
+  },
+  "filters": {
+    "all": "Všetky",
+    "count": "trás",
+    "country": "Krajina",
+    "length": "Dĺžka",
+    "long": "nad 200 km",
+    "medium": "100–200 km",
+    "none": "Tomuto výberu nezodpovedá žiadna trasa.",
+    "reset": "Zrušiť filtre",
+    "short": "do 100 km",
+    "tier": "Vrstva"
+  },
+  "countries": {
+    "CH": "Švajčiarsko",
+    "FR": "Francúzsko",
+    "IT": "Taliansko",
+    "NO": "Nórsko",
+    "RO": "Rumunsko"
   }
 }
