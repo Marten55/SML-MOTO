@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Col de la Bonette — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Col de la Bonette</name>
+    <rtept lat="44.384000" lon="6.654000"><name>Bonette — štart</name></rtept>
+    <rtept lat="44.421000" lon="6.712000"><name>Bonette 1</name></rtept>
+    <rtept lat="44.349000" lon="6.822000"><name>Bonette 2</name></rtept>
+    <rtept lat="44.293000" lon="6.805000"><name>Bonette 3</name></rtept>
+    <rtept lat="44.264000" lon="6.910000"><name>Bonette 4</name></rtept>
+    <rtept lat="44.199000" lon="7.031000"><name>Bonette — cieľ</name></rtept>
+  </rte>
+</gpx>

@@ -1,0 +1,106 @@
+{
+  "brand": {
+    "name": "SML — Simply Moto Life",
+    "tagline": "The Art of Simple Riding",
+    "claim": "Žiadna aplikácia. Žiadna registrácia. Len priesmyk."
+  },
+  "nav": {
+    "routes": "Trasy",
+    "planner": "Plánovač trás",
+    "guide": "Ako to funguje",
+    "legal": "Právne info"
+  },
+  "home": {
+    "title": "Cesty, ktoré niekto naozaj prešiel.",
+    "subtitle": "Žiadny algoritmus, žiadna náhodná čiara na mape. Každú trasu tu niekto osobne prejazdil, overil a pripravil tak, aby ti ju navigácia na polceste ticho neprepočítala.",
+    "browse": "Pozrieť trasy",
+    "planFree": "Vyskladať vlastnú trasu — zadarmo"
+  },
+  "tiers": {
+    "bronze": {
+      "name": "Bronze",
+      "short": "Vyskladáš si sám, dostaneš odkaz do Google Maps",
+      "cta": "Naplánovať zadarmo"
+    },
+    "silver": {
+      "name": "Silver",
+      "short": "Hotová GPX trasa, ktorá sa neprepočíta",
+      "cta": "Odomknúť trasu"
+    },
+    "gold": {
+      "name": "Gold",
+      "short": "Prejazdená lokálom, s RoadBookom a POV videami",
+      "cta": "Odomknúť trasu"
+    }
+  },
+  "route": {
+    "length": "Dĺžka",
+    "ascent": "Prevýšenie",
+    "difficulty": "Obtiažnosť",
+    "curviness": "Kľukatosť",
+    "season": "Prejazdné",
+    "highlights": "Čo ťa tam čaká",
+    "included": "Čo je v balíčku",
+    "backToRoutes": "Späť na trasy",
+    "region": "Kraj",
+    "duration": "Trvanie",
+    "temp": "Teplota hore",
+    "gear": "Odporúčaná výbava"
+  },
+  "difficulty": {
+    "easy": "Pohodová",
+    "medium": "Stredná",
+    "hard": "Náročná"
+  },
+  "checkout": {
+    "unlock": "Odomknúť trasu",
+    "processing": "Moment…",
+    "unavailable": "Platby zatiaľ nie sú nastavené.",
+    "methods": "TWINT alebo karta — päť sekúnd, bez účtu.",
+    "error": "Platbu sa nepodarilo spustiť. Skús to prosím znova."
+  },
+  "delivery": {
+    "title": "Šťastnú cestu.",
+    "subtitle": "Trasa je pripravená. Odkaz máš aj v e-maile — neexpiruje.",
+    "track": "Stiahnuť stopu (GPX)",
+    "trackHint": "Presná čiara. Prístroj ju neprepočíta.",
+    "navigation": "Verzia na navigovanie (GPX)",
+    "navigationHint": "Na hlasovú navigáciu zákruta po zákrute.",
+    "poi": "Body záujmu (GPX)",
+    "poiHint": "Čerpačky, jedlo, vyhliadky.",
+    "roadbook": "RoadBook (PDF)",
+    "maps": "Otvoriť v Google Maps",
+    "howto": "Ako dostať trasu do mobilu za dve minúty"
+  },
+  "common": {
+    "free": "zadarmo",
+    "from": "od",
+    "soon": "Pripravujeme",
+    "example": "Ukážkový obsah"
+  },
+  "status": {
+    "open": "Prejazdná",
+    "closed": "Zavretá",
+    "openHint": "Priesmyk je otvorený",
+    "closedHint": "Priesmyk je momentálne zavretý"
+  },
+  "filters": {
+    "all": "Všetky",
+    "count": "trás",
+    "country": "Krajina",
+    "length": "Dĺžka",
+    "long": "nad 200 km",
+    "medium": "100–200 km",
+    "none": "Tomuto výberu nezodpovedá žiadna trasa.",
+    "reset": "Zrušiť filtre",
+    "short": "do 100 km",
+    "tier": "Vrstva"
+  },
+  "countries": {
+    "CH": "Švajčiarsko",
+    "FR": "Francúzsko",
+    "IT": "Taliansko",
+    "NO": "Nórsko",
+    "RO": "Rumunsko"
+  }
+}

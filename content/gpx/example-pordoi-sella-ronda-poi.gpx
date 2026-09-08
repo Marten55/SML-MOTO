@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Passo Pordoi &amp; Sella Ronda — points of interest</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <wpt lat="46.489000" lon="11.825000">
+    <name>Sella 1</name>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="46.477000" lon="11.772000">
+    <name>Sella 2</name>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="46.515000" lon="11.714000">
+    <name>Sella 3</name>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="46.570000" lon="11.674000">
+    <name>Sella 4</name>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="46.562000" lon="11.733000">
+    <name>Sella 5</name>
+    <sym>Summit</sym>
+  </wpt>
+  <wpt lat="46.515000" lon="11.714000">
+    <name>Sella 6</name>
+    <sym>Summit</sym>
+  </wpt>
+</gpx>

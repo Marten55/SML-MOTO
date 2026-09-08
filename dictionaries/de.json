@@ -1,0 +1,106 @@
+{
+  "brand": {
+    "name": "SML — Simply Moto Life",
+    "tagline": "The Art of Simple Riding",
+    "claim": "Keine App. Keine Anmeldung. Nur der Pass."
+  },
+  "nav": {
+    "routes": "Routen",
+    "planner": "Routenplaner",
+    "guide": "Anleitung",
+    "legal": "Rechtliches"
+  },
+  "home": {
+    "title": "Strecken, die jemand wirklich gefahren ist.",
+    "subtitle": "Kein Algorithmus, keine zufällige Linie auf der Karte. Jede Route hier wurde persönlich abgefahren, geprüft und so vorbereitet, dass dein Navi sie unterwegs nicht neu berechnet.",
+    "browse": "Routen ansehen",
+    "planFree": "Eigene Route planen — gratis"
+  },
+  "tiers": {
+    "bronze": {
+      "name": "Bronze",
+      "short": "Selbst geplant, Link zu Google Maps",
+      "cta": "Gratis planen"
+    },
+    "silver": {
+      "name": "Silver",
+      "short": "Fertige GPX-Route, die sich nicht neu berechnet",
+      "cta": "Route freischalten"
+    },
+    "gold": {
+      "name": "Gold",
+      "short": "Vor Ort gefahren, mit RoadBook und POV-Videos",
+      "cta": "Route freischalten"
+    }
+  },
+  "route": {
+    "length": "Länge",
+    "ascent": "Höhenmeter",
+    "difficulty": "Schwierigkeit",
+    "curviness": "Kurvenfaktor",
+    "season": "Befahrbar",
+    "highlights": "Was dich erwartet",
+    "included": "Im Paket enthalten",
+    "backToRoutes": "Zurück zu den Routen",
+    "region": "Region",
+    "duration": "Dauer",
+    "temp": "Temperatur oben",
+    "gear": "Empfohlene Ausrüstung"
+  },
+  "difficulty": {
+    "easy": "Entspannt",
+    "medium": "Mittel",
+    "hard": "Anspruchsvoll"
+  },
+  "checkout": {
+    "unlock": "Route freischalten",
+    "processing": "Einen Moment …",
+    "unavailable": "Zahlungen sind noch nicht eingerichtet.",
+    "methods": "TWINT oder Karte — fünf Sekunden, ohne Konto.",
+    "error": "Die Zahlung konnte nicht gestartet werden. Bitte versuch es nochmal."
+  },
+  "delivery": {
+    "title": "Gute Fahrt.",
+    "subtitle": "Deine Route ist bereit. Den Link findest du auch in deinem Postfach — er läuft nicht ab.",
+    "track": "Spur herunterladen (GPX)",
+    "trackHint": "Exakte Linie. Wird vom Gerät nicht neu berechnet.",
+    "navigation": "Navigationsversion (GPX)",
+    "navigationHint": "Für Sprachnavigation Kurve für Kurve.",
+    "poi": "Wegpunkte (GPX)",
+    "poiHint": "Tankstellen, Essen, Aussichtspunkte.",
+    "roadbook": "RoadBook (PDF)",
+    "maps": "In Google Maps öffnen",
+    "howto": "So bekommst du die Route in zwei Minuten aufs Handy"
+  },
+  "common": {
+    "free": "gratis",
+    "from": "ab",
+    "soon": "In Vorbereitung",
+    "example": "Beispielinhalt"
+  },
+  "status": {
+    "open": "Befahrbar",
+    "closed": "Gesperrt",
+    "openHint": "Pass ist offen",
+    "closedHint": "Pass ist derzeit zu"
+  },
+  "filters": {
+    "all": "Alle",
+    "count": "Routen",
+    "country": "Land",
+    "length": "Länge",
+    "long": "über 200 km",
+    "medium": "100–200 km",
+    "none": "Keine Route passt zu dieser Auswahl.",
+    "reset": "Filter zurücksetzen",
+    "short": "bis 100 km",
+    "tier": "Stufe"
+  },
+  "countries": {
+    "CH": "Schweiz",
+    "FR": "Frankreich",
+    "IT": "Italien",
+    "NO": "Norwegen",
+    "RO": "Rumänien"
+  }
+}

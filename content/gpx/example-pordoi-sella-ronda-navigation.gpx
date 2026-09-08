@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Passo Pordoi &amp; Sella Ronda — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Passo Pordoi &amp; Sella Ronda</name>
+    <rtept lat="46.499000" lon="11.876000"><name>Sella — štart</name></rtept>
+    <rtept lat="46.489000" lon="11.825000"><name>Sella 1</name></rtept>
+    <rtept lat="46.477000" lon="11.772000"><name>Sella 2</name></rtept>
+    <rtept lat="46.515000" lon="11.714000"><name>Sella 3</name></rtept>
+    <rtept lat="46.570000" lon="11.674000"><name>Sella 4</name></rtept>
+    <rtept lat="46.562000" lon="11.733000"><name>Sella 5</name></rtept>
+    <rtept lat="46.515000" lon="11.714000"><name>Sella 6</name></rtept>
+    <rtept lat="46.499000" lon="11.876000"><name>Sella — cieľ</name></rtept>
+  </rte>
+</gpx>

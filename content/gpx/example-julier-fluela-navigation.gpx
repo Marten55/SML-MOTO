@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SML Moto — example generator"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Julier Pass &amp; Flüela Pass — navigation</name>
+    <desc>UKAZKOVY OBSAH — priamkova interpolacia medzi priesmykmi, nie skutocna cesta. Sluzi na test doručovania, nie na navigaciu.</desc>
+  </metadata>
+  <rte>
+    <name>Julier Pass &amp; Flüela Pass</name>
+    <rtept lat="46.850000" lon="9.533000"><name>Julier — štart</name></rtept>
+    <rtept lat="46.691000" lon="9.438000"><name>Julier 1</name></rtept>
+    <rtept lat="46.470000" lon="9.726000"><name>Julier 2</name></rtept>
+    <rtept lat="46.500000" lon="9.838000"><name>Julier 3</name></rtept>
+    <rtept lat="46.791000" lon="9.818000"><name>Julier 4</name></rtept>
+    <rtept lat="46.756000" lon="9.948000"><name>Julier 5</name></rtept>
+    <rtept lat="46.716000" lon="10.094000"><name>Julier — cieľ</name></rtept>
+  </rte>
+</gpx>

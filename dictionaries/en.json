@@ -1,0 +1,106 @@
+{
+  "brand": {
+    "name": "SML — Simply Moto Life",
+    "tagline": "The Art of Simple Riding",
+    "claim": "No app. No sign-up. Just the pass."
+  },
+  "nav": {
+    "routes": "Routes",
+    "planner": "Route planner",
+    "guide": "How it works",
+    "legal": "Legal"
+  },
+  "home": {
+    "title": "Roads someone has actually ridden.",
+    "subtitle": "No algorithm, no random line on a map. Every route here was ridden in person, checked, and prepared so your sat-nav will not quietly reroute you halfway through.",
+    "browse": "Browse routes",
+    "planFree": "Plan your own route — free"
+  },
+  "tiers": {
+    "bronze": {
+      "name": "Bronze",
+      "short": "Plan it yourself, get a Google Maps link",
+      "cta": "Plan for free"
+    },
+    "silver": {
+      "name": "Silver",
+      "short": "A ready GPX route that will not recalculate",
+      "cta": "Unlock route"
+    },
+    "gold": {
+      "name": "Gold",
+      "short": "Ridden locally, with a RoadBook and POV videos",
+      "cta": "Unlock route"
+    }
+  },
+  "route": {
+    "length": "Distance",
+    "ascent": "Ascent",
+    "difficulty": "Difficulty",
+    "curviness": "Curviness",
+    "season": "Open",
+    "highlights": "What you get out there",
+    "included": "What is in the package",
+    "backToRoutes": "Back to routes",
+    "region": "Region",
+    "duration": "Time",
+    "temp": "Temperature up top",
+    "gear": "Recommended gear"
+  },
+  "difficulty": {
+    "easy": "Relaxed",
+    "medium": "Moderate",
+    "hard": "Demanding"
+  },
+  "checkout": {
+    "unlock": "Unlock route",
+    "processing": "One moment…",
+    "unavailable": "Payments are not set up yet.",
+    "methods": "TWINT or card — five seconds, no account.",
+    "error": "We could not start the payment. Please try again."
+  },
+  "delivery": {
+    "title": "Ride safe.",
+    "subtitle": "Your route is ready. The link is in your inbox too — it does not expire.",
+    "track": "Download track (GPX)",
+    "trackHint": "The exact line. Your device will not recalculate it.",
+    "navigation": "Navigation version (GPX)",
+    "navigationHint": "For turn-by-turn voice guidance.",
+    "poi": "Waypoints (GPX)",
+    "poiHint": "Fuel, food, viewpoints.",
+    "roadbook": "RoadBook (PDF)",
+    "maps": "Open in Google Maps",
+    "howto": "Get the route onto your phone in two minutes"
+  },
+  "common": {
+    "free": "free",
+    "from": "from",
+    "soon": "Coming soon",
+    "example": "Example content"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed",
+    "openHint": "Pass is open",
+    "closedHint": "Pass is closed right now"
+  },
+  "filters": {
+    "all": "All",
+    "count": "routes",
+    "country": "Country",
+    "length": "Distance",
+    "long": "over 200 km",
+    "medium": "100–200 km",
+    "none": "No route matches this selection.",
+    "reset": "Clear filters",
+    "short": "up to 100 km",
+    "tier": "Tier"
+  },
+  "countries": {
+    "CH": "Switzerland",
+    "FR": "France",
+    "IT": "Italy",
+    "NO": "Norway",
+    "RO": "Romania"
+  }
+}

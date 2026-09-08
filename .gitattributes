@@ -1,1 +1,20 @@
+# Hero videá starého webu idú cez Git LFS. Toto pravidlo musí ostať —
+# bez neho by sa videá commitli ako stovky MB priamo do histórie.
 *.MP4 filter=lfs diff=lfs merge=lfs -text
+
+# Normalizácia koncov riadkov — inak Windows vyrába šum v diffoch
+* text=auto eol=lf
+
+# Binárne súbory nechať tak
+*.png   binary
+*.jpg   binary
+*.webp  binary
+*.mp4   binary
+*.webm  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.pdf   binary
+
+# GPX je XML, ale je to dáta produktu — nech sa needituje omylom
+*.gpx text eol=lf linguist-generated=true
