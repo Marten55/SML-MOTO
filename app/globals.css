@@ -134,6 +134,13 @@
   }
 }
 
+/* OSM dodáva len svetlé dlaždice. V tmavom režime sa prefarbia filtrom —
+   invert plus otočenie odtieňa zachová farby ciest a vody rozoznateľné.
+   Markery a čiary sú v inej vrstve, takže sa ich to netýka. */
+.sml-tiles-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

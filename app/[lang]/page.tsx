@@ -1,9 +1,15 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
 import { getDictionary, isLocale } from '@/lib/i18n';
 import { getAllRoutes } from '@/lib/routes';
 import { RouteCard } from '@/components/route-card';
+
+// Leaflet siaha na window, takže sa mapa nesmie renderovať na serveri
+const RouteMap = dynamic(() =>
+  import('@/components/route-map').then((m) => m.RouteMap),
+);
 
 export default async function HomePage({
   params,
@@ -60,6 +66,15 @@ export default async function HomePage({
       </section>
 
       <section className="py-16">
+        <h2 className="font-display text-3xl font-semibold">{dict.map.heading}</h2>
+        <p className="mt-2 max-w-[58ch] text-ink-2">{dict.map.lede}</p>
+
+        <div className="mt-8">
+          <RouteMap routes={routes} lang={lang} dict={dict} />
+        </div>
+      </section>
+
+      <section className="border-t border-line py-16">
         <h2 className="font-display text-3xl font-semibold">{dict.nav.routes}</h2>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

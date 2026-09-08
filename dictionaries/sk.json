@@ -102,5 +102,14 @@
     "IT": "Taliansko",
     "NO": "Nórsko",
     "RO": "Rumunsko"
+  },
+  "map": {
+    "close": "Zavrieť",
+    "heading": "Kam to vedie",
+    "hint": "Ťukni na bod",
+    "label": "Mapa trás",
+    "lede": "Každý bod je trasa, ktorú niekto prešiel a overil. Ťukni na niektorý.",
+    "loading": "Načítavam mapu …",
+    "open": "Otvoriť"
   }
 }

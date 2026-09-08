@@ -102,5 +102,14 @@
     "IT": "Italy",
     "NO": "Norway",
     "RO": "Romania"
+  },
+  "map": {
+    "close": "Close",
+    "heading": "Where these go",
+    "hint": "Tap a point",
+    "label": "Map of routes",
+    "lede": "Every point is a route that was ridden and checked. Tap one.",
+    "loading": "Loading the map …",
+    "open": "Open"
   }
 }

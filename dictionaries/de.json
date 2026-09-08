@@ -102,5 +102,14 @@
     "IT": "Italien",
     "NO": "Norwegen",
     "RO": "Rumänien"
+  },
+  "map": {
+    "close": "Schliessen",
+    "heading": "Wo es hingeht",
+    "hint": "Tippe auf einen Punkt",
+    "label": "Karte der Routen",
+    "lede": "Jeder Punkt ist eine Route, die abgefahren und geprüft wurde. Tippe drauf.",
+    "loading": "Karte wird geladen …",
+    "open": "Ansehen"
   }
 }

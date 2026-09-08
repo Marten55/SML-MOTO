@@ -102,5 +102,14 @@
     "IT": "Italie",
     "NO": "Norvège",
     "RO": "Roumanie"
+  },
+  "map": {
+    "close": "Fermer",
+    "heading": "Où ça mène",
+    "hint": "Touchez un point",
+    "label": "Carte des itinéraires",
+    "lede": "Chaque point est un itinéraire parcouru et vérifié. Touchez-en un.",
+    "loading": "Chargement de la carte …",
+    "open": "Ouvrir"
   }
 }

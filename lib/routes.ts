@@ -118,3 +118,15 @@ export function googleMapsUrl(route: Route): string {
 export function isSellable(route: Route): boolean {
   return Boolean(route.assets.track && route.assets.navigation);
 }
+
+/**
+ * Ťažisko trasy. Na mape sa marker umiestňuje sem, nie na štart — označuje,
+ * kde trasa je, a nezlepí sa s inou, ktorá vychádza z toho istého mesta.
+ * (Bernina aj Julier štartujú z Churu a markery si navzájom blokovali klik.)
+ */
+export function routeCenter(route: Route): [number, number] {
+  const points = [route.start, ...route.via, route.finish];
+  const lat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
+  const lng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
+  return [lat, lng];
+}
