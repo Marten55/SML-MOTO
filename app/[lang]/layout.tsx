@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Barlow_Condensed, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 
+import { ConsentProvider } from '@/components/cookie-consent';
 import { getDictionary, isLocale, locales, localeNames, type Locale } from '@/lib/i18n';
 import '../globals.css';
 
@@ -73,9 +75,19 @@ export default async function LangLayout({
       className={`${barlowCondensed.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body className="min-h-dvh font-sans antialiased">
-        <SiteHeader lang={lang} dict={dict} />
-        <main>{children}</main>
-        <SiteFooter dict={dict} />
+        <ConsentProvider
+          labels={{
+            text: dict.consent.text,
+            accept: dict.consent.accept,
+            decline: dict.consent.decline,
+            more: dict.consent.more,
+            moreHref: `/${lang}/datenschutz`,
+          }}
+        >
+          <SiteHeader lang={lang} dict={dict} />
+          <main>{children}</main>
+          <SiteFooter lang={lang} dict={dict} />
+        </ConsentProvider>
       </body>
     </html>
   );
@@ -141,12 +153,59 @@ function LocaleSwitcher({ current }: { current: Locale }) {
   );
 }
 
-function SiteFooter({ dict }: { dict: Awaited<ReturnType<typeof getDictionary>> }) {
+/** Sociálne siete zo starého webu. Odkazy zatiaľ nikam nevedú — klient ich dodá. */
+const SOCIALS = [
+  { label: 'Facebook', glyph: 'f', href: '#' },
+  { label: 'Instagram', glyph: '◍', href: '#' },
+  { label: 'YouTube', glyph: '▶', href: '#' },
+  { label: 'TikTok', glyph: '♫', href: '#' },
+  { label: 'E-mail', glyph: '✉', href: 'mailto:info@sml.sk' },
+];
+
+function SiteFooter({
+  lang,
+  dict,
+}: {
+  lang: Locale;
+  dict: Awaited<ReturnType<typeof getDictionary>>;
+}) {
   return (
     <footer className="mt-24 border-t border-line">
-      <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-6 py-8 font-mono text-xs text-ink-3">
-        <span>{dict.brand.claim}</span>
-        <span>Ride simple. Live free.</span>
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-12">
+        <Image src="/logo.png" alt="SML" width={110} height={110} className="opacity-90" />
+
+        <nav className="flex gap-3" aria-label={dict.footer.contact}>
+          {SOCIALS.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              title={s.label}
+              aria-label={s.label}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink-3 hover:border-accent hover:text-accent"
+            >
+              <span aria-hidden>{s.glyph}</span>
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 font-mono text-xs text-ink-3">
+          <Link href={`/${lang}/impressum`} className="hover:text-accent">
+            Impressum
+          </Link>
+          <Link href={`/${lang}/datenschutz`} className="hover:text-accent">
+            {dict.consent.more}
+          </Link>
+          <Link href={`/${lang}/agb`} className="hover:text-accent">
+            AGB
+          </Link>
+        </div>
+
+        <p className="font-mono text-xs text-ink-3">{dict.brand.claim}</p>
+
+        {/* Easter egg zo starého webu — viditeľný až po označení textu */}
+        <p className="font-mono text-xs text-transparent select-all">
+          {dict.footer.secret}
+        </p>
       </div>
     </footer>
   );

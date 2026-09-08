@@ -111,5 +111,25 @@
     "lede": "Každý bod je trasa, ktorú niekto prešiel a overil. Ťukni na niektorý.",
     "loading": "Načítavam mapu …",
     "open": "Otvoriť"
+  },
+  "intro": {
+    "body": "Horské priechody, kľukaté cesty, mlčiace údolia. Tu nájdeš trasy, ktoré stoja za to — overené, premyslené a pripravené na stiahnutie.",
+    "head": "Každá cesta má svoj príbeh.",
+    "label": "Objavuj trasy"
+  },
+  "about": {
+    "body": "Motocykel pre mňa znamená slobodu a jednoduchosť života. Jazdím s dôrazom na bezpečnosť a pohodu na cestách. Vyhľadávam horské priechody, tiché cesty a miesta, kde sa čas spomaľuje. Každá cesta je príbeh — a ja ich rád zdieľam s vami.",
+    "tagline": "Simple Life, Safe Rides!",
+    "title": "O mne"
+  },
+  "consent": {
+    "accept": "Súhlasím",
+    "decline": "Nie, ďakujem",
+    "more": "Ochrana údajov",
+    "text": "Hero video sa načítava z YouTube, ktoré si o tebe vie uložiť údaje. Bez súhlasu ho nespustíme — zvyšok webu funguje rovnako."
+  },
+  "footer": {
+    "contact": "Kontakt",
+    "secret": "SML = Slaninku Mirko ľúbi ❤"
   }
 }

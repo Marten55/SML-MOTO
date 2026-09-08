@@ -111,5 +111,25 @@
     "lede": "Every point is a route that was ridden and checked. Tap one.",
     "loading": "Loading the map …",
     "open": "Open"
+  },
+  "intro": {
+    "body": "Mountain passes, winding roads, silent valleys. Here you will find routes worth riding — checked, thought through and ready to download.",
+    "head": "Every road has a story.",
+    "label": "Discover routes"
+  },
+  "about": {
+    "body": "A motorcycle means freedom and a simple life to me. I ride with safety and ease in mind. I look for mountain passes, quiet roads and places where time slows down. Every ride is a story — and I like sharing them.",
+    "tagline": "Simple Life, Safe Rides!",
+    "title": "About me"
+  },
+  "consent": {
+    "accept": "I agree",
+    "decline": "No thanks",
+    "more": "Privacy",
+    "text": "The hero video is loaded from YouTube, which can store data about you. We will not load it without your consent — the rest of the site works the same."
+  },
+  "footer": {
+    "contact": "Contact",
+    "secret": "SML = Slaninku Mirko ľúbi ❤"
   }
 }

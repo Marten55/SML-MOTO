@@ -111,5 +111,25 @@
     "lede": "Jeder Punkt ist eine Route, die abgefahren und geprüft wurde. Tippe drauf.",
     "loading": "Karte wird geladen …",
     "open": "Ansehen"
+  },
+  "intro": {
+    "body": "Bergpässe, kurvige Strassen, stille Täler. Hier findest du Routen, die sich lohnen — abgefahren, durchdacht und bereit zum Herunterladen.",
+    "head": "Jede Strasse hat ihre Geschichte.",
+    "label": "Routen entdecken"
+  },
+  "about": {
+    "body": "Das Motorrad bedeutet für mich Freiheit und ein einfaches Leben. Ich fahre mit Blick auf Sicherheit und Gelassenheit. Ich suche Bergpässe, stille Strassen und Orte, an denen die Zeit langsamer wird. Jede Fahrt ist eine Geschichte — und ich teile sie gern.",
+    "tagline": "Simple Life, Safe Rides!",
+    "title": "Über mich"
+  },
+  "consent": {
+    "accept": "Einverstanden",
+    "decline": "Nein, danke",
+    "more": "Datenschutz",
+    "text": "Das Hero-Video kommt von YouTube, das dabei Daten über dich speichern kann. Ohne Zustimmung laden wir es nicht — der Rest der Seite funktioniert gleich."
+  },
+  "footer": {
+    "contact": "Kontakt",
+    "secret": "SML = Slaninku Mirko ľúbi ❤"
   }
 }

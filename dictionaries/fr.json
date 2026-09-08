@@ -111,5 +111,25 @@
     "lede": "Chaque point est un itinéraire parcouru et vérifié. Touchez-en un.",
     "loading": "Chargement de la carte …",
     "open": "Ouvrir"
+  },
+  "intro": {
+    "body": "Cols de montagne, routes sinueuses, vallées silencieuses. Vous trouverez ici des itinéraires qui en valent la peine — vérifiés, réfléchis et prêts à télécharger.",
+    "head": "Chaque route a son histoire.",
+    "label": "Découvrir les itinéraires"
+  },
+  "about": {
+    "body": "La moto, pour moi, c'est la liberté et la simplicité. Je roule en pensant à la sécurité et au plaisir. Je cherche les cols, les routes tranquilles et les endroits où le temps ralentit. Chaque route est une histoire — et j'aime les partager.",
+    "tagline": "Simple Life, Safe Rides!",
+    "title": "À propos"
+  },
+  "consent": {
+    "accept": "J'accepte",
+    "decline": "Non merci",
+    "more": "Confidentialité",
+    "text": "La vidéo est chargée depuis YouTube, qui peut enregistrer des données vous concernant. Sans votre accord, nous ne la chargeons pas — le reste du site fonctionne pareil."
+  },
+  "footer": {
+    "contact": "Contact",
+    "secret": "SML = Slaninku Mirko ľúbi ❤"
   }
 }
