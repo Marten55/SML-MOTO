@@ -12,7 +12,7 @@
   },
   "home": {
     "title": "Cesty, ktoré niekto naozaj prešiel.",
-    "subtitle": "Žiadny algoritmus, žiadna náhodná čiara na mape. Každú trasu tu niekto osobne prejazdil, overil a pripravil tak, aby ti ju navigácia na polceste ticho neprepočítala.",
+    "subtitle": "Žiadny algoritmus, žiadna náhodná čiara na mape. Každú trasu tu ručne pripravil človek nad švajčiarskymi topografickými mapami — so zreteľom na povrch aj na to, kadiaľ sa smie.",
     "browse": "Pozrieť trasy",
     "planFree": "Vyskladať vlastnú trasu — zadarmo"
   },
@@ -109,7 +109,7 @@
     "heading": "Kam to vedie",
     "hint": "Ťukni na bod",
     "label": "Mapa trás",
-    "lede": "Každý bod je trasa, ktorú niekto prešiel a overil. Ťukni na niektorý.",
+    "lede": "Každý bod je trasa pripravená ručne, nie vypočítaná algoritmom. Ťukni na niektorú.",
     "loading": "Načítavam mapu …",
     "open": "Otvoriť"
   },
@@ -156,8 +156,8 @@
     "clear": "Vymazať všetko",
     "hint": "Ťukni na mapu a pridaj prvý bod",
     "lede": "Klikni na mapu, kadiaľ chceš ísť. Spočítame ti trasu, ktorá sa vyhne diaľniciam, a pošleme ti ju do navigácie. Zadarmo a bez registrácie.",
-    "nearbyHeading": "Takto tade jazdí lokál",
-    "nearbyLede": "Overené trasy z rovnakého kraja. Tie niekto osobne prešiel a pripravil tak, aby sa navigácia cestou neprepočítala.",
+    "nearbyHeading": "Hotové trasy v tomto kraji",
+    "nearbyLede": "Tieto nezostavil algoritmus. Sú pripravené ručne nad topografickými mapami a majú presnú stopu, ktorá sa v navigácii neprepočíta.",
     "title": "Vyskladaj si vlastnú trasu",
     "undo": "Späť o bod"
   },

@@ -9,8 +9,14 @@ import type { Locale } from '@/lib/i18n';
  * na vrátenie peňazí.
  *
  * Jedna vec je tu navyše oproti poznámkam a je dôležitá: podmienky musia
- * odlíšiť trasu vygenerovanú plánovačom (Bronze) od trasy, ktorú niekto
- * osobne prešiel (Silver, Gold). Pri Bronze SML negarantuje nič.
+ * rozlíšiť TRI úrovne, nie dve.
+ *
+ *   Bronze — vypočítal algoritmus, nikto ju neprešiel, negarantuje sa nič
+ *   Silver — pripravená nad topografickými podkladmi, ale nemusí byť
+ *            prejazdená osobne; časť trás na overenie ešte čaká
+ *   Gold   — lokálny jazdec ju osobne prešiel a overil
+ *
+ * Sľubovať overenie aj pri Silver by bolo tvrdenie, ktoré sa neplní.
  *
  * POZOR: toto nie je právne stanovisko. Pred ostrým spustením to má prejsť
  * niekto, kto na švajčiarske právo naozaj je — najmä Impressum a nDSG.
@@ -109,10 +115,11 @@ const sk: LegalContent = {
         ],
       },
       {
-        heading: 'Rozdiel medzi generovanou a overenou trasou',
+        heading: 'Tri úrovne overenia',
         body: [
-          'Trasy Silver a Gold niekto osobne prešiel a overil.',
-          'Trasa z bezplatného plánovača (Bronze) je výsledok automatického výpočtu. Nikto ju neprešiel a SML za ňu neručí v ničom — ani za zjazdnosť, ani za povolenie vjazdu, ani za povrch.',
+          'Bronze je výsledok automatického výpočtu z bezplatného plánovača. Nikto ju neprešiel a SML za ňu neručí v ničom — ani za zjazdnosť, ani za povolenie vjazdu, ani za povrch.',
+          'Silver je trasa pripravená SML nad topografickými podkladmi. Je zostavená so zreteľom na povrch a povolený vjazd, ale nemusí byť prejazdená osobne — časť trás na overenie lokálnym jazdcom ešte čaká.',
+          'Gold je trasa, ktorú lokálny jazdec osobne prešiel a overil. Len pri tejto úrovni SML potvrdzuje, že trasa bola v teréne skutočne prejdená.',
         ],
       },
       {
@@ -219,10 +226,11 @@ const de: LegalContent = {
         ],
       },
       {
-        heading: 'Unterschied zwischen generierter und geprüfter Route',
+        heading: 'Drei Stufen der Prüfung',
         body: [
-          'Silver- und Gold-Routen wurden persönlich abgefahren und geprüft.',
-          'Eine Route aus dem kostenlosen Planer (Bronze) ist ein automatisches Rechenergebnis. Niemand ist sie gefahren, und SML übernimmt dafür keinerlei Gewähr — weder für Befahrbarkeit noch für Zufahrtsrechte oder Belag.',
+          'Bronze ist ein automatisches Rechenergebnis aus dem kostenlosen Planer. Niemand ist sie gefahren, und SML übernimmt dafür keinerlei Gewähr — weder für Befahrbarkeit noch für Zufahrtsrechte oder Belag.',
+          'Silver ist eine von SML auf topografischer Grundlage erstellte Route. Sie ist mit Blick auf Belag und Zufahrtsrechte zusammengestellt, muss aber nicht persönlich abgefahren sein — ein Teil der Routen wartet noch auf die Prüfung durch einen ortskundigen Fahrer.',
+          'Gold ist eine Route, die ein ortskundiger Fahrer persönlich abgefahren und geprüft hat. Nur auf dieser Stufe bestätigt SML, dass die Route tatsächlich vor Ort befahren wurde.',
         ],
       },
       {
@@ -329,10 +337,11 @@ const en: LegalContent = {
         ],
       },
       {
-        heading: 'Generated versus checked routes',
+        heading: 'Three levels of checking',
         body: [
-          'Silver and Gold routes were ridden and checked in person.',
-          'A route from the free planner (Bronze) is the result of an automatic calculation. Nobody has ridden it, and SML gives no warranty for it whatsoever — not for passability, not for access rights, not for surface.',
+          'Bronze is the result of an automatic calculation from the free planner. Nobody has ridden it, and SML gives no warranty for it whatsoever — not for passability, not for access rights, not for surface.',
+          'Silver is a route prepared by SML from topographic sources. It is put together with surface and access rights in mind, but it need not have been ridden in person — some routes are still waiting to be checked by a local rider.',
+          'Gold is a route that a local rider has ridden and checked in person. Only at this level does SML confirm that the route was actually ridden on the ground.',
         ],
       },
       {
@@ -439,10 +448,11 @@ const fr: LegalContent = {
         ],
       },
       {
-        heading: 'Itinéraire généré ou vérifié',
+        heading: 'Trois niveaux de vérification',
         body: [
-          'Les itinéraires Silver et Gold ont été parcourus et vérifiés en personne.',
-          'Un itinéraire issu du planificateur gratuit (Bronze) est le résultat d’un calcul automatique. Personne ne l’a parcouru et SML n’offre aucune garantie le concernant — ni praticabilité, ni droit d’accès, ni revêtement.',
+          'Bronze est le résultat d’un calcul automatique issu du planificateur gratuit. Personne ne l’a parcouru et SML n’offre aucune garantie le concernant — ni praticabilité, ni droit d’accès, ni revêtement.',
+          'Silver est un itinéraire préparé par SML à partir de fonds topographiques. Il est composé en tenant compte du revêtement et des droits d’accès, mais il n’a pas nécessairement été parcouru en personne — certains itinéraires attendent encore la vérification d’un pilote local.',
+          'Gold est un itinéraire qu’un pilote local a parcouru et vérifié en personne. Ce n’est qu’à ce niveau que SML confirme que l’itinéraire a réellement été parcouru sur le terrain.',
         ],
       },
       {

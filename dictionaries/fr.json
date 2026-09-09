@@ -12,7 +12,7 @@
   },
   "home": {
     "title": "Des routes que quelqu'un a vraiment parcourues.",
-    "subtitle": "Pas d'algorithme, pas de trait au hasard sur une carte. Chaque itinéraire a été roulé en personne, vérifié et préparé pour que votre GPS ne le recalcule pas en route.",
+    "subtitle": "Pas d’algorithme, pas de trait au hasard sur une carte. Chaque itinéraire a été composé à la main sur les cartes topographiques suisses — en tenant compte du revêtement et des endroits où l’on a le droit de rouler.",
     "browse": "Voir les itinéraires",
     "planFree": "Créer votre itinéraire — gratuit"
   },
@@ -109,7 +109,7 @@
     "heading": "Où ça mène",
     "hint": "Touchez un point",
     "label": "Carte des itinéraires",
-    "lede": "Chaque point est un itinéraire parcouru et vérifié. Touchez-en un.",
+    "lede": "Chaque point est un itinéraire composé à la main, pas calculé par un algorithme. Touchez-en un.",
     "loading": "Chargement de la carte …",
     "open": "Ouvrir"
   },
@@ -156,8 +156,8 @@
     "clear": "Tout effacer",
     "hint": "Touchez la carte pour placer le premier point",
     "lede": "Touchez la carte là où vous voulez rouler. Nous calculons un itinéraire qui évite les autoroutes et vous l’envoyons dans votre navigation. Gratuit, sans inscription.",
-    "nearbyHeading": "Voici comment roule un local",
-    "nearbyLede": "Itinéraires vérifiés de la même région. Ceux-là ont été parcourus en personne et préparés pour que le GPS ne recalcule pas en route.",
+    "nearbyHeading": "Itinéraires prêts dans cette région",
+    "nearbyLede": "Ceux-ci n’ont pas été assemblés par un algorithme. Ils sont composés à la main sur cartes topographiques et portent une trace exacte qui ne se recalcule pas dans votre navigation.",
     "title": "Composez votre itinéraire",
     "undo": "Annuler le point"
   },

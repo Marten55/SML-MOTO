@@ -12,7 +12,7 @@
   },
   "home": {
     "title": "Roads someone has actually ridden.",
-    "subtitle": "No algorithm, no random line on a map. Every route here was ridden in person, checked, and prepared so your sat-nav will not quietly reroute you halfway through.",
+    "subtitle": "No algorithm, no random line on a map. Every route here was put together by hand on Swiss topographic maps — with an eye on surface and on where you are actually allowed to ride.",
     "browse": "Browse routes",
     "planFree": "Plan your own route — free"
   },
@@ -109,7 +109,7 @@
     "heading": "Where these go",
     "hint": "Tap a point",
     "label": "Map of routes",
-    "lede": "Every point is a route that was ridden and checked. Tap one.",
+    "lede": "Every point is a route built by hand, not by an algorithm. Tap one.",
     "loading": "Loading the map …",
     "open": "Open"
   },
@@ -156,8 +156,8 @@
     "clear": "Clear all",
     "hint": "Tap the map to place the first point",
     "lede": "Tap the map where you want to ride. We will work out a route that avoids motorways and send it to your navigation. Free, no sign-up.",
-    "nearbyHeading": "This is how a local rides here",
-    "nearbyLede": "Checked routes from the same area. Those were ridden in person and prepared so your sat-nav will not recalculate on the way.",
+    "nearbyHeading": "Ready-made routes in this area",
+    "nearbyLede": "These were not assembled by an algorithm. They are built by hand on topographic maps and carry an exact track that will not recalculate in your navigation.",
     "title": "Build your own route",
     "undo": "Undo point"
   },

@@ -12,7 +12,7 @@
   },
   "home": {
     "title": "Strecken, die jemand wirklich gefahren ist.",
-    "subtitle": "Kein Algorithmus, keine zufällige Linie auf der Karte. Jede Route hier wurde persönlich abgefahren, geprüft und so vorbereitet, dass dein Navi sie unterwegs nicht neu berechnet.",
+    "subtitle": "Kein Algorithmus, keine zufällige Linie auf der Karte. Jede Route hier hat ein Mensch von Hand auf Schweizer topografischen Karten erstellt — mit Blick auf Belag und darauf, wo man fahren darf.",
     "browse": "Routen ansehen",
     "planFree": "Eigene Route planen — gratis"
   },
@@ -109,7 +109,7 @@
     "heading": "Wo es hingeht",
     "hint": "Tippe auf einen Punkt",
     "label": "Karte der Routen",
-    "lede": "Jeder Punkt ist eine Route, die abgefahren und geprüft wurde. Tippe drauf.",
+    "lede": "Jeder Punkt ist eine von Hand erstellte Route, kein Rechenergebnis. Tippe drauf.",
     "loading": "Karte wird geladen …",
     "open": "Ansehen"
   },
@@ -156,8 +156,8 @@
     "clear": "Alles löschen",
     "hint": "Tippe auf die Karte und setze den ersten Punkt",
     "lede": "Tippe auf die Karte, wo du langfahren willst. Wir berechnen eine Route, die Autobahnen meidet, und schicken sie dir in die Navigation. Gratis und ohne Anmeldung.",
-    "nearbyHeading": "So fährt ein Einheimischer hier",
-    "nearbyLede": "Geprüfte Routen aus derselben Gegend. Die ist jemand persönlich gefahren und so vorbereitet, dass das Navi unterwegs nicht neu rechnet.",
+    "nearbyHeading": "Fertige Routen in dieser Gegend",
+    "nearbyLede": "Diese hat kein Algorithmus zusammengestellt. Sie sind von Hand auf topografischen Karten erstellt und haben eine exakte Spur, die sich im Navi nicht neu berechnet.",
     "title": "Stell dir deine Route zusammen",
     "undo": "Punkt zurück"
   },
