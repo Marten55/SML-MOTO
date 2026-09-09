@@ -147,5 +147,24 @@
     "rain": "Pluie",
     "snow": "Neige",
     "storm": "Orages"
+  },
+  "planner": {
+    "algorithmNote": "Cet itinéraire a été calculé par un algorithme. Personne ne l’a parcouru et nous n’offrons aucune garantie — ni praticabilité, ni revêtement, ni droit d’accès.",
+    "away": "d’ici",
+    "calculate": "Calculer l’itinéraire",
+    "calculating": "Calcul en cours …",
+    "clear": "Tout effacer",
+    "hint": "Touchez la carte pour placer le premier point",
+    "lede": "Touchez la carte là où vous voulez rouler. Nous calculons un itinéraire qui évite les autoroutes et vous l’envoyons dans votre navigation. Gratuit, sans inscription.",
+    "nearbyHeading": "Voici comment roule un local",
+    "nearbyLede": "Itinéraires vérifiés de la même région. Ceux-là ont été parcourus en personne et préparés pour que le GPS ne recalcule pas en route.",
+    "title": "Composez votre itinéraire",
+    "undo": "Annuler le point"
+  },
+  "plannerError": {
+    "generic": "Impossible de calculer l’itinéraire. Merci de réessayer.",
+    "noRoute": "Aucune route trouvée entre ces points. Rapprochez-les d’une route.",
+    "notConfigured": "Le planificateur n’est pas encore configuré.",
+    "rateLimited": "Trop de tentatives d’affilée. Patientez un instant."
   }
 }

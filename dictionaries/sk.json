@@ -147,5 +147,24 @@
     "rain": "Dážď",
     "snow": "Sneženie",
     "storm": "Búrky"
+  },
+  "planner": {
+    "algorithmNote": "Túto trasu vypočítal algoritmus. Nikto ju neprešiel a negarantujeme na nej nič — ani zjazdnosť, ani povrch, ani povolenie vjazdu.",
+    "away": "odtiaľto",
+    "calculate": "Spočítať trasu",
+    "calculating": "Počítam…",
+    "clear": "Vymazať všetko",
+    "hint": "Ťukni na mapu a pridaj prvý bod",
+    "lede": "Klikni na mapu, kadiaľ chceš ísť. Spočítame ti trasu, ktorá sa vyhne diaľniciam, a pošleme ti ju do navigácie. Zadarmo a bez registrácie.",
+    "nearbyHeading": "Takto tade jazdí lokál",
+    "nearbyLede": "Overené trasy z rovnakého kraja. Tie niekto osobne prešiel a pripravil tak, aby sa navigácia cestou neprepočítala.",
+    "title": "Vyskladaj si vlastnú trasu",
+    "undo": "Späť o bod"
+  },
+  "plannerError": {
+    "generic": "Trasu sa nepodarilo spočítať. Skús to prosím znova.",
+    "noRoute": "Medzi týmito bodmi sa nepodarilo nájsť cestu. Skús ich posunúť bližšie k ceste.",
+    "notConfigured": "Plánovač zatiaľ nie je nastavený.",
+    "rateLimited": "Priveľa pokusov za sebou. Chvíľu počkaj."
   }
 }

@@ -147,5 +147,24 @@
     "rain": "Rain",
     "snow": "Snow",
     "storm": "Storms"
+  },
+  "planner": {
+    "algorithmNote": "This route was calculated by an algorithm. Nobody has ridden it, and we give no warranty for it — not for passability, not for surface, not for access rights.",
+    "away": "away",
+    "calculate": "Calculate route",
+    "calculating": "Working …",
+    "clear": "Clear all",
+    "hint": "Tap the map to place the first point",
+    "lede": "Tap the map where you want to ride. We will work out a route that avoids motorways and send it to your navigation. Free, no sign-up.",
+    "nearbyHeading": "This is how a local rides here",
+    "nearbyLede": "Checked routes from the same area. Those were ridden in person and prepared so your sat-nav will not recalculate on the way.",
+    "title": "Build your own route",
+    "undo": "Undo point"
+  },
+  "plannerError": {
+    "generic": "We could not calculate the route. Please try again.",
+    "noRoute": "No road was found between these points. Try moving them closer to a road.",
+    "notConfigured": "The route planner is not set up yet.",
+    "rateLimited": "Too many attempts in a row. Wait a moment."
   }
 }

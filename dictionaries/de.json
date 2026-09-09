@@ -147,5 +147,24 @@
     "rain": "Regen",
     "snow": "Schnee",
     "storm": "Gewitter"
+  },
+  "planner": {
+    "algorithmNote": "Diese Route hat ein Algorithmus berechnet. Niemand ist sie gefahren, und wir übernehmen dafür keinerlei Gewähr — weder für Befahrbarkeit noch Belag oder Zufahrtsrechte.",
+    "away": "entfernt",
+    "calculate": "Route berechnen",
+    "calculating": "Berechne …",
+    "clear": "Alles löschen",
+    "hint": "Tippe auf die Karte und setze den ersten Punkt",
+    "lede": "Tippe auf die Karte, wo du langfahren willst. Wir berechnen eine Route, die Autobahnen meidet, und schicken sie dir in die Navigation. Gratis und ohne Anmeldung.",
+    "nearbyHeading": "So fährt ein Einheimischer hier",
+    "nearbyLede": "Geprüfte Routen aus derselben Gegend. Die ist jemand persönlich gefahren und so vorbereitet, dass das Navi unterwegs nicht neu rechnet.",
+    "title": "Stell dir deine Route zusammen",
+    "undo": "Punkt zurück"
+  },
+  "plannerError": {
+    "generic": "Die Route konnte nicht berechnet werden. Bitte versuch es nochmal.",
+    "noRoute": "Zwischen diesen Punkten wurde keine Strasse gefunden. Setze sie näher an eine Strasse.",
+    "notConfigured": "Der Routenplaner ist noch nicht eingerichtet.",
+    "rateLimited": "Zu viele Versuche hintereinander. Warte einen Moment."
   }
 }
