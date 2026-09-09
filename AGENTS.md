@@ -101,6 +101,17 @@ v Stripe Dashboarde. Nehľadaj integráciu, ktorá neexistuje.
 GitHub Flow. `main` je vždy funkčný, práca ide vo vetvách pomenovaných
 podľa fáz z ponuky (`feature/faza-1-web`), spája sa cez PR.
 
+## Dve cudzie služby, ktoré treba pred spustením doriešiť
+
+Obe teraz fungujú bez kľúča a bez registrácie, obe majú licenčný háčik
+pre komerčnú prevádzku. V oboch prípadoch je to zmena URL a kľúča,
+nie prepisovanie kódu:
+
+| Služba | Kde | Háčik |
+|---|---|---|
+| **OpenStreetMap dlaždice** | `components/route-map.tsx` | OSM neodporúča komerčnú prevádzku na svojich dlaždiciach. Riešenie: MapTiler, Stadia alebo Thunderforest. |
+| **Open-Meteo** | `lib/weather.ts` | Bezplatné pásmo je určené na nekomerčné použitie. Overiť licenciu, prípadne platený plán. |
+
 ## Čo ešte nie je overené
 
 - **Skutočná platba cez TWINT** — čaká na Stripe účet

@@ -4,7 +4,16 @@ import type { Metadata } from 'next';
 
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { getAllRoutes, getRouteBySlug, googleMapsUrl } from '@/lib/routes';
+import { RouteWeather } from '@/components/route-weather';
 import { UnlockButton } from '@/components/unlock-button';
+
+/**
+ * Stránka ostáva predgenerovaná, ale Next.js ju sám prestaví každú polhodinu,
+ * aby počasie nezamrzlo na hodnote z builderu. Obsah trasy sa nemení, takže
+ * je to len kvôli meteo bloku — a je to lacnejšie a menej krehké než ťahať
+ * počasie zvlášť cez klientský JavaScript.
+ */
+export const revalidate = 1800;
 
 export function generateStaticParams() {
   return locales.flatMap((lang) =>
@@ -114,6 +123,8 @@ export default async function RouteDetailPage({
 
           <h2 className="mt-12 font-display text-2xl font-semibold">{dict.route.gear}</h2>
           <p className="mt-3 max-w-[60ch] text-ink-2">{route.gear[lang]}</p>
+
+          <RouteWeather point={route.weatherPoint} dict={dict} locale={lang} />
         </div>
 
         <aside className="lg:sticky lg:top-8 lg:self-start">

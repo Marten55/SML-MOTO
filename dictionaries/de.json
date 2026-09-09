@@ -131,5 +131,20 @@
   "footer": {
     "contact": "Kontakt",
     "secret": "SML = Slaninku Mirko ľúbi ❤"
+  },
+  "weather": {
+    "at": "Gemessen bei",
+    "heading": "Wetter auf der Route",
+    "rain": "Niederschlag",
+    "source": "Quelle: Open-Meteo · wird halbstündlich aktualisiert",
+    "wind": "Wind"
+  },
+  "weatherKind": {
+    "clear": "Klar",
+    "cloudy": "Bewölkt",
+    "fog": "Nebel",
+    "rain": "Regen",
+    "snow": "Schnee",
+    "storm": "Gewitter"
   }
 }

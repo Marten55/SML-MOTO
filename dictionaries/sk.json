@@ -131,5 +131,20 @@
   "footer": {
     "contact": "Kontakt",
     "secret": "SML = Slaninku Mirko ľúbi ❤"
+  },
+  "weather": {
+    "at": "Merané pri",
+    "heading": "Počasie na trase",
+    "rain": "Zrážky",
+    "source": "Zdroj: Open-Meteo · aktualizuje sa každú polhodinu",
+    "wind": "Vietor"
+  },
+  "weatherKind": {
+    "clear": "Jasno",
+    "cloudy": "Oblačno",
+    "fog": "Hmla",
+    "rain": "Dážď",
+    "snow": "Sneženie",
+    "storm": "Búrky"
   }
 }
