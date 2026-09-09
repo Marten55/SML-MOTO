@@ -70,7 +70,8 @@
     "poiHint": "Tankstellen, Essen, Aussichtspunkte.",
     "roadbook": "RoadBook (PDF)",
     "maps": "In Google Maps öffnen",
-    "howto": "So bekommst du die Route in zwei Minuten aufs Handy"
+    "howto": "So bekommst du die Route in zwei Minuten aufs Handy",
+    "qr": "Mit dem Handy scannen — die Route öffnet sich in der Navigation"
   },
   "common": {
     "free": "gratis",

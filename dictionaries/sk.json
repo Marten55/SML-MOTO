@@ -70,7 +70,8 @@
     "poiHint": "Čerpačky, jedlo, vyhliadky.",
     "roadbook": "RoadBook (PDF)",
     "maps": "Otvoriť v Google Maps",
-    "howto": "Ako dostať trasu do mobilu za dve minúty"
+    "howto": "Ako dostať trasu do mobilu za dve minúty",
+    "qr": "Naskenuj mobilom a trasa sa otvorí v navigácii"
   },
   "common": {
     "free": "zadarmo",

@@ -70,7 +70,8 @@
     "poiHint": "Fuel, food, viewpoints.",
     "roadbook": "RoadBook (PDF)",
     "maps": "Open in Google Maps",
-    "howto": "Get the route onto your phone in two minutes"
+    "howto": "Get the route onto your phone in two minutes",
+    "qr": "Scan with your phone and the route opens in your navigation"
   },
   "common": {
     "free": "free",

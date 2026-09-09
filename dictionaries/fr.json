@@ -70,7 +70,8 @@
     "poiHint": "Carburant, restaurants, points de vue.",
     "roadbook": "RoadBook (PDF)",
     "maps": "Ouvrir dans Google Maps",
-    "howto": "Charger l'itinéraire sur votre téléphone en deux minutes"
+    "howto": "Charger l'itinéraire sur votre téléphone en deux minutes",
+    "qr": "Scannez avec votre téléphone : l'itinéraire s'ouvre dans la navigation"
   },
   "common": {
     "free": "gratuit",

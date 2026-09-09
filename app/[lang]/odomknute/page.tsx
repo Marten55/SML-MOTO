@@ -5,6 +5,7 @@ import { downloadUrl, verifyAccessToken, type DownloadKind } from '@/lib/access'
 import { accessTokenFor, availableDownloads } from '@/lib/delivery';
 import { getDictionary, isLocale, type Dictionary, type Locale } from '@/lib/i18n';
 import { getAllRoutes, googleMapsUrl, type Route } from '@/lib/routes';
+import { RouteQr } from '@/components/route-qr';
 import { getStripe } from '@/lib/stripe';
 
 /** Závisí od parametrov v adrese a od Stripe — nedá sa predgenerovať. */
@@ -61,14 +62,19 @@ export default async function UnlockedPage({
         ))}
       </ul>
 
-      <a
-        href={googleMapsUrl(route)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-4 block rounded-sm border border-line px-5 py-4 text-center hover:border-accent hover:text-accent"
-      >
-        {dict.delivery.maps}
-      </a>
+      <div className="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <a
+          href={googleMapsUrl(route)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-sm border border-line px-5 py-4 text-center hover:border-accent hover:text-accent"
+        >
+          {dict.delivery.maps}
+        </a>
+
+        {/* Prenos z obrazovky do mobilu bez prepisovania odkazu */}
+        <RouteQr url={googleMapsUrl(route)} label={dict.delivery.qr} />
+      </div>
 
       <Link
         href={`/${lang}/navod`}
