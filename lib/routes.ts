@@ -23,7 +23,12 @@ export interface RouteAssets {
   poi?: string;
   /** Len Gold. */
   roadbook?: string;
+  /**
+   * Verejná ukážka na pár sekúnd bez zvuku, cesta v public/ (napr. /pov/furka.mp4).
+   * NIE plné POV video z Gold — to je platený obsah a ide cez /api/download.
+   */
   previewVideo?: string;
+  /** Prvý záber ukážky. Zobrazí sa, kým sa video nespustí. */
   poster?: string;
 }
 

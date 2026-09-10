@@ -8,7 +8,7 @@
  *
  * Spustenie:  node scripts/migrate-old-site-routes.mjs
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const COORDS = JSON.parse(
@@ -317,6 +317,11 @@ const out = ROUTES.map((r) => {
       navigation: `example-${r.slug}-navigation.gpx`,
       poi: `example-${r.slug}-poi.gpx`,
       ...(r.tier === 'gold' ? { roadbook: `example-${r.slug}-roadbook.pdf` } : {}),
+      // Ukážka na kartu, ak k trase existuje video — inak by ju nové
+      // spustenie skriptu z routes.json ticho vymazalo
+      ...(existsSync(path.join(process.cwd(), 'public', 'pov', `${r.slug}.mp4`))
+        ? { previewVideo: `/pov/${r.slug}.mp4`, poster: `/pov/${r.slug}.jpg` }
+        : {}),
     },
     isExample: true,
   };

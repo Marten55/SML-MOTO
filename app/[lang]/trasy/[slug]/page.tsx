@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
 import { getAllRoutes, getRouteBySlug, googleMapsUrl } from '@/lib/routes';
+import { PovPreview } from '@/components/pov-preview';
 import { RouteWeather } from '@/components/route-weather';
 import { UnlockButton } from '@/components/unlock-button';
 
@@ -103,9 +104,19 @@ export default async function RouteDetailPage({
             {route.passable ? dict.status.openHint : dict.status.closedHint}
           </p>
 
-          <div className="mt-8 flex aspect-video items-center justify-center rounded-sm border border-line bg-surface-2">
-            <span className="font-mono text-xs text-ink-3">POV</span>
-          </div>
+          {route.assets.previewVideo ? (
+            <PovPreview
+              src={route.assets.previewVideo}
+              poster={route.assets.poster}
+              sizes="(min-width: 1024px) 60vw, 100vw"
+              eager
+              className="mt-8 aspect-video rounded-sm border border-line"
+            />
+          ) : (
+            <div className="mt-8 flex aspect-video items-center justify-center rounded-sm border border-line bg-surface-2">
+              <span className="font-mono text-xs text-ink-3">POV</span>
+            </div>
+          )}
 
           <p className="mt-8 max-w-[64ch] text-lg text-ink-2">{route.summary[lang]}</p>
 

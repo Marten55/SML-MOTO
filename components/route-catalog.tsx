@@ -107,8 +107,9 @@ export function RouteCatalog({
         </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((route) => (
-            <RouteCard key={route.id} route={route} lang={lang} dict={dict} />
+          {/* Prvý riadok mriežky je na počítači hneď na obrazovke */}
+          {visible.map((route, i) => (
+            <RouteCard key={route.id} route={route} lang={lang} dict={dict} eager={i < 3} />
           ))}
         </div>
       )}
