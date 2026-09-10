@@ -11,7 +11,7 @@
     "legal": "Legal"
   },
   "home": {
-    "title": "Roads someone has actually ridden.",
+    "title": "Roads worth riding.",
     "subtitle": "No algorithm, no random line on a map. Every route here was put together by hand on Swiss topographic maps — with an eye on surface and on where you are actually allowed to ride.",
     "browse": "Browse routes",
     "planFree": "Plan your own route — free"
@@ -114,7 +114,7 @@
     "open": "Open"
   },
   "intro": {
-    "body": "Mountain passes, winding roads, silent valleys. Here you will find routes worth riding — checked, thought through and ready to download.",
+    "body": "Mountain passes, winding roads, silent valleys. Here you will find routes worth riding — thought through, built on topographic maps and ready to download.",
     "head": "Every road has a story.",
     "label": "Discover routes"
   },

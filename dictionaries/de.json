@@ -11,7 +11,7 @@
     "legal": "Rechtliches"
   },
   "home": {
-    "title": "Strecken, die jemand wirklich gefahren ist.",
+    "title": "Strecken, die sich lohnen.",
     "subtitle": "Kein Algorithmus, keine zufällige Linie auf der Karte. Jede Route hier hat ein Mensch von Hand auf Schweizer topografischen Karten erstellt — mit Blick auf Belag und darauf, wo man fahren darf.",
     "browse": "Routen ansehen",
     "planFree": "Eigene Route planen — gratis"
@@ -114,7 +114,7 @@
     "open": "Ansehen"
   },
   "intro": {
-    "body": "Bergpässe, kurvige Strassen, stille Täler. Hier findest du Routen, die sich lohnen — abgefahren, durchdacht und bereit zum Herunterladen.",
+    "body": "Bergpässe, kurvige Strassen, stille Täler. Hier findest du Routen, die sich lohnen — durchdacht, auf topografischen Karten erstellt und bereit zum Herunterladen.",
     "head": "Jede Strasse hat ihre Geschichte.",
     "label": "Routen entdecken"
   },
