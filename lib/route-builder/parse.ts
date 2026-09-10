@@ -1,5 +1,6 @@
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 
+import { bboxOf, haversineM, trackDistanceM } from './geo';
 import { detectSwissGrid, swissToWgs84 } from './swiss-coords';
 import type {
   FileFormat,
@@ -193,7 +194,9 @@ export function parseKml(content: string): Omit<ParsedFile, 'fileName' | 'format
       for (const line of asArray(g.LineString)) {
         const pts = parseKmlCoordinates(line.coordinates);
         if (pts.length > 0) {
-          track.push(...pts);
+          // Cyklus namiesto push(...pts): rozbalenie státisícov bodov
+          // do argumentov funkcie padá na limite zásobníka
+          for (const p of pts) track.push(p);
           kinds.add('trk');
         }
       }
@@ -363,35 +366,123 @@ export function parseFile(file: InputFile): ParsedFile {
   return { fileName: file.name, format, ...parsed };
 }
 
+const SAME_ENDPOINT_M = 200;
+const SAME_BBOX_M = 1000;
+const SAME_LENGTH_RATIO = 0.2;
+const SAME_WAYPOINT_M = 25;
+/** Koniec jednej časti a začiatok ďalšej v tom istom bode — netreba ho dvakrát. */
+const JOIN_POINT_M = 1;
+
+/**
+ * Je to tá istá trasa, len v inom súbore? Typicky GPX aj KML z jedného
+ * exportu, alebo stopa a jej navigovaná verzia.
+ *
+ * Nestačí rovnaký štart a cieľ — dva rôzne okruhy z toho istého hotela ich
+ * majú tiež. Líšia sa ale tým, kam až siahajú, a dĺžkou.
+ */
+export function isSameTrack(a: TrackPoint[], b: TrackPoint[]): boolean {
+  if (a.length < 2 || b.length < 2) return false;
+  if (haversineM(a[0], b[0]) > SAME_ENDPOINT_M) return false;
+  if (haversineM(a[a.length - 1], b[b.length - 1]) > SAME_ENDPOINT_M) return false;
+
+  const ba = bboxOf(a);
+  const bb = bboxOf(b);
+  const corner = (lat: number, lng: number) => ({ lat, lng });
+  if (haversineM(corner(ba.minLat, ba.minLng), corner(bb.minLat, bb.minLng)) > SAME_BBOX_M) return false;
+  if (haversineM(corner(ba.maxLat, ba.maxLng), corner(bb.maxLat, bb.maxLng)) > SAME_BBOX_M) return false;
+
+  const la = trackDistanceM(a);
+  const lb = trackDistanceM(b);
+  return Math.abs(la - lb) <= SAME_LENGTH_RATIO * Math.max(la, lb);
+}
+
+/**
+ * Z dvoch kópií tej istej trasy nechá lepšiu: stopu pred trasou na
+ * prepočítanie, potom tú s výškami, potom tú s viac bodmi.
+ * Pri úplnej zhode vyhráva skôr nahratý súbor.
+ */
+function betterCopy(a: ParsedFile, b: ParsedFile): ParsedFile {
+  const score = (f: ParsedFile) => [
+    f.kinds.includes('trk') ? 1 : 0,
+    f.track.some((p) => p.ele !== undefined) ? 1 : 0,
+    f.track.length,
+  ];
+  const sa = score(a);
+  const sb = score(b);
+  for (let i = 0; i < sa.length; i++) if (sa[i] !== sb[i]) return sb[i] > sa[i] ? b : a;
+  return a;
+}
+
+export interface DuplicateTrack {
+  fileName: string;
+  keptFileName: string;
+}
+
 /**
  * Zlúči viac súborov do jednej trasy — presne ten krok, ktorý Miroslav
- * dnes robí ručne v gpx.studio. Stopy idú za sebou v poradí nahratia,
- * body sa zjednotia a duplicity sa vyhodia.
+ * dnes robí ručne v gpx.studio. Rôzne časti trasy idú za sebou v poradí
+ * nahratia. Tá istá trasa vo viacerých formátoch sa použije len raz —
+ * inak by sa po nahratí GPX aj KML z jedného exportu zdvojnásobila.
  */
 export function mergeParsed(files: ParsedFile[]): {
   track: TrackPoint[];
   waypoints: Waypoint[];
   kinds: SourceKind[];
   swissGrid?: SwissGrid;
+  duplicates: DuplicateTrack[];
 } {
-  const track: TrackPoint[] = [];
-  const kinds = new Set<SourceKind>();
-  const seen = new Set<string>();
-  const waypoints: Waypoint[] = [];
-  let swissGrid: SwissGrid | undefined;
+  const parts: ParsedFile[] = [];
+  const dropped: { fileName: string; partIndex: number }[] = [];
 
   for (const f of files) {
-    track.push(...f.track);
-    f.kinds.forEach((k) => kinds.add(k));
-    if (f.swissGrid) swissGrid = f.swissGrid;
+    if (f.track.length === 0) continue;
+    const twin = parts.findIndex((p) => isSameTrack(p.track, f.track));
+    if (twin === -1) {
+      parts.push(f);
+      continue;
+    }
+    const kept = betterCopy(parts[twin], f);
+    dropped.push({ fileName: (kept === f ? parts[twin] : f).fileName, partIndex: twin });
+    parts[twin] = kept;
+  }
+
+  const track: TrackPoint[] = [];
+  for (const part of parts) {
+    const last = track[track.length - 1];
+    const start = last && haversineM(last, part.track[0]) < JOIN_POINT_M ? 1 : 0;
+    for (let i = start; i < part.track.length; i++) track.push(part.track[i]);
+  }
+
+  // Ten istý bod v dvoch súboroch: rovnaké meno a pár metrov od seba.
+  // Porovnanie zaokrúhlených súradníc by zlyhalo, lebo GPX a KML
+  // z toho istého exportu nemusia mať rovnaký počet desatinných miest.
+  const waypoints: Waypoint[] = [];
+  for (const f of files) {
     for (const w of f.waypoints) {
-      // Rovnaký bod v dvoch súboroch (napr. GPX aj KML z toho istého exportu)
-      const key = `${w.lat.toFixed(5)},${w.lng.toFixed(5)},${w.name}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      waypoints.push(w);
+      const existing = waypoints.find((x) => x.name === w.name && haversineM(x, w) < SAME_WAYPOINT_M);
+      if (!existing) {
+        waypoints.push({ ...w });
+        continue;
+      }
+      // KML často nemá popis alebo výšku, ktorú má GPX — doplníme, čo chýba
+      existing.desc ??= w.desc;
+      existing.ele ??= w.ele;
     }
   }
 
-  return { track, waypoints, kinds: [...kinds], ...(swissGrid ? { swissGrid } : {}) };
+  const kinds = new Set<SourceKind>();
+  for (const part of parts) for (const k of part.kinds) if (k !== 'wpt') kinds.add(k);
+  if (waypoints.length > 0) kinds.add('wpt');
+
+  const swissGrid = parts.find((p) => p.swissGrid)?.swissGrid;
+
+  return {
+    track,
+    waypoints,
+    kinds: [...kinds],
+    ...(swissGrid ? { swissGrid } : {}),
+    // Meno ponechaného súboru sa dopĺňa až na konci: tretia kópia mohla
+    // medzitým vytlačiť tú, ktorá vyhrala ako prvá
+    duplicates: dropped.map((d) => ({ fileName: d.fileName, keptFileName: parts[d.partIndex].fileName })),
+  };
 }

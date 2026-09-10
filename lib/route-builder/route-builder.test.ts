@@ -37,6 +37,11 @@ function gpxWithTrack(track: TrackPoint[], extra = ''): string {
   return `<?xml version="1.0"?><gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1">${extra}<trk><trkseg>${pts}</trkseg></trk></gpx>`;
 }
 
+function kmlWithTrack(track: TrackPoint[]): string {
+  const coords = track.map((p) => `${p.lng},${p.lat},${p.ele ?? 0}`).join(' ');
+  return `<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><LineString><coordinates>${coords}</coordinates></LineString></Placemark></Document></kml>`;
+}
+
 /** Zhruba 200 km cez pol Švajčiarska — aby sa odkazy do Google Maps museli deliť. */
 function longTrack(points = 3000): TrackPoint[] {
   return Array.from({ length: points }, (_, i) => {
@@ -321,6 +326,53 @@ describe('zloženie balíčka', () => {
     );
     expect(pkg.ok).toBe(true);
     expect(pkg.waypoints).toHaveLength(2);
+  });
+
+  // Miroslav nahrá celý export naraz — GPX aj KML tej istej trasy
+  it('tú istú trasu v GPX aj KML použije len raz, nezdvojnásobí ju', () => {
+    const track = furkaTrack();
+    const single = buildRoutePackage([{ name: 'f.gpx', content: gpxWithTrack(track) }], { name: 'F' });
+    const both = buildRoutePackage(
+      [
+        { name: 'f.gpx', content: gpxWithTrack(track) },
+        { name: 'f.kml', content: kmlWithTrack(track) },
+      ],
+      { name: 'F' },
+    );
+    expect(both.track).toHaveLength(track.length);
+    expect(both.stats!.distanceKm).toBe(single.stats!.distanceKm);
+    expect(both.issues.find((i) => i.code === 'duplicate_track')?.message).toContain('použil som len f.gpx');
+  });
+
+  it('zo stopy a navigovanej verzie tej istej cesty nechá stopu, aj keď prišla druhá', () => {
+    const track = furkaTrack();
+    const rte = `<gpx><rte>${simplifyToCount(track, 20)
+      .map((p) => `<rtept lat="${p.lat}" lon="${p.lng}"/>`)
+      .join('')}</rte></gpx>`;
+    const pkg = buildRoutePackage(
+      [
+        { name: 'navigacia.gpx', content: rte },
+        { name: 'stopa.gpx', content: gpxWithTrack(track) },
+      ],
+      { name: 'F' },
+    );
+    expect(pkg.track).toHaveLength(track.length);
+    expect(pkg.issues.map((i) => i.code)).not.toContain('route_not_track');
+    expect(pkg.issues.find((i) => i.code === 'duplicate_track')?.message).toContain('použil som len stopa.gpx');
+  });
+
+  it('dve nadväzujúce časti trasy spojí za sebou a spoločný bod nezdvojí', () => {
+    const track = furkaTrack();
+    const half = track.length / 2;
+    const pkg = buildRoutePackage(
+      [
+        { name: 'cast1.gpx', content: gpxWithTrack(track.slice(0, half + 1)) },
+        { name: 'cast2.gpx', content: gpxWithTrack(track.slice(half)) },
+      ],
+      { name: 'F' },
+    );
+    expect(pkg.track).toHaveLength(track.length);
+    expect(pkg.issues.map((i) => i.code)).not.toContain('duplicate_track');
   });
 
   it('pokazený súbor nahlási, ale ostatné spracuje', () => {

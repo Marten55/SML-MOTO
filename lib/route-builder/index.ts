@@ -32,7 +32,14 @@ export function buildRoutePackage(files: InputFile[], opts: { name: string; desc
 
   const merged = mergeParsed(parsed);
   const stats = merged.track.length >= 2 ? computeStats(merged.track) : null;
-  const issues = [...parseIssues, ...validate({ ...merged, stats })];
+  const duplicateIssues = merged.duplicates.map(
+    (d): Issue => ({
+      level: 'info',
+      code: 'duplicate_track',
+      message: `Súbor ${d.fileName} obsahuje tú istú trasu ako ${d.keptFileName} — použil som len ${d.keptFileName}.`,
+    }),
+  );
+  const issues = [...parseIssues, ...validate({ ...merged, stats }), ...duplicateIssues];
   const ok = !issues.some((i) => i.level === 'error');
 
   if (!ok || !stats) {
