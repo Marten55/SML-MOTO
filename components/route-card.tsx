@@ -2,25 +2,45 @@ import Link from 'next/link';
 
 import type { Dictionary, Locale } from '@/lib/i18n';
 import type { Route } from '@/lib/routes';
+import { PovPreview } from './pov-preview';
 
 export function RouteCard({
   route,
   lang,
   dict,
+  eager = false,
 }: {
   route: Route;
   lang: Locale;
   dict: Dictionary;
+  /** Karta je pri otvorení stránky hneď viditeľná — obrázok načítať bez čakania. */
+  eager?: boolean;
 }) {
   return (
     <Link
       href={`/${lang}/trasy/${route.slug}`}
-      className="group flex flex-col rounded-sm border border-line bg-surface transition-colors hover:border-line-strong"
+      data-pov-trigger
+      // Karta sa pod kurzorom zdvihne nad susedov. Zväčšenie nemení rozloženie
+      // mriežky, takže nič neposkočí. hover: v Tailwinde 4 platí len na
+      // zariadeniach s myšou, na mobile sa karta nezväčšuje.
+      // Pozor: scale-* v Tailwinde 4 zapisuje CSS vlastnosť `scale`, nie
+      // `transform` — preto je v zozname prechodov `scale`, inak by karta skočila.
+      className="group relative flex flex-col overflow-hidden rounded-sm border border-line bg-surface transition-[scale,box-shadow,border-color] duration-300 ease-out hover:z-10 hover:border-line-strong hover:shadow-[0_24px_48px_-16px_rgb(0_0_0/0.45)] motion-safe:hover:scale-[1.04]"
     >
-      {/* Miesto pre POV video. Kým nedorazí, drží pomer strán, aby karta neposkakovala. */}
-      <div className="flex aspect-video items-center justify-center border-b border-line bg-surface-2">
-        <span className="font-mono text-xs text-ink-3">POV</span>
-      </div>
+      {route.assets.previewVideo ? (
+        <PovPreview
+          src={route.assets.previewVideo}
+          poster={route.assets.poster}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          eager={eager}
+          className="aspect-video border-b border-line"
+        />
+      ) : (
+        // Kým video nedorazí, miesto drží pomer strán, aby karta neposkakovala
+        <div className="flex aspect-video items-center justify-center border-b border-line bg-surface-2">
+          <span className="font-mono text-xs text-ink-3">POV</span>
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center gap-2">
