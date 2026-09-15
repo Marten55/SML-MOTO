@@ -129,6 +129,9 @@
     "more": "Privacy",
     "text": "The hero video is loaded from YouTube, which can store data about you. We will not load it without your consent — the rest of the site works the same."
   },
+  "staging": {
+    "banner": "Preview — this is not the live site. Routes are examples and no payment is real."
+  },
   "footer": {
     "contact": "Contact",
     "secret": "SML = Slaninku Mirko ľúbi ❤"

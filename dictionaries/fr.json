@@ -129,6 +129,9 @@
     "more": "Confidentialité",
     "text": "La vidéo est chargée depuis YouTube, qui peut enregistrer des données vous concernant. Sans votre accord, nous ne la chargeons pas — le reste du site fonctionne pareil."
   },
+  "staging": {
+    "banner": "Aperçu — ce n'est pas le site en ligne. Les itinéraires sont des exemples et aucun paiement n'est réel."
+  },
   "footer": {
     "contact": "Contact",
     "secret": "SML = Slaninku Mirko ľúbi ❤"

@@ -129,6 +129,9 @@
     "more": "Ochrana údajov",
     "text": "Hero video sa načítava z YouTube, ktoré si o tebe vie uložiť údaje. Bez súhlasu ho nespustíme — zvyšok webu funguje rovnako."
   },
+  "staging": {
+    "banner": "Náhľad — toto nie je ostrý web. Trasy sú ukážkové a žiadna platba nie je skutočná."
+  },
   "footer": {
     "contact": "Kontakt",
     "secret": "SML = Slaninku Mirko ľúbi ❤"

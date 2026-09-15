@@ -96,6 +96,38 @@ Dashboarde webhook na `https://<doména>/api/webhook`, udalosť
 **TWINT nemá vlastný API kľúč.** Zapína sa ako platobná metóda priamo
 v Stripe Dashboarde. Nehľadaj integráciu, ktorá neexistuje.
 
+### Náhľad pre klienta (staging)
+
+Beží na subdoméne ADM so `SITE_ENV=staging`. To pridá hlavičku
+`X-Robots-Tag: noindex` a pruh „toto nie je ostrý web". Oboje sa rozhoduje
+pri builde — po zmene premennej treba nasadiť znova.
+
+- **Zámerne nie `Disallow` v robots.txt.** Google musí stránku načítať,
+  aby noindex videl. Zakázaná stránka sa do výsledkov dostane aj tak.
+- **Iný `DOWNLOAD_SIGNING_SECRET` než na ostrom webe.** Token vydaný
+  na náhľade by inak otváral platené trasy aj na ostrom webe.
+- **Stripe len testovacie kľúče** (`sk_test_`). Po platbe sa trasa odomkne
+  aj bez webhooku a bez Resend — `/odomknute` si platbu overí cez `session_id`.
+- **Bez `OPENROUTESERVICE_KEY` plánovač vráti 503.** Náhľad beží ako
+  produkcia, takže demo server OSRM sa nepoužije.
+
+### Na čo pri hostingu pozor
+
+- **Vercel Hobby je len na nekomerčné použitie** — výslovne vrátane webu,
+  za ktorý niekto dostal zaplatené
+  ([fair use](https://vercel.com/docs/limits/fair-use-guidelines#commercial-usage)).
+  Klientsky projekt patrí na Pro.
+- **Git LFS na Verceli nezapínať.** V LFS sú len hero videá starého webu
+  (`Videa/`, spolu ~870 MB) a nová aplikácia ich nepoužíva. Každý build by
+  ich stiahol a minul bezplatný LFS limit GitHubu (1 GB mesačne).
+- **Na serveri sú len ukážkové GPX.** `/api/download` číta z `content/gpx/`
+  a do gitu smú len `example-*`. Skutočné trasy potrebujú súkromné
+  úložisko — otvorené rozhodnutie, rieši sa pred prvou ostrou trasou.
+- Build zbalí `content/gpx/` k funkcii `/api/download` sám (overené
+  v `.next/server/app/api/download/route.js.nft.json`). Ak sa zmení, ako
+  sa cesta k súboru skladá, treba to overiť znova — inak stiahnutie
+  na serveri vráti `file_missing`, hoci lokálne funguje.
+
 ## Vetvenie
 
 GitHub Flow. `main` je vždy funkčný, práca ide vo vetvách pomenovaných
