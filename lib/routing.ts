@@ -28,8 +28,34 @@ export type RoutingError =
 /** Google Maps unesie v odkaze obmedzený počet zastávok — viac nemá zmysel zbierať. */
 export const MAX_PLAN_POINTS = 8;
 
+/**
+ * Kľúč ide do hlavičky Authorization, ktorá unesie len tlačiteľné ASCII.
+ * Keď sa do Vercelu vloží zamaskovaná hodnota (••••) alebo kľúč s medzerou
+ * uprostred, fetch spadne až pri požiadavke s nezrozumiteľným „ByteString".
+ * Na náhľade to stálo polhodinu hľadania — preto sa to kontroluje tu.
+ */
+function routingKey(): string | null {
+  const key = process.env.OPENROUTESERVICE_KEY?.trim();
+  if (!key) return null;
+
+  const printableAscii = [...key].every((c) => {
+    const code = c.charCodeAt(0);
+    return code > 32 && code < 127;
+  });
+
+  if (!printableAscii) {
+    console.error(
+      '[routing] OPENROUTESERVICE_KEY obsahuje neplatné znaky — pravdepodobne je ' +
+        'skopírovaný zamaskovaný (••••). Premennú zmaž a vlož kľúč znova.',
+    );
+    return null;
+  }
+
+  return key;
+}
+
 export function isRoutingConfigured(): boolean {
-  return Boolean(process.env.OPENROUTESERVICE_KEY);
+  return routingKey() !== null;
 }
 
 /**
@@ -49,8 +75,9 @@ export async function planRoute(
 
   const trimmed = points.slice(0, MAX_PLAN_POINTS);
 
-  if (isRoutingConfigured()) {
-    return planWithOpenRouteService(trimmed);
+  const key = routingKey();
+  if (key) {
+    return planWithOpenRouteService(trimmed, key);
   }
 
   if (devFallbackAllowed()) {
@@ -67,6 +94,7 @@ export async function planRoute(
 /** Hlavná cesta. Vyhýba sa diaľniciam a mýtu, čo je pri motorke zmysel celej veci. */
 async function planWithOpenRouteService(
   points: [number, number][],
+  key: string,
 ): Promise<{ route: PlannedRoute } | { error: RoutingError }> {
   try {
     const res = await fetch(
@@ -74,7 +102,7 @@ async function planWithOpenRouteService(
       {
         method: 'POST',
         headers: {
-          Authorization: process.env.OPENROUTESERVICE_KEY!,
+          Authorization: key,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

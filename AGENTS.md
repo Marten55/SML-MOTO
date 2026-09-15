@@ -99,14 +99,20 @@ v Stripe Dashboarde. Nehľadaj integráciu, ktorá neexistuje.
 ### Náhľad pre klienta (staging)
 
 Beží na https://sml.admtechnics.sk (Vercel, DNS záznam CNAME vo Websupporte)
-so `SITE_ENV=staging`. To pridá `<meta name="robots" content="noindex, nofollow">`
-a pruh „toto nie je ostrý web". Oboje sa rozhoduje pri builde — po zmene
+so `SITE_ENV=staging`. To pridá noindex (meta tag v `app/[lang]/layout.tsx`
+pre stránky, hlavičku `X-Robots-Tag` v `next.config.ts` pre všetko ostatné)
+a pruh „toto nie je ostrý web". Všetko sa rozhoduje pri builde — po zmene
 premennej treba nasadiť znova.
 
-- **noindex je v `app/[lang]/layout.tsx`, nie v `next.config.ts`.** Hlavička
-  `X-Robots-Tag` cez `headers()` fungovala lokálne, ale na Verceli sa
-  neprejavila, kým pruh z tej istej premennej áno. Príčina nezistená —
-  nevracaj ju tam bez overenia na živom náhľade.
+- **Do Vercelu nevkladaj celý `.env.example`.** Presne tak vznikol prázdny
+  `SITE_ENV` a náhľad bežal bez pruhu aj bez noindexu, hoci premenná
+  v zozname stála.
+- **Netajné premenné (`SITE_ENV`, `NEXT_PUBLIC_SITE_URL`, `MAIL_FROM`) ukladaj
+  vo Verceli ako typ Config.** Typ Secret sa po uložení nedá zobraziť, takže
+  chybnú hodnotu neodhalíš inak než z výsledku na webe.
+- **Pruh overuj na vykreslenom prvku (`role="note"`), nie na texte.** Text
+  pruhu je v slovníku, ktorý ide do prehliadača vždy — nájdeš ho aj vtedy,
+  keď pruh na stránke nie je.
 
 - **Zámerne nie `Disallow` v robots.txt.** Google musí stránku načítať,
   aby noindex videl. Zakázaná stránka sa do výsledkov dostane aj tak.
