@@ -84,6 +84,16 @@ export default async function LangLayout({
             moreHref: `/${lang}/datenschutz`,
           }}
         >
+          {/* Aby si nikto náhľad nepomýlil s ostrým webom — ani Miroslav, ani
+              náhodný návštevník, ktorý na subdoménu natrafí */}
+          {process.env.SITE_ENV === 'staging' && (
+            <div
+              role="note"
+              className="border-b border-warn/40 bg-surface-2 px-6 py-2 text-center font-mono text-xs text-warn"
+            >
+              {dict.staging.banner}
+            </div>
+          )}
           <SiteHeader lang={lang} dict={dict} />
           <main>{children}</main>
           <SiteFooter lang={lang} dict={dict} />

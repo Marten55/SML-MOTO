@@ -129,6 +129,9 @@
     "more": "Datenschutz",
     "text": "Das Hero-Video kommt von YouTube, das dabei Daten über dich speichern kann. Ohne Zustimmung laden wir es nicht — der Rest der Seite funktioniert gleich."
   },
+  "staging": {
+    "banner": "Vorschau — das ist nicht die Live-Website. Die Routen sind Beispiele, keine Zahlung ist echt."
+  },
   "footer": {
     "contact": "Kontakt",
     "secret": "SML = Slaninku Mirko ľúbi ❤"

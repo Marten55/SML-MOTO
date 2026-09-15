@@ -1,6 +1,11 @@
 # Hero videá starého webu idú cez Git LFS. Toto pravidlo musí ostať —
 # bez neho by sa videá commitli ako stovky MB priamo do histórie.
-*.MP4 filter=lfs diff=lfs merge=lfs -text
+#
+# Pravidlo je zámerne obmedzené na Videa/. Pôvodné „*.MP4" na Windows
+# (core.ignorecase) chytilo aj malé POV ukážky v public/pov/*.mp4, na Linuxe
+# (Vercel) by ich ale nechytilo a namiesto videa by sa nasadil textový
+# LFS pointer. Ukážky majú spolu 8 MB, patria do gitu normálne.
+Videa/*.MP4 filter=lfs diff=lfs merge=lfs -text
 
 # Normalizácia koncov riadkov — inak Windows vyrába šum v diffoch
 * text=auto eol=lf
