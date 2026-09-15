@@ -54,9 +54,8 @@ export async function generateMetadata({
     alternates: {
       languages: Object.fromEntries(locales.map((l) => [l, `/${l}`])),
     },
-    // Náhľad pre klienta nesmie do Google. Zámerne tu v HTML, nie ako hlavička
-    // v next.config — tá sa na Verceli neprejavila, kým pruh z tej istej
-    // premennej áno. Tento tag sa vykresľuje rovnako ako pruh.
+    // Náhľad pre klienta nesmie do Google. Hlavička v next.config.ts pokryje
+    // aj videá a API, tento tag je poistka priamo v HTML stránky.
     ...(process.env.SITE_ENV === 'staging' && {
       robots: { index: false, follow: false },
     }),
