@@ -1,29 +1,11 @@
 import type { NextConfig } from 'next';
 
-/**
- * Náhľad pre klienta beží na subdoméne ADM a nesmie sa dostať do Google.
- * Inak by sa zaindexovali ukážkové trasy a zástupné Impressum pod cudzou
- * doménou a ostrý web by potom súťažil sám so sebou o tie isté texty.
- *
- * Zámerne len hlavička noindex, BEZ zákazu v robots.txt: Google musí stránku
- * načítať, aby noindex vôbec uvidel. Zakázaná stránka sa môže do výsledkov
- * dostať aj tak — ako holá adresa, na ktorú niekto odkázal.
- *
- * headers() sa vyhodnocuje pri builde, takže zmena SITE_ENV chce nové nasadenie.
+/*
+ * noindex pre náhľad (SITE_ENV=staging) tu NIE JE, hoci by sem patril ako
+ * hlavička X-Robots-Tag cez headers(). Lokálne fungovala, na Verceli sa
+ * neprejavila (15. 9. 2026, príčina nezistená). Je v app/[lang]/layout.tsx
+ * ako meta tag — overené na živom náhľade.
  */
-const isStaging = process.env.SITE_ENV === 'staging';
-
-const nextConfig: NextConfig = {
-  async headers() {
-    if (!isStaging) return [];
-
-    return [
-      {
-        source: '/:path*',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
-      },
-    ];
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

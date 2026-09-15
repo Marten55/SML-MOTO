@@ -98,9 +98,15 @@ v Stripe Dashboarde. Nehľadaj integráciu, ktorá neexistuje.
 
 ### Náhľad pre klienta (staging)
 
-Beží na subdoméne ADM so `SITE_ENV=staging`. To pridá hlavičku
-`X-Robots-Tag: noindex` a pruh „toto nie je ostrý web". Oboje sa rozhoduje
-pri builde — po zmene premennej treba nasadiť znova.
+Beží na https://sml.admtechnics.sk (Vercel, DNS záznam CNAME vo Websupporte)
+so `SITE_ENV=staging`. To pridá `<meta name="robots" content="noindex, nofollow">`
+a pruh „toto nie je ostrý web". Oboje sa rozhoduje pri builde — po zmene
+premennej treba nasadiť znova.
+
+- **noindex je v `app/[lang]/layout.tsx`, nie v `next.config.ts`.** Hlavička
+  `X-Robots-Tag` cez `headers()` fungovala lokálne, ale na Verceli sa
+  neprejavila, kým pruh z tej istej premennej áno. Príčina nezistená —
+  nevracaj ju tam bez overenia na živom náhľade.
 
 - **Zámerne nie `Disallow` v robots.txt.** Google musí stránku načítať,
   aby noindex videl. Zakázaná stránka sa do výsledkov dostane aj tak.
