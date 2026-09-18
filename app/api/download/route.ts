@@ -3,7 +3,7 @@ import path from 'node:path';
 import { NextResponse } from 'next/server';
 
 import { isAccessConfigured, isDownloadKind, verifyAccessToken } from '@/lib/access';
-import { getAllRoutes } from '@/lib/routes';
+import { getPurchasedRoute } from '@/lib/routes-db';
 
 /**
  * Chránené stiahnutie. Súbory zámerne NIE SÚ v public/ — čokoľvek tam leží
@@ -34,7 +34,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'invalid_token' }, { status: 403 });
   }
 
-  const route = getAllRoutes().find((r) => r.id === payload.routeId);
+  // Aj trasa stiahnutá z predaja — kto zaplatil, má prístup natrvalo
+  const route = await getPurchasedRoute(payload.routeId);
   if (!route) {
     return NextResponse.json({ error: 'route_not_found' }, { status: 404 });
   }

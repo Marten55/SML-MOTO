@@ -1,5 +1,6 @@
 import 'server-only';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+
+import { signToken, verifyToken } from './signed-token';
 
 /**
  * Prístup k zaplatenej trase bez databázy a bez prihlasovania.
@@ -35,40 +36,14 @@ export function isAccessConfigured(): boolean {
   return Boolean(process.env.DOWNLOAD_SIGNING_SECRET);
 }
 
-const b64url = {
-  encode: (buf: Buffer) => buf.toString('base64url'),
-  decode: (str: string) => Buffer.from(str, 'base64url'),
-};
-
-function sign(data: string): string {
-  return b64url.encode(createHmac('sha256', getSecret()).update(data).digest());
-}
-
 export function createAccessToken(payload: AccessPayload): string {
-  const data = b64url.encode(Buffer.from(JSON.stringify(payload), 'utf8'));
-  return `${data}.${sign(data)}`;
+  return signToken(payload, getSecret());
 }
 
 export function verifyAccessToken(token: string): AccessPayload | null {
-  const parts = token.split('.');
-  if (parts.length !== 2) return null;
-
-  const [data, signature] = parts;
-
-  const expected = Buffer.from(sign(data));
-  const actual = Buffer.from(signature);
-
-  // Rovnaká dĺžka je podmienka timingSafeEqual, inak hádže výnimku
-  if (expected.length !== actual.length) return null;
-  if (!timingSafeEqual(expected, actual)) return null;
-
-  try {
-    const payload = JSON.parse(b64url.decode(data).toString('utf8')) as AccessPayload;
-    if (!payload.routeId || typeof payload.issuedAt !== 'number') return null;
-    return payload;
-  } catch {
-    return null;
-  }
+  const payload = verifyToken(token, getSecret()) as Partial<AccessPayload> | null;
+  if (!payload?.routeId || typeof payload.issuedAt !== 'number') return null;
+  return payload as AccessPayload;
 }
 
 /** Ktoré súbory sa dajú stiahnuť. Roadbook je len pri Gold. */

@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { downloadUrl, verifyAccessToken, type DownloadKind } from '@/lib/access';
 import { accessTokenFor, availableDownloads } from '@/lib/delivery';
 import { getDictionary, isLocale, type Dictionary, type Locale } from '@/lib/i18n';
-import { getAllRoutes, googleMapsUrl, type Route } from '@/lib/routes';
+import { googleMapsUrl, type Route } from '@/lib/routes';
+import { getPurchasedRoute } from '@/lib/routes-db';
 import { RouteQr } from '@/components/route-qr';
 import { getStripe } from '@/lib/stripe';
 
@@ -101,7 +102,7 @@ async function resolveAccess({
     const payload = verifyAccessToken(tokenParam);
     if (!payload) return null;
 
-    const route = getAllRoutes().find((r) => r.id === payload.routeId);
+    const route = await getPurchasedRoute(payload.routeId);
     return route ? { route, token: tokenParam } : null;
   }
 
@@ -117,7 +118,7 @@ async function resolveAccess({
     if (session.payment_status !== 'paid') return null;
 
     const routeId = session.metadata?.routeId;
-    const route = getAllRoutes().find((r) => r.id === routeId);
+    const route = routeId ? await getPurchasedRoute(routeId) : undefined;
     if (!route) return null;
 
     return { route, token: accessTokenFor(route, session.id) };

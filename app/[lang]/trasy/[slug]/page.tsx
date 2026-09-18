@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
-import { getAllRoutes, getRouteBySlug, googleMapsUrl } from '@/lib/routes';
+import { googleMapsUrl } from '@/lib/routes';
+import { getAllRoutes, getRouteBySlug } from '@/lib/routes-db';
 import { PovPreview } from '@/components/pov-preview';
 import { RouteWeather } from '@/components/route-weather';
 import { UnlockButton } from '@/components/unlock-button';
@@ -16,10 +17,11 @@ import { UnlockButton } from '@/components/unlock-button';
  */
 export const revalidate = 1800;
 
-export function generateStaticParams() {
-  return locales.flatMap((lang) =>
-    getAllRoutes().map((route) => ({ lang, slug: route.slug })),
-  );
+// Pri builde sa predgenerujú zverejnené trasy. Novú trasu z administrácie
+// Next.js vyrenderuje pri prvej návšteve (dynamicParams je predvolene zapnuté).
+export async function generateStaticParams() {
+  const routes = await getAllRoutes();
+  return locales.flatMap((lang) => routes.map((route) => ({ lang, slug: route.slug })));
 }
 
 export async function generateMetadata({
@@ -28,7 +30,7 @@ export async function generateMetadata({
   params: Promise<{ lang: string; slug: string }>;
 }): Promise<Metadata> {
   const { lang, slug } = await params;
-  const route = getRouteBySlug(slug);
+  const route = await getRouteBySlug(slug);
   if (!route || !isLocale(lang)) return {};
 
   return {
@@ -45,7 +47,7 @@ export default async function RouteDetailPage({
   const { lang, slug } = await params;
   if (!isLocale(lang)) notFound();
 
-  const route = getRouteBySlug(slug);
+  const route = await getRouteBySlug(slug);
   if (!route) notFound();
 
   const dict = await getDictionary(lang);

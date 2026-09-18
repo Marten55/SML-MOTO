@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { isLocale } from '@/lib/i18n';
-import { getRouteBySlug, isSellable } from '@/lib/routes';
+import { isSellable } from '@/lib/routes';
+import { getRouteBySlug } from '@/lib/routes-db';
 import { CURRENCY, PAYMENT_METHODS, getStripe } from '@/lib/stripe';
 
 export async function POST(request: Request) {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'invalid_body' }, { status: 400 });
   }
 
-  const route = getRouteBySlug(slug);
+  const route = await getRouteBySlug(slug);
   if (!route || !isSellable(route)) {
     return NextResponse.json({ error: 'route_not_found' }, { status: 404 });
   }

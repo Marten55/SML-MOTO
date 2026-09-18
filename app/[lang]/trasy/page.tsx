@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { RouteCatalog } from '@/components/route-catalog';
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
-import { getAllRoutes } from '@/lib/routes';
+import { getAllRoutes } from '@/lib/routes-db';
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
@@ -17,7 +17,7 @@ export default async function RoutesPage({
   if (!isLocale(lang)) notFound();
 
   const dict = await getDictionary(lang);
-  const routes = getAllRoutes();
+  const routes = await getAllRoutes();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">

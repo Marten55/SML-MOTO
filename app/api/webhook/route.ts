@@ -4,7 +4,7 @@ import type Stripe from 'stripe';
 import { isAccessConfigured } from '@/lib/access';
 import { accessTokenFor, sendRouteEmail } from '@/lib/delivery';
 import { isLocale } from '@/lib/i18n';
-import { getAllRoutes } from '@/lib/routes';
+import { getPurchasedRoute } from '@/lib/routes-db';
 import { getStripe } from '@/lib/stripe';
 
 /**
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  const route = getAllRoutes().find((r) => r.id === routeId);
+  const route = await getPurchasedRoute(routeId);
   if (!route) {
     console.error(`[webhook] Neznáma trasa ${routeId} v session ${session.id}`);
     return NextResponse.json({ received: true });

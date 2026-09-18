@@ -13,6 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # SML Moto — čo treba vedieť pred prvým zásahom
 
 Web a e-shop na predaj overených motorkárskych trás po alpských priesmykoch.
+Kde práca práve stojí a čo ju blokuje: [`STAV.md`](STAV.md).
 Odsúhlasený rozsah a rozhodnutia: [artefakt v3](https://claude.ai/code/artifact/1fd826fe-b2fd-4a13-a4a8-c4900903b51d)
 
 ## Tri veci, ktoré sa dajú ľahko pokaziť
@@ -37,7 +38,7 @@ Prechodný stav, kým nie je nová aplikácia nasadená:
 | Čo | Kde | Beží na |
 |---|---|---|
 | Starý statický web | `index.html`, `style.css`, `cookies.js`, `Videa/`, `Ikony/`, `vlajky/` | GitHub Pages — [živý](https://marten55.github.io/SML-MOTO/) |
-| Nová aplikácia | `app/`, `lib/`, `components/`, `content/`, `data/` | zatiaľ nikde |
+| Nová aplikácia | `app/`, `lib/`, `components/`, `content/`, `data/`, `supabase/` | náhľad pre klienta na [sml.admtechnics.sk](https://sml.admtechnics.sk) (Vercel), ostrá doména zatiaľ nie |
 
 Pages servírujú `index.html` z koreňa a o zvyšok sa nestarajú. `.nojekyll`
 je tam preto, aby sa Jekyll nepokúšal spracovať zdrojáky a Pages nespadli
@@ -51,14 +52,43 @@ Starého webu sa nedotýkaj inak než cez vetvu a PR.
 
 ## Ako to funguje
 
-Bez databázy a bez prihlasovania. Prístup k zaplatenej trase nesie token
-podpísaný cez HMAC-SHA256 — nemusí sa nikde ukladať a nedá sa podvrhnúť.
-Platí trvalo: trasu si človek kupuje týždne pred dovolenkou a na ceste ju
-otvára opakovane, takže expirácia by vyrábala len reklamácie.
+Zákazník sa neregistruje. Prístup k zaplatenej trase nesie token podpísaný
+cez HMAC-SHA256 (`lib/signed-token.ts`) — nemusí sa nikde ukladať a nedá sa
+podvrhnúť. Platí trvalo: trasu si človek kupuje týždne pred dovolenkou a na
+ceste ju otvára opakovane, takže expirácia by vyrábala len reklamácie.
+**Formát tokenu sa nesmie meniť** — stráži to `lib/signed-token.test.ts`.
 
-Trasy sú v `data/routes.json`, žiadna databáza. Odkaz do Google Maps sa
-generuje z tých istých dát. Zoznam zastávok sa orezáva na 8 — Google Maps
-URL viac neunesie a odkaz by sa ticho zlomil.
+Trasy sú v **Supabase** (tabuľka `routes`, schéma v `supabase/migrations/`).
+Čítanie je v `lib/routes-db.ts` (len server), typy a výpočty v `lib/routes.ts`
+(ten importujú aj komponenty v prehliadači). `data/routes.json` je seed
+(`npm run db:seed`) a lokálna záloha, keď Supabase nie je nastavený — na
+ostrom webe záloha zámerne neplatí. Odkaz do Google Maps sa generuje z tých
+istých dát. Zoznam zastávok sa orezáva na 8 — Google Maps URL viac neunesie
+a odkaz by sa ticho zlomil.
+
+### Databáza: kto čo smie
+
+| Klient | Kľúč | Čo vidí | Kto ho smie použiť |
+|---|---|---|---|
+| `publicClient()` | publishable | len `published = true`, zapisovať nemôže (RLS) | verejný web |
+| `adminClient()` | secret | všetko, RLS obchádza | kód za `requireAdmin()` a `getPurchasedRoute()` s ID z overeného tokenu |
+
+Trasa stiahnutá z predaja sa kupujúcim stále dá stiahnuť — preto
+`/api/download`, webhook aj `/odomknute` čítajú cez `getPurchasedRoute()`.
+
+### Administrácia (`/admin`)
+
+Jeden admin, jedno heslo: v premenných je len scrypt hash
+(`ADMIN_PASSWORD_HASH`, vyrobí `npm run admin:heslo`), prihlásenie je
+podpísaná cookie na 12 hodín (`ADMIN_SESSION_SECRET`). Zmena hesla odhlási
+všetky zariadenia. Limit pokusov (5 z jednej IP, 50 celkovo za 15 minút)
+je v tabuľke `admin_login_attempts` — v pamäti by na Verceli nefungoval,
+lebo beží viac inštancií naraz.
+
+**Každá stránka aj Server Action administrácie musí sama overiť admina**
+(`requireAdmin()` z `lib/admin-session.ts`, alebo funkcia z `lib/routes-db.ts`,
+ktorá to robí vo vnútri). Server Action je verejná POST adresa; `proxy.ts`
+pred /admin je len predbežná kontrola a dá sa obísť.
 
 Každá trasa má GPX v dvoch podobách a je to jadro produktu:
 **stopa** sa nepočíta, len kreslí (prístroj ju nemá ako skrátiť),
@@ -81,7 +111,17 @@ npm run dev
 ```
 
 Bez kľúčov web beží normálne — checkout vráti 503 a rozhranie na to reaguje
-hláškou „platby nie sú nastavené". To je zámer, nie chyba.
+hláškou „platby nie sú nastavené". To je zámer, nie chyba. Bez Supabase
+číta trasy z `data/routes.json` (len lokálne).
+
+**Databáza, prvé nastavenie** (raz na projekt Supabase):
+
+1. Spusti SQL zo `supabase/migrations/` v poradí podľa dátumu
+   (Supabase → SQL Editor, alebo `npx supabase db push`).
+2. Doplň `SUPABASE_*` do `.env.local` a spusti `npm run db:seed`.
+3. `npm run admin:heslo` → oba riadky `ADMIN_*` do `.env.local`.
+4. To isté (okrem seedu) do premenných na Verceli, typ Secret. Bez nich
+   build na Verceli zlyhá — zámerne.
 
 ## Nasadenie
 

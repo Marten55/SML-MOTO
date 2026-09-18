@@ -1,5 +1,10 @@
-import routesData from '@/data/routes.json';
 import type { Locale } from './i18n';
+
+/*
+ * Typy trás a výpočty nad nimi. Načítanie trás je v lib/routes-db.ts (len server)
+ * — tento súbor importujú aj komponenty v prehliadači (mapa, plánovač),
+ * preto sem nesmie nič, čo pozná kľúče k databáze.
+ */
 
 export type Tier = 'silver' | 'gold';
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -79,16 +84,6 @@ export interface Route {
    * aby sa nikdy nevydával za reálnu prejazdenú trasu.
    */
   isExample?: boolean;
-}
-
-const routes = routesData as unknown as Route[];
-
-export function getAllRoutes(): Route[] {
-  return routes;
-}
-
-export function getRouteBySlug(slug: string): Route | undefined {
-  return routes.find((r) => r.slug === slug);
 }
 
 /**
