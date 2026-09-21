@@ -1,6 +1,6 @@
 # Stav práce — nástroj na výrobu trás (administrácia)
 
-Posledná aktualizácia: 18. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
+Posledná aktualizácia: 21. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
 tu je len to, kde práca stojí a čo ju blokuje.
 
 ## Kroky
@@ -8,7 +8,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Krok | Obsah | Stav |
 |---|---|---|
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
-| **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | 🟡 kód hotový na vetve `feature/admin-a-supabase`, čaká na databázu |
+| **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | 🟡 hotové a overené s databázou na vetve `feature/admin-a-supabase`, čaká na premenné na Verceli |
 | B | obrazovka nahratia a náhľadu trasy | ⬜ |
 | D | zverejnenie trasy do katalógu, `revalidatePath()` | ⬜ potrebuje A |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
@@ -28,19 +28,25 @@ Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
 - **Prihlásenie:** scrypt hash hesla (`npm run admin:heslo`), podpísaná cookie
   na 12 h, limit 5 pokusov z IP / 50 celkovo za 15 min, `requireAdmin()`
   v každej stránke a Server Action, `proxy.ts` ako predbežná kontrola.
+  Pokus sa zapisuje **pred** overením hesla — pôvodné poradie pustilo
+  12 súbežných pokusov naraz (overené testom, opravené 21. 9.).
 - **Obrazovky:** `/admin/login`, `/admin` (zoznam trás), odhlásenie.
 - **Upratanie:** `middleware.ts` → `proxy.ts` (Next.js 16), podpis tokenov
   na jednom mieste (`lib/signed-token.ts`) — staré odkazy v e-mailoch platia.
 - **Testy:** 63 (z toho 24 nových). Prihlásenie prejdené v prehliadači
   13/13: presmerovanie, zlé a správne heslo, vlastnosti cookie, odhlásenie,
-  podvrhnutá cookie, limit pokusov.
+  podvrhnutá cookie, limit pokusov; 12 pokusov naraz → 0 overených.
+- **Overené s databázou (21. 9.):** 9 trás naplnených, produkčný build
+  (77 stránok), katalóg a detail z databázy, stiahnutie cez token.
+  RLS: verejný kľúč nevidí skrytú trasu, nezapíše trasu, nezmení cenu,
+  nevidí pokusy o prihlásenie; databáza odmietne cenu 0 aj od admina.
 
 ## Krok A — čo chýba, kým pôjde do `main`
 
-1. [ ] Projekt Supabase na účte ADM, región Frankfurt; `SUPABASE_*` do `.env.local`.
-2. [ ] Spustiť migráciu (SQL Editor alebo Supabase MCP) a `npm run db:seed`.
-3. [ ] `npm run admin:heslo` → `ADMIN_*` do `.env.local`.
-4. [ ] Produkčný build lokálne s databázou (`npm run build`).
+1. [x] Projekt Supabase na účte ADM, región Frankfurt; `SUPABASE_*` do `.env.local`.
+2. [x] Spustiť migráciu (SQL Editor alebo Supabase MCP) a `npm run db:seed`.
+3. [x] `npm run admin:heslo` → `ADMIN_*` do `.env.local`.
+4. [x] Produkčný build lokálne s databázou (`npm run build`).
 5. [ ] Na Verceli pridať `SUPABASE_*` a `ADMIN_*` (typ Secret, Production aj Preview).
 6. [ ] Až potom spojiť vetvu do `main`.
 

@@ -4,11 +4,11 @@ import { redirect } from 'next/navigation';
 
 import { verifyPassword } from '@/lib/admin-password';
 import {
+  beginLoginAttempt,
   clientIp,
   createAdminSession,
   deleteAdminSession,
-  loginBlocked,
-  recordLoginAttempt,
+  markLoginSucceeded,
 } from '@/lib/admin-session';
 import { adminAuthConfig } from '@/lib/admin-token';
 
@@ -32,8 +32,11 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     return { error: 'Administrácia nie je nastavená.' };
   }
 
-  const ip = await clientIp();
-  if (await loginBlocked(ip)) {
+  // Pokus sa zapíše ako neúspešný ešte pred overením hesla (prečo — pozri
+  // beginLoginAttempt). Zablokovaný pokus sa tiež počíta, takže kto skúša
+  // ďalej, predlžuje si zámok.
+  const attempt = await beginLoginAttempt(await clientIp());
+  if (attempt.blocked) {
     return { error: 'Priveľa neúspešných pokusov. Skús to znova o 15 minút.' };
   }
 
@@ -42,12 +45,12 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     return { error: 'Zadaj heslo.' };
   }
 
-  const ok = await verifyPassword(password, config.passwordHash);
-  await recordLoginAttempt(ip, ok);
-
   // Rovnaká hláška pri každom neúspechu — nič nenapovedá, čo bolo zle
-  if (!ok) return { error: 'Nesprávne heslo.' };
+  if (!(await verifyPassword(password, config.passwordHash))) {
+    return { error: 'Nesprávne heslo.' };
+  }
 
+  await markLoginSucceeded(attempt);
   await createAdminSession();
   redirect('/admin');
 }
