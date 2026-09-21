@@ -1,6 +1,8 @@
 import 'server-only';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+import { supabaseUrlProblem } from './supabase-url';
+
 /**
  * Dvaja klienti s rôznymi právami — oddelenie podľa oprávnení, nie podľa servera.
  *
@@ -36,20 +38,20 @@ function required(name: string): string {
   return value;
 }
 
+/** Zlá adresa zhodí build s jasnou hláškou, nie s „fetch failed". */
+function supabaseUrl(): string {
+  const url = process.env.SUPABASE_URL;
+  const problem = supabaseUrlProblem(url);
+  if (problem) throw new Error(problem);
+  return url as string;
+}
+
 export function publicClient(): SupabaseClient {
-  publicInstance ??= createClient(
-    required('SUPABASE_URL'),
-    required('SUPABASE_PUBLISHABLE_KEY'),
-    options,
-  );
+  publicInstance ??= createClient(supabaseUrl(), required('SUPABASE_PUBLISHABLE_KEY'), options);
   return publicInstance;
 }
 
 export function adminClient(): SupabaseClient {
-  adminInstance ??= createClient(
-    required('SUPABASE_URL'),
-    required('SUPABASE_SECRET_KEY'),
-    options,
-  );
+  adminInstance ??= createClient(supabaseUrl(), required('SUPABASE_SECRET_KEY'), options);
   return adminInstance;
 }
