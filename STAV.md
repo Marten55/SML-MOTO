@@ -8,7 +8,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Krok | Obsah | Stav |
 |---|---|---|
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
-| **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | 🟡 hotové a overené s databázou na vetve `feature/admin-a-supabase`, čaká na premenné na Verceli |
+| **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy | ⬜ |
 | D | zverejnenie trasy do katalógu, `revalidatePath()` | ⬜ potrebuje A |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
@@ -41,18 +41,25 @@ Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
   RLS: verejný kľúč nevidí skrytú trasu, nezapíše trasu, nezmení cenu,
   nevidí pokusy o prihlásenie; databáza odmietne cenu 0 aj od admina.
 
-## Krok A — čo chýba, kým pôjde do `main`
+## Krok A — nasadenie (hotové 21. 9.)
 
 1. [x] Projekt Supabase na účte ADM, región Frankfurt; `SUPABASE_*` do `.env.local`.
 2. [x] Spustiť migráciu (SQL Editor alebo Supabase MCP) a `npm run db:seed`.
 3. [x] `npm run admin:heslo` → `ADMIN_*` do `.env.local`.
 4. [x] Produkčný build lokálne s databázou (`npm run build`).
-5. [ ] Na Verceli pridať `SUPABASE_*` a `ADMIN_*` (typ Secret, Production aj Preview).
-6. [ ] Až potom spojiť vetvu do `main`.
+5. [x] Na Verceli pridať `SUPABASE_*` a `ADMIN_*` (typ Secret, Production aj Preview).
+6. [x] Spojené do `main`, overené naživo: `/admin` → prihlásenie, zlé heslo
+   odmietnuté a zapísané do databázy, katalóg a detail z databázy.
 
-**Nespájať do `main` skôr.** Bez `SUPABASE_*` build na Verceli zámerne
-zlyhá a náhľad pre klienta na sml.admtechnics.sk prestane fungovať.
-Náhľady vetvy na Verceli do toho času padajú — to je v poriadku.
+**Keď build na Verceli zlyhá** (napr. chýba premenná), doména ďalej ukazuje
+poslednú funkčnú verziu — web nespadne, len sa nová verzia nedostane von.
+
+**Pasce z nasadenia (21. 9.):**
+- Skutočné hodnoty patria do `.env.local` a do Vercelu, **nikdy** do
+  `.env.example` (ten je v gite). GitHub push s kľúčom Supabase odmietol.
+- `SUPABASE_URL` končí na `.supabase.co`, nie `.com`. Preklep dával len
+  „fetch failed“; odteraz build povie priamo, čo je zle (`lib/supabase-url.ts`).
+- `SUPABASE_URL` ukladať na Verceli ako typ **Config** — dá sa skontrolovať.
 
 ## Vyskúšanie lokálne
 

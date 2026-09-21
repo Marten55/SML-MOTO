@@ -15,13 +15,15 @@ import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 
 import { routeSchema, routeToRow } from '../lib/route-schema.ts';
+import { supabaseUrlProblem } from '../lib/supabase-url.ts';
 
 process.loadEnvFile('.env.local');
 
 const url = process.env.SUPABASE_URL;
 const secretKey = process.env.SUPABASE_SECRET_KEY;
-if (!url || !secretKey) {
-  console.error('V .env.local chýba SUPABASE_URL alebo SUPABASE_SECRET_KEY.');
+const urlProblem = supabaseUrlProblem(url);
+if (urlProblem || !url || !secretKey) {
+  console.error(urlProblem ?? 'V .env.local chýba SUPABASE_SECRET_KEY.');
   process.exit(1);
 }
 
