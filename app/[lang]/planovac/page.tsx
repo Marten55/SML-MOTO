@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
 import { getDictionary, isLocale, locales } from '@/lib/i18n';
-import { getAllRoutes } from '@/lib/routes';
+import { getAllRoutes } from '@/lib/routes-db';
 
 // Leaflet siaha na window, takže sa plánovač nesmie renderovať na serveri
 const Planner = dynamic(() =>
@@ -49,7 +49,7 @@ export default async function PlannerPage({
       <p className="mt-5 max-w-[62ch] text-lg text-ink-2">{dict.planner.lede}</p>
 
       <div className="mt-10">
-        <Planner routes={getAllRoutes()} lang={lang} dict={dict} />
+        <Planner routes={await getAllRoutes()} lang={lang} dict={dict} />
       </div>
     </div>
   );

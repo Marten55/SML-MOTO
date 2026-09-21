@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "admin:heslo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/hash-admin-password.mts",
+    "db:seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-routes.mts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
     "fast-xml-parser": "^5.11.1",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
@@ -18,7 +21,8 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
-    "stripe": "^22.6.1"
+    "stripe": "^22.6.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

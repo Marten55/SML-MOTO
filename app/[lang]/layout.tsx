@@ -1,33 +1,12 @@
 import type { Metadata } from 'next';
-import { Barlow_Condensed, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { ConsentProvider } from '@/components/cookie-consent';
 import { getDictionary, isLocale, locales, localeNames, type Locale } from '@/lib/i18n';
+import { fontVariables } from '../fonts';
 import '../globals.css';
-
-const barlowCondensed = Barlow_Condensed({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['500', '600', '700'],
-  variable: '--font-barlow-condensed',
-  display: 'swap',
-});
-
-const plexSans = IBM_Plex_Sans({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '500', '600'],
-  variable: '--font-plex-sans',
-  display: 'swap',
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '500'],
-  variable: '--font-plex-mono',
-  display: 'swap',
-});
 
 /** Všetky štyri jazyky sa predgenerujú pri builde. */
 export function generateStaticParams() {
@@ -77,7 +56,7 @@ export default async function LangLayout({
   return (
     <html
       lang={lang}
-      className={`${barlowCondensed.variable} ${plexSans.variable} ${plexMono.variable}`}
+      className={fontVariables}
     >
       <body className="min-h-dvh font-sans antialiased">
         <ConsentProvider

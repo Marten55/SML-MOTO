@@ -1,5 +1,17 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { ADMIN_COOKIE, adminAuthConfig, isValidAdminToken } from '@/lib/admin-token';
+
+/*
+ * Proxy (do Next.js 15 „middleware") beží pred každou stránkou. Robí dve veci:
+ *
+ * 1. Administrácia: neprihláseného pošle na /admin/login. Je to len PREDBEŽNÁ
+ *    kontrola — skutočná ochrana je requireAdmin() v každej stránke a Server
+ *    Action (lib/admin-session.ts). Proxy sa dá obísť zmenou matchera alebo
+ *    chybou vo frameworku (CVE-2025-29927), preto naň nespoliehame.
+ * 2. Web: adresu bez jazyka presmeruje na jazyk podľa prehliadača.
+ */
+
 const locales = ['en', 'de', 'fr', 'sk'] as const;
 const defaultLocale = 'de';
 
@@ -31,8 +43,22 @@ function pickLocale(header: string | null): string {
   return defaultLocale;
 }
 
-export function middleware(request: NextRequest) {
+function isAdminPath(pathname: string): boolean {
+  return pathname === '/admin' || pathname.startsWith('/admin/');
+}
+
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (isAdminPath(pathname)) {
+    if (pathname === '/admin/login') return NextResponse.next();
+
+    const token = request.cookies.get(ADMIN_COOKIE)?.value;
+    if (!isValidAdminToken(token, adminAuthConfig(), Date.now())) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    return NextResponse.next();
+  }
 
   const hasLocale = locales.some(
     (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),

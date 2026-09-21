@@ -16,13 +16,26 @@ const isStaging = process.env.SITE_ENV === 'staging';
 
 const nextConfig: NextConfig = {
   async headers() {
-    if (!isStaging) return [];
-
     return [
+      // Administrácia vždy, aj na ostrom webe: nepatrí do Google, nesmie sa
+      // vložiť do cudzej stránky (clickjacking) a nič z nej nemá ostať v cache.
+      // `:path*` znamená „nula a viac častí", takže pokryje aj samotné /admin.
       {
-        source: '/:path*',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+        source: '/admin/:path*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
       },
+      ...(isStaging
+        ? [
+            {
+              source: '/:path*',
+              headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+            },
+          ]
+        : []),
     ];
   },
 };

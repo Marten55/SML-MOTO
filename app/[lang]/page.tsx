@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Hero } from "@/components/hero";
 import { RouteCard } from "@/components/route-card";
 import { getDictionary, isLocale } from "@/lib/i18n";
-import { getAllRoutes } from "@/lib/routes";
+import { getAllRoutes } from "@/lib/routes-db";
 
 // Leaflet siaha na window, takže sa mapa nesmie renderovať na serveri
 const RouteMap = dynamic(() =>
@@ -21,7 +21,7 @@ export default async function HomePage({
   if (!isLocale(lang)) notFound();
 
   const dict = await getDictionary(lang);
-  const routes = getAllRoutes();
+  const routes = await getAllRoutes();
 
   return (
     <>

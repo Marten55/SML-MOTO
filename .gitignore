@@ -51,3 +51,10 @@ next-env.d.ts
 # --------------------------------------------------------------------------
 content/gpx/*
 !content/gpx/example-*
+
+# --------------------------------------------------------------------------
+# Osobné súbory presunuté z pracovnej plochy (iné projekty, zálohy, kontakty).
+# NIKDY do gitu — repo je verejné a je tu aj záloha s API kľúčmi
+# a databázou leadov (hladac-de2-zaloha-*.zip).
+# --------------------------------------------------------------------------
+/_plocha/
