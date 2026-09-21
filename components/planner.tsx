@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Map as LeafletMap, LayerGroup, Polyline } from 'leaflet';
 
 import type { Dictionary, Locale } from '@/lib/i18n';
+import { prefersDark, TILE_ATTRIBUTION as ATTRIBUTION, TILE_URL } from '@/lib/map-tiles';
 import { routeCenter, type Route } from '@/lib/routes';
 
 import 'leaflet/dist/leaflet.css';
@@ -17,10 +18,6 @@ import 'leaflet/dist/leaflet.css';
  * Pod výsledkom sa preto zobrazia overené trasy z rovnakého kraja — free vrstva
  * je lievik, nie konkurencia platenému obsahu.
  */
-
-const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 const MAX_POINTS = 8;
 
@@ -36,14 +33,6 @@ interface PlannedRoute {
 }
 
 type Status = 'idle' | 'loading' | 'error' | 'done';
-
-function prefersDark(): boolean {
-  if (typeof window === 'undefined') return false;
-  const stamped = document.documentElement.dataset.theme;
-  if (stamped === 'dark') return true;
-  if (stamped === 'light') return false;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
 
 /** Vzdušná vzdialenosť v km — na zoradenie blízkych trás stačí. */
 function distanceKm(a: [number, number], b: [number, number]): number {

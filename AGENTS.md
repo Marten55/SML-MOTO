@@ -193,7 +193,7 @@ nie prepisovanie kódu:
 
 | Služba | Kde | Háčik |
 |---|---|---|
-| **OpenStreetMap dlaždice** | `components/route-map.tsx` | OSM neodporúča komerčnú prevádzku na svojich dlaždiciach. Riešenie: MapTiler, Stadia alebo Thunderforest. |
+| **OpenStreetMap dlaždice** | `lib/map-tiles.ts` (všetky mapy) | OSM neodporúča komerčnú prevádzku na svojich dlaždiciach. Riešenie: MapTiler, Stadia alebo Thunderforest. |
 | **Open-Meteo** | `lib/weather.ts` | Bezplatné pásmo je určené na nekomerčné použitie. Overiť licenciu, prípadne platený plán. |
 | **Routing pre plánovač** | `lib/routing.ts` | Bez `OPENROUTESERVICE_KEY` sa vo vývoji použije demo server OSRM, ktorý je podľa podmienok **len na testovanie**. V produkcii bez kľúča vráti 503 — to je zámer, nie chyba. |
 

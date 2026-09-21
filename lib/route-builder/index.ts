@@ -4,6 +4,7 @@ import type { InputFile, Issue, ParsedFile, RoutePackage } from './types';
 import { buildMapsLinks, writeMasterGpx, writeNavigationGpx, writePoiGpx } from './write';
 
 export type * from './types';
+export { MAX_FILE_BYTES } from './parse';
 export { MAX_NAVIGATION_POINTS, MAPS_POINTS_PER_SEGMENT } from './write';
 
 /**

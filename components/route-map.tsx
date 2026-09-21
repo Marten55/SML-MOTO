@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Map as LeafletMap, Polyline } from 'leaflet';
 
 import type { Dictionary, Locale } from '@/lib/i18n';
+import { prefersDark, TILE_ATTRIBUTION as ATTRIBUTION, TILE_URL } from '@/lib/map-tiles';
 import { routeCenter, type Route } from '@/lib/routes';
 
 import 'leaflet/dist/leaflet.css';
@@ -26,21 +27,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
  * Pri plánovaných stovkách trás je to nutnosť, nie ozdoba.
  */
 
-/**
- * Podklady z OpenStreetMap — bez API kľúča.
- *
- * POZOR pred spustením naostro: OSM má vlastnú politiku používania dlaždíc
- * a komerčnú prevádzku na nich neodporúča. Pred ostrým spustením treba
- * prejsť na poskytovateľa s licenciou (MapTiler, Stadia, Thunderforest)
- * — je to zmena jedného riadku plus kľúč v premenných prostredia.
- *
- * CARTO tu bolo pôvodne, ale bez kľúča vracia dlaždice s vodoznakom
- * „API KEY REQUIRED" cez celú mapu.
- */
-const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+// Podklady (OpenStreetMap, pred spustením vymeniť) sú v lib/map-tiles.ts
 
 const TIER_COLOR: Record<string, string> = {
   gold: '#8a6600',
@@ -51,14 +38,6 @@ const TIER_COLOR_DARK: Record<string, string> = {
   gold: '#ddb254',
   silver: '#a9bac4',
 };
-
-function prefersDark(): boolean {
-  if (typeof window === 'undefined') return false;
-  const stamped = document.documentElement.dataset.theme;
-  if (stamped === 'dark') return true;
-  if (stamped === 'light') return false;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
 
 export function RouteMap({
   routes,

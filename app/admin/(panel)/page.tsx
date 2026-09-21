@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { getRoutesForAdmin } from '@/lib/routes-db';
 
 const dateFormat = new Intl.DateTimeFormat('sk-SK', {
@@ -15,9 +17,17 @@ export default async function AdminHomePage() {
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-display text-4xl font-semibold">Trasy</h1>
-        <p className="font-mono text-sm text-ink-3 tabular-nums">
-          {routes.length} spolu · {published} zverejnených
-        </p>
+        <div className="flex items-center gap-6">
+          <p className="font-mono text-sm text-ink-3 tabular-nums">
+            {routes.length} spolu · {published} zverejnených
+          </p>
+          <Link
+            href="/admin/nova-trasa"
+            className="rounded-sm bg-accent px-5 py-2.5 font-display text-sm font-semibold tracking-wider text-ground uppercase"
+          >
+            Nová trasa
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 overflow-x-auto">
@@ -66,9 +76,6 @@ export default async function AdminHomePage() {
         </table>
       </div>
 
-      <p className="mt-8 text-sm text-ink-3">
-        Nahrávanie a úprava trás pribudne v ďalšom kroku.
-      </p>
     </>
   );
 }
