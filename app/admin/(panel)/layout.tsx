@@ -16,13 +16,22 @@ export default async function AdminPanelLayout({ children }: { children: React.R
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
-      <header className="flex items-center justify-between gap-6 border-b border-line pb-4">
+      <header className="flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-line pb-4">
         <Link
           href="/admin"
           className="font-display text-sm font-semibold tracking-[0.2em] text-accent uppercase"
         >
           SML · administrácia
         </Link>
+
+        <nav className="flex flex-1 gap-6 text-sm text-ink-2">
+          <Link href="/admin" className="hover:text-accent">
+            Trasy
+          </Link>
+          <Link href="/admin/nova-trasa" className="hover:text-accent">
+            Nová trasa
+          </Link>
+        </nav>
 
         <form action={logout}>
           <button type="submit" className="font-mono text-sm text-ink-3 hover:text-accent">

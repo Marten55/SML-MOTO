@@ -9,7 +9,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 |---|---|---|
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
-| B | obrazovka nahratia a náhľadu trasy | ⬜ |
+| B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | 🟡 hotové na vetve `feature/admin-b-nahratie` |
 | D | zverejnenie trasy do katalógu, `revalidatePath()` | ⬜ potrebuje A |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
@@ -40,6 +40,24 @@ Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
   (77 stránok), katalóg a detail z databázy, stiahnutie cez token.
   RLS: verejný kľúč nevidí skrytú trasu, nezapíše trasu, nezmení cenu,
   nevidí pokusy o prihlásenie; databáza odmietne cenu 0 aj od admina.
+
+## Krok B — čo je hotové
+
+- **`/admin/nova-trasa`:** výber alebo pretiahnutie GPX/KML/CSV (aj viac naraz,
+  rovnaké meno nahradí starší súbor), KMZ odmietne s vysvetlením.
+- **Rozbor v prehliadači** — súbor sa nikam neposiela (žiadny limit 4,5 MB
+  serverovej funkcie, nič neopustí počítač pred zverejnením). Pri zverejnení
+  v kroku D ho server zopakuje sám.
+- **Náhľad:** verdikt (dá sa / nedá sa predať), chyby a upozornenia z jadra,
+  8 štatistík, mapa so stopou, štartom, cieľom a bodmi záujmu, stiahnutie
+  `-master`, `-navigation`, `-poi.gpx`, odkazy do Google Maps po úsekoch.
+- **Upratanie:** mapové podklady pre všetky mapy v `lib/map-tiles.ts` —
+  pred spustením sa menia na jednom mieste. `lib/slug.ts` pre názvy súborov
+  a neskôr adresy trás.
+- **Overené v prehliadači 12/12:** dobrá trasa, len body záujmu (nedá sa
+  predať, balíček sa neponúkne), len `<rte>` (upozornenie), KMZ, stiahnutý
+  GPX obsahuje stopu, body aj názov, žiadne chyby v konzole.
+- **Chýba:** skúška na skutočnom exporte zo Swisstopo — čaká na podklady.
 
 ## Krok A — nasadenie (hotové 21. 9.)
 
