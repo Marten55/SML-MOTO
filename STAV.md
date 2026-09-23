@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 hotové |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 v `main`, ďalej D2 |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -22,7 +22,7 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 
 | Časť | Obsah | Stav |
 |---|---|---|
-| **D1** | súkromné úložisko súborov, `/api/download` z neho | 🟡 hotové na vetve `feature/admin-d1-uloziste` |
+| **D1** | súkromné úložisko súborov, `/api/download` z neho | ✅ v `main`, nasadené na náhľad (23. 9.) |
 | D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ⬜ |
 | D3 | uloženie konceptu: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false` | ⬜ potrebuje D1, D2 |
 | D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail **aj úvodnú stránku** (mapa trás) | ⬜ potrebuje D3 |
@@ -43,6 +43,11 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
   stiahnuté cez token bajt po bajte zhodné s originálom, pod správnym menom;
   roadbook pri Silver → `file_not_available`, podvrhnutý token → `invalid_token`,
   chýbajúci súbor v úložisku → `file_missing` + záznam v logu.
+- **Naživo na náhľade (23. 9.):** nasadenie prešlo, katalóg beží, `/api/download`
+  odmieta zlý token. Celé stiahnutie sa tam overiť nedalo — náhľad má iný
+  `DOWNLOAD_SIGNING_SECRET` (zámerne) a Stripe ešte nie je nastavený.
+  **Overiť pri prvom testovacom nákupe:** zaplatiť kartou 4242…, na `/odomknute`
+  stiahnuť všetky súbory.
 - **Neoverené:** vypršanie 60 s odkazu (správanie Supabase, nie nášho kódu).
 
 ## Krok A — čo je hotové
