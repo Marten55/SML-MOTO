@@ -24,8 +24,9 @@ produkt by stratil zmysel. `.gitignore` pustí do `content/gpx/` len súbory
 s predponou `example-`. Nikdy to pravidlo neuvoľňuj.
 
 **2. GPX nikdy nepatrí do `public/`.**
-Čokoľvek tam leží je dostupné bez overenia. Súbory chodia cez
-`/api/download`, ktoré najprv overí podpísaný token.
+Čokoľvek tam leží je dostupné bez overenia. Súbory ležia v súkromnom
+úložisku a chodia cez `/api/download`, ktoré najprv overí podpísaný token
+a až potom presmeruje na odkaz platný minútu.
 
 **3. `index.html` v koreni sa nesmie zmazať.**
 Je to starý statický web, ktorý práve beží na GitHub Pages a ktorý klient
@@ -76,6 +77,12 @@ a odkaz by sa ticho zlomil.
 Trasa stiahnutá z predaja sa kupujúcim stále dá stiahnuť — preto
 `/api/download`, webhook aj `/odomknute` čítajú cez `getPurchasedRoute()`.
 
+**Súbory trás** (GPX, roadbook) sú v Supabase Storage, v súkromnom buckete
+`route-files`, cesta `<id trasy>/<meno súboru>` (`lib/route-file-path.ts`).
+Bucket nemá žiadne pravidlá pre verejný kľúč, takže ho vidí len `adminClient()`.
+**Nikdy ho neprepínaj na verejný** — `npm run db:subory` by v takom prípade
+skončil s chybou.
+
 ### Administrácia (`/admin`)
 
 Jeden admin, jedno heslo: v premenných je len scrypt hash
@@ -119,8 +126,10 @@ hláškou „platby nie sú nastavené". To je zámer, nie chyba. Bez Supabase
 1. Spusti SQL zo `supabase/migrations/` v poradí podľa dátumu
    (Supabase → SQL Editor, alebo `npx supabase db push`).
 2. Doplň `SUPABASE_*` do `.env.local` a spusti `npm run db:seed`.
-3. `npm run admin:heslo` → oba riadky `ADMIN_*` do `.env.local`.
-4. To isté (okrem seedu) do premenných na Verceli, typ Secret. Bez nich
+3. `npm run db:subory` — vytvorí súkromný bucket na súbory trás a nahrá
+   ukážkové GPX. Bez neho stiahnutie po zaplatení vráti `file_missing`.
+4. `npm run admin:heslo` → oba riadky `ADMIN_*` do `.env.local`.
+5. To isté (okrem seedu) do premenných na Verceli, typ Secret. Bez nich
    build na Verceli zlyhá — zámerne.
 
 ## Nasadenie
@@ -172,13 +181,12 @@ premennej treba nasadiť znova.
 - **Git LFS na Verceli nezapínať.** V LFS sú len hero videá starého webu
   (`Videa/`, spolu ~870 MB) a nová aplikácia ich nepoužíva. Každý build by
   ich stiahol a minul bezplatný LFS limit GitHubu (1 GB mesačne).
-- **Na serveri sú len ukážkové GPX.** `/api/download` číta z `content/gpx/`
-  a do gitu smú len `example-*`. Skutočné trasy potrebujú súkromné
-  úložisko — otvorené rozhodnutie, rieši sa pred prvou ostrou trasou.
-- Build zbalí `content/gpx/` k funkcii `/api/download` sám (overené
-  v `.next/server/app/api/download/route.js.nft.json`). Ak sa zmení, ako
-  sa cesta k súboru skladá, treba to overiť znova — inak stiahnutie
-  na serveri vráti `file_missing`, hoci lokálne funguje.
+- **Súbory trás nie sú na serveri, ale v Supabase Storage.** Na disk Vercelu
+  sa za behu zapisovať nedá a do gitu smú len `example-*`. `content/gpx/`
+  sa na serveri nepoužíva — je to len záloha pre lokálny vývoj bez Supabase.
+- **Stiahnutie nejde cez funkciu Vercelu.** Tá unesie najviac 4,5 MB
+  odpovede, preto `/api/download` presmeruje na podpísaný odkaz. Nemeň to
+  na čítanie súboru a jeho posielanie ďalej — pri väčšom roadbooku by to spadlo.
 
 ## Vetvenie
 
