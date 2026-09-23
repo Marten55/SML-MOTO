@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "admin:heslo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/hash-admin-password.mts",
-    "db:seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-routes.mts"
+    "db:seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-routes.mts",
+    "db:subory": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/upload-route-files.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",

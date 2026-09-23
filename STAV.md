@@ -1,6 +1,6 @@
 # Stav práce — nástroj na výrobu trás (administrácia)
 
-Posledná aktualizácia: 21. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
+Posledná aktualizácia: 23. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
 tu je len to, kde práca stojí a čo ju blokuje.
 
 ## Kroky
@@ -9,12 +9,41 @@ tu je len to, kde práca stojí a čo ju blokuje.
 |---|---|---|
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
-| B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | 🟡 hotové na vetve `feature/admin-b-nahratie` |
-| D | zverejnenie trasy do katalógu, `revalidatePath()` | ⬜ potrebuje A |
+| B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 hotové |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
 čaká na podklad.
+
+## Krok D — rozdelený na časti
+
+Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľadu.
+
+| Časť | Obsah | Stav |
+|---|---|---|
+| **D1** | súkromné úložisko súborov, `/api/download` z neho | 🟡 hotové na vetve `feature/admin-d1-uloziste` |
+| D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ⬜ |
+| D3 | uloženie konceptu: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false` | ⬜ potrebuje D1, D2 |
+| D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail **aj úvodnú stránku** (mapa trás) | ⬜ potrebuje D3 |
+| D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
+
+## Krok D1 — čo je hotové
+
+- **Úložisko:** bucket `route-files` v Supabase Storage, súkromný, limit 30 MB
+  na súbor. Cesta `<id trasy>/<meno súboru>` (`lib/route-file-path.ts`).
+  Vytvára ho `npm run db:subory`, ktorý nahrá aj ukážkové súbory — dá sa
+  pustiť opakovane a na tabuľku `routes` nesiaha.
+- **Stiahnutie:** `/api/download` po overení tokenu presmeruje (303) na odkaz
+  platný 60 s (`lib/route-files.ts`). Súbor nejde cez funkciu Vercelu, takže
+  ju neobmedzuje limit 4,5 MB. Bez Supabase (lokálny vývoj) číta z `content/gpx/`.
+- **Nasadené v Supabase (23. 9.):** bucket vytvorený, 28 ukážkových súborov nahraných.
+- **Overené:** bez kľúča aj s verejným kľúčom sa súbor nedá stiahnuť, podpísať,
+  nahrať ani vypísať; secret kľúč áno. Produkčný build: 4 súbory trasy r001
+  stiahnuté cez token bajt po bajte zhodné s originálom, pod správnym menom;
+  roadbook pri Silver → `file_not_available`, podvrhnutý token → `invalid_token`,
+  chýbajúci súbor v úložisku → `file_missing` + záznam v logu.
+- **Neoverené:** vypršanie 60 s odkazu (správanie Supabase, nie nášho kódu).
 
 ## Krok A — čo je hotové
 

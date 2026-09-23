@@ -3,11 +3,16 @@ import path from 'node:path';
 import { NextResponse } from 'next/server';
 
 import { isAccessConfigured, isDownloadKind, verifyAccessToken } from '@/lib/access';
+import { signedDownloadUrl } from '@/lib/route-files';
 import { getPurchasedRoute } from '@/lib/routes-db';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 /**
  * Chránené stiahnutie. Súbory zámerne NIE SÚ v public/ — čokoľvek tam leží
  * je dostupné bez overenia, takže by sa platený produkt dal stiahnuť zadarmo.
+ *
+ * Súbory ležia v súkromnom úložisku Supabase (lib/route-files.ts). Lokálne bez
+ * Supabase sa číta z content/gpx/ — tam sú len ukážkové trasy z gitu.
  */
 const GPX_DIR = path.join(process.cwd(), 'content', 'gpx');
 
@@ -44,6 +49,22 @@ export async function GET(request: Request) {
   if (!filename) {
     return NextResponse.json({ error: 'file_not_available' }, { status: 404 });
   }
+
+  if (isSupabaseConfigured()) {
+    const url = await signedDownloadUrl(route.id, filename);
+    if (!url) {
+      return NextResponse.json({ error: 'file_missing' }, { status: 404 });
+    }
+    // 303 = „výsledok je na inej adrese, stiahni si ho odtiaľ". Odkaz platí minútu,
+    // takže ho nesmie podržať žiadna cache — o hodinu by viedol do prázdna.
+    return NextResponse.redirect(url, {
+      status: 303,
+      headers: { 'Cache-Control': 'private, no-store' },
+    });
+  }
+
+  // Bez Supabase sem príde len lokálny vývoj — na ostrom webe getPurchasedRoute
+  // bez databázy spadne skôr, než by sa dostal sem.
 
   // Meno súboru pochádza z našich dát, nie od používateľa, ale radšej sa uistím,
   // že sa nikto nedostane mimo priečinka cez ../
