@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 v `main`, ďalej D2 |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 v `main`, D2 na vetve, ďalej D3 |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -23,10 +23,40 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 | Časť | Obsah | Stav |
 |---|---|---|
 | **D1** | súkromné úložisko súborov, `/api/download` z neho | ✅ v `main`, nasadené na náhľad (23. 9.) |
-| D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ⬜ |
+| D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ vetva `feature/admin-d2-formular` (23. 9.), čaká na spojenie |
 | D3 | uloženie konceptu: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false` | ⬜ potrebuje D1, D2 |
 | D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail **aj úvodnú stránku** (mapa trás) | ⬜ potrebuje D3 |
 | D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
+
+## Krok D2 — čo je hotové
+
+- **Jadro bez Reactu:** `lib/route-draft.ts`. `routeGeometry()` vytiahne zo
+  stopy dĺžku, stúpanie, štart, cieľ, 8 bodov pre Google Maps (RDP) a body
+  na počasie. `checkDraft()` skontroluje formulár a vráti chyby podľa polí,
+  `assembleRoute()` pridá ID a súbory a pustí to cez `routeSchema` — tú
+  v D3 zavolá server.
+- **Pravidlá:** čísla a výbery sa berú z `routeSchema.shape`, texty sú
+  prísnejšie (nesmú byť prázdne, majú limity). Čítanie z databázy ostáva
+  zhovievavé — prázdny preklad by inak vyhodil z katalógu aj zaplatenú trasu.
+- **Formulár:** `app/admin/(panel)/nova-trasa/route-details-form.tsx` pod
+  náhľadom trasy. Chyby až po prvom „Skontrolovať údaje", potom sa menia pri
+  písaní; kurzor skočí na prvé chybné pole. Krajina, obtiažnosť a kľukatosť
+  nemajú predvoľbu (sú to filtre katalógu), sezóna áno (VI–X).
+- **Trasa bez výšok sa nedá dokončiť** — stúpanie by v katalógu svietilo 0 m.
+  Ukážkové GPX v repe výšky nemajú, na skúšku treba súbor s `<ele>`.
+- **Testy:** 95 (20 nových). V prehliadači prejdené: prázdny formulár, nahratie
+  GPX, bod na počasie (návrh mena vs. vlastné meno), cena pri zmene vrstvy,
+  doplnenie názvov, pridanie/odobratie bodu, výmena súboru za verziu bez
+  výšok a späť, dlhý text, konzola bez varovaní. Produkčný build prešiel.
+
+**Na čo myslieť v D3:**
+- Server zavolá `checkDraft()` na to, čo prišlo, a `assembleRoute()` —
+  nikdy neuloží hodnoty z prehliadača bez nich.
+- **Koncept sa dnes stratí** pri odchode zo stránky (aj klikom na „Trasy"
+  alebo „Odhlásiť sa"). Uloženie konceptu v D3 to rieši; kým nie je, nevypĺňať
+  na náhľade skutočné texty.
+- Slug musí byť jedinečný — databáza to odmietne (`unique`), treba z toho
+  urobiť zrozumiteľnú hlášku pri poli „Názov trasy".
 
 ## Krok D1 — čo je hotové
 

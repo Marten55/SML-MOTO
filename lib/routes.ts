@@ -93,7 +93,7 @@ export interface Route {
  * Google zvláda v URL len obmedzený počet zastávok, preto sa zoznam oreže.
  * Radšej menej bodov a funkčný odkaz než dlhý odkaz, ktorý sa zlomí.
  */
-const MAX_WAYPOINTS = 8;
+export const MAX_WAYPOINTS = 8;
 
 export function googleMapsUrl(route: Route): string {
   const coord = (p: GeoPoint) => `${p.lat},${p.lng}`;

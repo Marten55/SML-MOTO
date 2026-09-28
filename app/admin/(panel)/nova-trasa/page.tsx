@@ -13,7 +13,8 @@ export default async function NewRoutePage() {
       <h1 className="font-display text-4xl font-semibold">Nová trasa</h1>
       <p className="mt-3 max-w-[62ch] text-ink-2">
         Nahraj export zo Swisstopo — GPX, KML alebo CSV, pokojne všetky naraz. Skontrolujem,
-        či sa trasa dá predať, a poskladám z nej balíček pre navigácie.
+        či sa trasa dá predať, a poskladám z nej balíček pre navigácie. Pod ním doplníš
+        údaje, ktoré uvidí zákazník v katalógu.
       </p>
       <RouteBuilderForm />
     </>
