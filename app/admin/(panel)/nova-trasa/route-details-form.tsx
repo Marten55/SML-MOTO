@@ -21,8 +21,8 @@ import { slugify } from '@/lib/slug';
  * obtiažnosť, sezóna, bod na počasie.
  *
  * Formulár nič nekontroluje sám. Stav drží rodič (route-builder-form.tsx)
- * a kontrolu robí checkDraft() z lib/route-draft.ts — tá istá, ktorú v kroku
- * D3 zopakuje server. Tu sa len zobrazuje a zapisuje do stavu.
+ * a kontrolu robí checkDraft() z lib/route-draft.ts — tá istá, ktorú pri
+ * uložení zopakuje server. Tu sa len zobrazuje a zapisuje do stavu.
  *
  * Každé pole má data-field s cestou ku kľúču v chybách („title.de"), aby
  * rodič vedel po kontrole presunúť kurzor na prvé chybné pole na stránke.
@@ -68,13 +68,27 @@ interface Props {
   geometry: RouteGeometry | null;
   /** Prázdne, kým Miroslav prvýkrát neklikne na kontrolu — nie červené pole hneď po otvorení. */
   errors: FieldErrors;
-  /** Výsledok kontroly; null pred prvým kliknutím. */
-  result: DraftCheck | null;
-  onCheck: () => void;
+  /** Neúspešná kontrola; null pred prvým kliknutím a keď je všetko vyplnené. */
+  result: Extract<DraftCheck, { ok: false }> | null;
+  onSave: () => void;
+  /** Kým sa ukladá, tlačidlo nejde stlačiť druhýkrát — vznikli by dve trasy. */
+  saving: boolean;
+  /** Priebeh alebo chyba uloženia od rodiča. */
+  status: ReactNode;
   idPrefix: string;
 }
 
-export function RouteDetailsForm({ draft, setDraft, geometry, errors, result, onCheck, idPrefix }: Props) {
+export function RouteDetailsForm({
+  draft,
+  setDraft,
+  geometry,
+  errors,
+  result,
+  onSave,
+  saving,
+  status,
+  idPrefix,
+}: Props) {
   const fid = (path: string) => `${idPrefix}-${path.replaceAll('.', '-')}`;
 
   function set<K extends keyof RouteDraft>(key: K, value: RouteDraft[K]) {
@@ -124,7 +138,7 @@ export function RouteDetailsForm({ draft, setDraft, geometry, errors, result, on
       autoComplete="off"
       onSubmit={(e) => {
         e.preventDefault();
-        onCheck();
+        onSave();
       }}
       className="flex flex-col gap-12 border-t border-line-strong pt-10"
     >
@@ -428,13 +442,21 @@ export function RouteDetailsForm({ draft, setDraft, geometry, errors, result, on
       </Section>
 
       <div className="flex flex-col gap-4 border-t border-line pt-8">
-        <button
-          type="submit"
-          className="self-start rounded-sm bg-accent px-6 py-3 font-display text-sm font-semibold tracking-wider text-ground uppercase"
-        >
-          Skontrolovať údaje
-        </button>
-        {result && <CheckResult result={result} slug={slug} />}
+        <div className="flex flex-col gap-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="self-start rounded-sm bg-accent px-6 py-3 font-display text-sm font-semibold tracking-wider text-ground uppercase disabled:cursor-wait disabled:opacity-60"
+          >
+            {saving ? 'Ukladám…' : 'Uložiť ako skrytú trasu'}
+          </button>
+          <p className="max-w-[62ch] text-sm text-ink-3">
+            Uloží sa aj s nahratými súbormi. V katalógu sa neukáže, kým ju nezverejníš v zozname
+            trás.
+          </p>
+        </div>
+        {result && <CheckResult result={result} />}
+        {status}
       </div>
     </form>
   );
@@ -699,19 +721,7 @@ function plural(n: number, [one, few, many]: [string, string, string]): string {
   return n === 1 ? one : n >= 2 && n <= 4 ? few : many;
 }
 
-function CheckResult({ result, slug }: { result: DraftCheck; slug: string }) {
-  if (result.ok) {
-    return (
-      <div aria-live="polite" className="rounded-sm border-l-4 border-accent bg-surface px-5 py-4">
-        <p className="font-display text-xl font-semibold text-accent">Údaje sú kompletné</p>
-        <p className="mt-1 text-sm text-ink-2">
-          Trasa by dostala adresu <span className="font-mono">/trasy/{slug}</span>. Uloženie do
-          katalógu pribudne v ďalšom kroku — zatiaľ sa nič neuložilo.
-        </p>
-      </div>
-    );
-  }
-
+function CheckResult({ result }: { result: Extract<DraftCheck, { ok: false }> }) {
   const { [GEOMETRY_ERROR]: geometryError, ...fieldErrors } = result.errors;
   const count = Object.keys(fieldErrors).length;
 

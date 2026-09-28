@@ -1,6 +1,6 @@
 # Stav práce — nástroj na výrobu trás (administrácia)
 
-Posledná aktualizácia: 23. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
+Posledná aktualizácia: 28. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
 tu je len to, kde práca stojí a čo ju blokuje.
 
 ## Kroky
@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1 v `main`, D2 na vetve, ďalej D3 |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1, D2 v `main`, D3 na vetve, ďalej D4 |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -23,10 +23,48 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 | Časť | Obsah | Stav |
 |---|---|---|
 | **D1** | súkromné úložisko súborov, `/api/download` z neho | ✅ v `main`, nasadené na náhľad (23. 9.) |
-| D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ vetva `feature/admin-d2-formular` (23. 9.), čaká na spojenie |
-| D3 | uloženie konceptu: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false` | ⬜ potrebuje D1, D2 |
+| D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ v `main`, nasadené na náhľad (28. 9.) |
+| D3 | uloženie hotovej trasy ako skrytej: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false`. Rozpísaný formulár v `localStorage` | ✅ vetva `feature/admin-d3-koncept` (28. 9.) |
 | D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail **aj úvodnú stránku** (mapa trás) | ⬜ potrebuje D3 |
 | D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
+
+## Krok D3 — čo je hotové
+
+- **Rozhodnutie (28. 9.):** do tabuľky `routes` ide len **hotová** trasa
+  (povinné stĺpce, každý riadok prejde `routeSchema`). Rozpísaný formulár
+  chráni `localStorage` v prehliadači (`lib/draft-storage.ts`), nie tabuľka
+  na polotovary — tá by znamenala druhý tvar tých istých dát pri D5.
+  Cena: koncept je len v jednom prehliadači, GPX treba po návrate nahrať znova.
+- **Postup** (`lib/route-upload.ts`, akcie v `app/admin/(panel)/nova-trasa/actions.ts`):
+  `prepareRouteUpload` overí admina a voľnú adresu, vymyslí ID (UUID)
+  a vydá jednorazové adresy na nahratie + **podpísaný lístok** (30 min,
+  kľúč `ADMIN_SESSION_SECRET`) → prehliadač nahrá zdroj priamo do Supabase →
+  `saveRoute` podľa lístka stiahne zdroj, zopakuje rozbor (`routeFromSources`),
+  uloží balíček a riadok ako skrytý.
+- **Prečo lístok:** pri chybe sa súbory pokusu mažú. ID a cesty od prehliadača
+  by umožnili podstrčiť `r001` a zmazať súbory existujúcej trasy. Lístok
+  s ID inej podoby než UUID sa odmietne (test v `lib/route-upload.test.ts`).
+- **Úložisko:** zdroj v `<id>/source/01-<meno>.gpx` (zákazník sa k nemu cez
+  `/api/download` nedostane, mená s lomkou neprejdú), balíček ako
+  `<slug>-track.gpx`, `-navigation`, `-poi` — rovnako ako ukážkové trasy.
+- **Overené proti Supabase (28. 9.):** nahratie bez kľúča ide, CORS pustí,
+  podpísaná adresa platí len pre svoju cestu a len raz.
+- **V prehliadači prejdené:** obsadená adresa → hláška pri „Názov trasy",
+  kurzor tam, nič sa nenahralo; odchod na „Trasy" a späť → koncept obnovený
+  s hláškou; uloženie → presmerovanie na zoznam s hláškou, koncept zmazaný.
+  V databáze `published = false`, 23,9 km / 934 m ako v náhľade, 4 súbory
+  v úložisku. Testovacia trasa potom zmazaná. Produkčný build prešiel.
+- **Testy:** 116 (21 nových).
+
+**Neoverené / otvorené:**
+- **Upratanie po chybe na serveri** (zlý formulár, zlyhaný zápis) je len
+  v kóde, v prehliadači sa nedalo vyvolať bez podvrhu.
+- **Osirotené súbory:** keď nahratie v prehliadači spadne v polovici alebo
+  sa zavrie karta medzi nahratím a uložením, zdroj ostane v úložisku bez
+  riadku. Pri desiatkach trás to nevadí; neskôr upratovací skript
+  (priečinky bez riadku v `routes` staršie ako deň).
+- **25 MB export** neskúšaný — rozbor na serveri beží vo funkcii Vercelu,
+  pri veľkom súbore sledovať čas behu.
 
 ## Krok D2 — čo je hotové
 
@@ -49,14 +87,8 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
   doplnenie názvov, pridanie/odobratie bodu, výmena súboru za verziu bez
   výšok a späť, dlhý text, konzola bez varovaní. Produkčný build prešiel.
 
-**Na čo myslieť v D3:**
-- Server zavolá `checkDraft()` na to, čo prišlo, a `assembleRoute()` —
-  nikdy neuloží hodnoty z prehliadača bez nich.
-- **Koncept sa dnes stratí** pri odchode zo stránky (aj klikom na „Trasy"
-  alebo „Odhlásiť sa"). Uloženie konceptu v D3 to rieši; kým nie je, nevypĺňať
-  na náhľade skutočné texty.
-- Slug musí byť jedinečný — databáza to odmietne (`unique`), treba z toho
-  urobiť zrozumiteľnú hlášku pri poli „Názov trasy".
+Poznámky pre D3 z tohto kroku (serverová kontrola, strata konceptu,
+jedinečný slug) sú vyriešené — pozri krok D3 vyššie.
 
 ## Krok D1 — čo je hotové
 

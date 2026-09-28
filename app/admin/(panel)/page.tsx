@@ -8,10 +8,18 @@ const dateFormat = new Intl.DateTimeFormat('sk-SK', {
   timeZone: 'Europe/Zurich',
 });
 
-export default async function AdminHomePage() {
+export default async function AdminHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ulozena?: string }>;
+}) {
   // getRoutesForAdmin() si prihlásenie overí sama — Data Access Layer
   const routes = await getRoutesForAdmin();
   const published = routes.filter((r) => r.published).length;
+  // Po uložení novej trasy. Hláška sa ukáže len pre trasu, ktorá naozaj
+  // existuje — nie hocijaký text z adresy
+  const { ulozena } = await searchParams;
+  const justSaved = routes.find((r) => r.slug === ulozena);
 
   return (
     <>
@@ -29,6 +37,13 @@ export default async function AdminHomePage() {
           </Link>
         </div>
       </div>
+
+      {justSaved && (
+        <p role="status" className="mt-6 rounded-sm border-l-4 border-accent bg-surface px-5 py-4 text-sm text-ink-2">
+          Trasa <strong className="font-medium text-ink">{justSaved.title}</strong> je uložená ako
+          skrytá. Zákazníci ju zatiaľ nevidia.
+        </p>
+      )}
 
       <div className="mt-6 overflow-x-auto">
         <table className="w-full min-w-[640px] border-collapse text-sm">
