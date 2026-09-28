@@ -214,3 +214,22 @@ export async function setRoutePublished(id: string, published: boolean): Promise
   if (error) throw new Error(`[routes] Trasu ${id} sa nepodarilo ${published ? 'zverejniť' : 'skryť'}: ${error.message}`);
   return 'ok';
 }
+
+/**
+ * Trasa pre náhľad v administrácii — aj skrytá. null aj pri pokazenom
+ * riadku: taký sa zákazníkovi neukáže, takže nemá čo náhľadovať.
+ */
+export async function getRouteForAdmin(id: string): Promise<{ route: Route; published: boolean } | null> {
+  await requireAdmin();
+  if (jsonFallbackAllowed()) {
+    const route = routesFromJson().find((r) => r.id === id);
+    return route ? { route, published: true } : null;
+  }
+  assertConfigured();
+
+  const { data, error } = await adminClient().from('routes').select('*').eq('id', id).maybeSingle();
+  if (error) throw new Error(`[routes] Trasu ${id} sa nepodarilo načítať: ${error.message}`);
+  if (!data) return null;
+  const route = validRoutes([data as RouteRow])[0];
+  return route ? { route, published: (data as RouteRow).published } : null;
+}

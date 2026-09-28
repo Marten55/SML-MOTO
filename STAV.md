@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1–D3 v `main`, D4 na vetve, ďalej D5 |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1–D4 v `main` + náhľad trasy, ďalej D5 |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -25,7 +25,7 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 | **D1** | súkromné úložisko súborov, `/api/download` z neho | ✅ v `main`, nasadené na náhľad (23. 9.) |
 | D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ v `main`, nasadené na náhľad (28. 9.) |
 | D3 | uloženie hotovej trasy ako skrytej: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false`. Rozpísaný formulár v `localStorage` | ✅ v `main`, nasadené na náhľad (28. 9.) |
-| D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail, úvodnú stránku (mapa trás) **aj plánovač** | ✅ vetva `feature/admin-d4-zverejnenie` (28. 9.) |
+| D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail, úvodnú stránku (mapa trás) **aj plánovač** | ✅ v `main`, nasadené na náhľad (28. 9.) |
 | D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
 
 ## Krok D4 — čo je hotové
@@ -51,10 +51,23 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 - **Testy:** bez nových — nová logika je len zápis do databázy a
   revalidácia, obe overené naživo. Spolu 116.
 
+**Náhľad trasy (28. 9., vetva `feature/admin-nahlad-trasy`):**
+- `/admin/nahlad/<id>?jazyk=de` — ktorákoľvek trasa vrátane skrytej,
+  prepínač SK/DE/EN/FR (preklady píše Miroslav ručne, automatický preklad
+  zamietnutý 28. 9.). Odkaz „Náhľad" v zozname trás.
+- Obsah detailu je jeden komponent `components/route-detail.tsx` pre web
+  aj náhľad — náhľad sa nemôže rozísť s tým, čo uvidí zákazník. V náhľade
+  je namiesto tlačidla na kúpu poznámka.
+- Pod `/admin`, nie `?nahlad` na verejnom detaile: ten je predgenerovaný
+  a čítanie cookie by ho spravilo dynamickým pre všetkých; cookie admina
+  má aj tak `path=/admin`.
+- Overené na produkčnom builde: skrytá trasa verejne 404, náhľad bez
+  prihlásenia → login, s prihlásením DE aj FR text, žiadne tlačidlo kúpy,
+  verejný detail ďalej s tlačidlom. Konzola bez chýb.
+- Rozdiel oproti webu: náhľad je v užšom stĺpci administrácie a bez
+  hlavičky webu. Texty, fotky a údaje sú tie isté.
+
 **Na neskôr:**
-- **Náhľad skrytej trasy** pred zverejnením — dnes ju Miroslav prvýkrát
-  uvidí ako zákazník až po kliknutí na Zverejniť. Detail by pre prihláseného
-  admina mohol ukázať aj skrytú trasu s pruhom „náhľad".
 - **Na Verceli overiť raz naživo** (zverejniť a stiahnuť skúšobnú trasu) —
   lokálne `npm start` má cache na disku, Vercel vlastnú zdieľanú; správanie
   má byť rovnaké, ale overené je len lokálne.
