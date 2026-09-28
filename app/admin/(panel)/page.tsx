@@ -83,13 +83,21 @@ export default async function AdminHomePage({
                   {route.isExample && (
                     <span className="ml-2 font-mono text-xs text-warn">ukážka</span>
                   )}
+                  {!route.problem && (
+                    <Link
+                      href={`/admin/nahlad/${route.id}`}
+                      className="mt-1 mr-3 inline-block text-xs text-ink-3 hover:text-accent"
+                    >
+                      Náhľad
+                    </Link>
+                  )}
                   {route.published && (
                     // Katalóg je v nemčine (hlavný trh), slovenčina je pre Miroslava
                     <a
                       href={`/sk/trasy/${route.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 block text-xs text-ink-3 hover:text-accent"
+                      className="mt-1 inline-block text-xs text-ink-3 hover:text-accent"
                     >
                       Na webe ↗
                     </a>
