@@ -4,7 +4,7 @@ import { cache } from 'react';
 import routesJson from '@/data/routes.json';
 import { requireAdmin } from './admin-session';
 import { routeSchema, routeToRow, rowToRoute, type RouteRow } from './route-schema';
-import type { Route } from './routes';
+import { isSellable, type Route } from './routes';
 import { adminClient, isSupabaseConfigured, publicClient } from './supabase';
 
 /**
@@ -179,5 +179,38 @@ export async function insertHiddenRoute(route: Route): Promise<'ok' | 'slug_take
 
   if (error?.code === UNIQUE_VIOLATION && error.message.includes('slug')) return 'slug_taken';
   if (error) throw new Error(`[routes] Trasu ${route.id} sa nepodarilo uložiť: ${error.message}`);
+  return 'ok';
+}
+
+// ── Zverejnenie (krok D4) ──────────────────────────────────────────────────
+
+export type PublishResult = 'ok' | 'not_found' | 'invalid';
+
+/**
+ * Zverejní trasu alebo ju stiahne z predaja. Stiahnutie nič nemaže:
+ * kto trasu kúpil, stiahne si ju ďalej (getPurchasedRoute číta aj skryté).
+ *
+ * Zverejniť sa dá len trasa, ktorá prejde routeSchema a má obe podoby GPX.
+ * Pokazený riadok by katalóg ticho vynechal (validRoutes) — Miroslav by
+ * videl „Zverejnená" a zákazník nič. Radšej odmietnuť nahlas.
+ */
+export async function setRoutePublished(id: string, published: boolean): Promise<PublishResult> {
+  await requireAdmin();
+  const db = adminClient();
+
+  const { data: row, error: readError } = await db.from('routes').select('*').eq('id', id).maybeSingle();
+  if (readError) throw new Error(`[routes] Trasu ${id} sa nepodarilo načítať: ${readError.message}`);
+  if (!row) return 'not_found';
+
+  if (published) {
+    const result = rowToRoute(row as RouteRow);
+    if ('error' in result || !isSellable(result.route)) {
+      console.error(`[routes] ${id} sa nedá zverejniť: ${'error' in result ? result.error : 'chýba GPX'}`);
+      return 'invalid';
+    }
+  }
+
+  const { error } = await db.from('routes').update({ published }).eq('id', id);
+  if (error) throw new Error(`[routes] Trasu ${id} sa nepodarilo ${published ? 'zverejniť' : 'skryť'}: ${error.message}`);
   return 'ok';
 }

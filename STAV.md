@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1, D2 v `main`, D3 na vetve, ďalej D4 |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1–D3 v `main`, D4 na vetve, ďalej D5 |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -24,9 +24,40 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 |---|---|---|
 | **D1** | súkromné úložisko súborov, `/api/download` z neho | ✅ v `main`, nasadené na náhľad (23. 9.) |
 | D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ v `main`, nasadené na náhľad (28. 9.) |
-| D3 | uloženie hotovej trasy ako skrytej: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false`. Rozpísaný formulár v `localStorage` | ✅ vetva `feature/admin-d3-koncept` (28. 9.) |
-| D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail **aj úvodnú stránku** (mapa trás) | ⬜ potrebuje D3 |
+| D3 | uloženie hotovej trasy ako skrytej: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false`. Rozpísaný formulár v `localStorage` | ✅ v `main`, nasadené na náhľad (28. 9.) |
+| D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail, úvodnú stránku (mapa trás) **aj plánovač** | ✅ vetva `feature/admin-d4-zverejnenie` (28. 9.) |
 | D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
+
+## Krok D4 — čo je hotové
+
+- **Zoznam trás** (`/admin`): stĺpec „Predaj" s tlačidlom Zverejniť /
+  Stiahnuť z predaja (`publish-toggle.tsx`, Server Action v
+  `app/admin/(panel)/actions.ts`), pri zverejnenej odkaz „Na webe ↗".
+- **Zverejniť sa dá len platná trasa** (`setRoutePublished` v
+  `lib/routes-db.ts`): riadok musí prejsť `routeSchema` a mať obe GPX.
+  Inak by katalóg pokazenú trasu ticho vynechal a v administrácii by
+  svietila ako zverejnená.
+- **Stiahnutie nič nemaže** — kto trasu kúpil, stiahne si ju ďalej.
+- **Obnova webu:** `revalidatePath('/[lang]', 'layout')` — celý verejný web
+  naraz (úvod, katalóg, detail, plánovač aj stránky, ktoré pribudnú).
+  Zoznam jednotlivých stránok by sa pri novej stránke zabudol doplniť;
+  zbytočne prestavané právne stránky nič nestoja.
+- **Overené na produkčnom builde (`npm start`), nie v `next dev`** — dev
+  stránky nekešuje, takže by skúška nič nedokázala. Dve dočasné skryté
+  trasy v Supabase: neúplná → odmietnutá s hláškou; platná → po zverejnení
+  hneď na `/sk`, `/sk/trasy`, `/de/trasy`, `/sk/planovac`, detail 200 (hoci
+  pri builde neexistoval); po stiahnutí zo všetkých preč, detail 404.
+  Konzola bez chýb. Testovacie trasy potom zmazané.
+- **Testy:** bez nových — nová logika je len zápis do databázy a
+  revalidácia, obe overené naživo. Spolu 116.
+
+**Na neskôr:**
+- **Náhľad skrytej trasy** pred zverejnením — dnes ju Miroslav prvýkrát
+  uvidí ako zákazník až po kliknutí na Zverejniť. Detail by pre prihláseného
+  admina mohol ukázať aj skrytú trasu s pruhom „náhľad".
+- **Na Verceli overiť raz naživo** (zverejniť a stiahnuť skúšobnú trasu) —
+  lokálne `npm start` má cache na disku, Vercel vlastnú zdieľanú; správanie
+  má byť rovnaké, ale overené je len lokálne.
 
 ## Krok D3 — čo je hotové
 
