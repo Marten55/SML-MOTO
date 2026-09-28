@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useDeferredValue, useId, useMemo, useState } from 'react';
+import { useDeferredValue, useId, useMemo, useRef, useState } from 'react';
 
 import {
   buildRoutePackage,
@@ -11,7 +11,9 @@ import {
   type RoutePackage,
   type RouteStats,
 } from '@/lib/route-builder';
+import { checkDraft, emptyRouteDraft, routeGeometry, type RouteDraft } from '@/lib/route-draft';
 import { slugify } from '@/lib/slug';
+import { RouteDetailsForm } from './route-details-form';
 
 /*
  * Rozbor beží celý v prehliadači — súbor sa nikam neposiela.
@@ -37,15 +39,21 @@ const ACCEPT = '.gpx,.kml,.csv';
 const FALLBACK_NAME = 'Nová trasa';
 
 export function RouteBuilderForm() {
-  const nameId = useId();
-  const [name, setName] = useState('');
+  const idPrefix = useId();
+  const nameId = `${idPrefix}-name`;
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Celý koncept (názov aj údaje do katalógu) je jeden objekt v stave tu,
+  // nie v podformulári — keby sa podformulár prekreslil nanovo (napr. po
+  // odstránení súboru), vyplnené texty by sa nestratili.
+  const [draft, setDraft] = useState<RouteDraft>(emptyRouteDraft);
+  const [showErrors, setShowErrors] = useState(false);
   const [inputs, setInputs] = useState<InputFile[]>([]);
   const [readErrors, setReadErrors] = useState<string[]>([]);
   const [dragging, setDragging] = useState(false);
 
   // Rozbor sa robí nanovo aj pri zmene názvu (ide do GPX). useDeferredValue
   // zabezpečí, že písanie do poľa nezamrzne, kým sa balíček prepočítava.
-  const deferredName = useDeferredValue(name);
+  const deferredName = useDeferredValue(draft.name);
   const pkg = useMemo<RoutePackage | null>(
     () =>
       inputs.length === 0
@@ -53,6 +61,23 @@ export function RouteBuilderForm() {
         : buildRoutePackage(inputs, { name: deferredName.trim() || FALLBACK_NAME }),
     [inputs, deferredName],
   );
+  const geometry = useMemo(() => (pkg ? routeGeometry(pkg) : null), [pkg]);
+
+  // Kontrola beží pri každej zmene (pár desiatok polí, zlomok milisekundy),
+  // ale chyby sa ukážu až po prvom kliknutí na „Skontrolovať". Potom sa
+  // opravené pole odčervení hneď pri písaní, bez ďalšieho klikania.
+  const check = useMemo(() => checkDraft(draft, geometry), [draft, geometry]);
+  const errors = showErrors && !check.ok ? check.errors : {};
+
+  function handleCheck() {
+    setShowErrors(true);
+    if (check.ok) return;
+    // Prvé chybné pole v poradí, ako sú na stránke — nie v poradí schémy
+    const fields = rootRef.current?.querySelectorAll<HTMLElement>('[data-field]') ?? [];
+    Array.from(fields)
+      .find((el) => check.errors[el.dataset.field!])
+      ?.focus();
+  }
 
   async function addFiles(list: FileList | null) {
     if (!list?.length) return;
@@ -87,23 +112,36 @@ export function RouteBuilderForm() {
   const slug = slugify(deferredName) || 'trasa';
 
   return (
-    <div className="mt-8 flex flex-col gap-8">
-      <label htmlFor={nameId} className="flex max-w-xl flex-col gap-2">
-        <span className="font-display text-xs font-semibold tracking-[0.14em] text-ink-3 uppercase">
+    <div ref={rootRef} className="mt-8 flex flex-col gap-8">
+      <div className="flex max-w-xl flex-col gap-2">
+        <label
+          htmlFor={nameId}
+          className="font-display text-xs font-semibold tracking-[0.14em] text-ink-3 uppercase"
+        >
           Názov trasy
-        </span>
+        </label>
         <input
           id={nameId}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          data-field="name"
+          value={draft.name}
+          onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
           placeholder="napr. Furka · Grimsel · Susten"
           maxLength={120}
-          className="rounded-sm border border-line bg-surface px-4 py-3 text-base focus:border-accent focus:outline-none"
+          aria-invalid={Boolean(errors.name)}
+          aria-describedby={`${nameId}-note`}
+          className="rounded-sm border border-line bg-surface px-4 py-3 text-base focus:border-accent focus:outline-none aria-[invalid=true]:border-crit"
         />
-        <span className="text-sm text-ink-3">
-          Uloží sa do GPX súborov — navigácia ho ukáže v zozname trás.
-        </span>
-      </label>
+        {errors.name ? (
+          <span id={`${nameId}-note`} className="text-sm text-crit">
+            {errors.name}
+          </span>
+        ) : (
+          <span id={`${nameId}-note`} className="text-sm text-ink-3">
+            Uloží sa do GPX súborov — navigácia ho ukáže v zozname trás. Vznikne z neho aj
+            adresa stránky.
+          </span>
+        )}
+      </div>
 
       <div
         onDragOver={(e) => {
@@ -168,6 +206,16 @@ export function RouteBuilderForm() {
       )}
 
       {pkg && <Result pkg={pkg} slug={slug} />}
+
+      <RouteDetailsForm
+        draft={draft}
+        setDraft={setDraft}
+        geometry={geometry}
+        errors={errors}
+        result={showErrors ? check : null}
+        onCheck={handleCheck}
+        idPrefix={idPrefix}
+      />
     </div>
   );
 }
@@ -186,8 +234,7 @@ function Result({ pkg, slug }: { pkg: RoutePackage; slug: string }) {
       {pkg.files && <Downloads files={pkg.files} slug={slug} />}
       {pkg.mapsLinks.length > 0 && <MapsLinks links={pkg.mapsLinks} />}
       <p className="text-sm text-ink-3">
-        Rozbor prebehol v tvojom prehliadači, nič sa zatiaľ neuložilo. Zverejnenie trasy
-        do katalógu pribudne v ďalšom kroku.
+        Rozbor prebehol v tvojom prehliadači, nič sa zatiaľ neuložilo.
       </p>
     </section>
   );
