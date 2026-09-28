@@ -219,11 +219,18 @@ export async function setRoutePublished(id: string, published: boolean): Promise
  * Trasa pre náhľad v administrácii — aj skrytá. null aj pri pokazenom
  * riadku: taký sa zákazníkovi neukáže, takže nemá čo náhľadovať.
  */
-export async function getRouteForAdmin(id: string): Promise<{ route: Route; published: boolean } | null> {
+export interface AdminRoute {
+  route: Route;
+  published: boolean;
+  /** ISO čas poslednej zmeny v databáze; null pri lokálnom JSON. */
+  updatedAt: string | null;
+}
+
+export async function getRouteForAdmin(id: string): Promise<AdminRoute | null> {
   await requireAdmin();
   if (jsonFallbackAllowed()) {
     const route = routesFromJson().find((r) => r.id === id);
-    return route ? { route, published: true } : null;
+    return route ? { route, published: true, updatedAt: null } : null;
   }
   assertConfigured();
 
@@ -231,5 +238,26 @@ export async function getRouteForAdmin(id: string): Promise<{ route: Route; publ
   if (error) throw new Error(`[routes] Trasu ${id} sa nepodarilo načítať: ${error.message}`);
   if (!data) return null;
   const route = validRoutes([data as RouteRow])[0];
-  return route ? { route, published: (data as RouteRow).published } : null;
+  const row = data as RouteRow;
+  return route ? { route, published: row.published, updatedAt: row.updated_at ?? null } : null;
+}
+
+// ── Úprava (krok D5) ───────────────────────────────────────────────────────
+
+/**
+ * Prepíše obsah existujúcej trasy. Stav zverejnenia a poradie v katalógu
+ * nemení — na to je zoznam trás (D4). 'slug_taken' ako pri insertHiddenRoute.
+ */
+export async function updateRouteContent(route: Route): Promise<'ok' | 'slug_taken' | 'not_found'> {
+  await requireAdmin();
+  const row: Partial<RouteRow> = routeToRow(route, { published: false, sortOrder: 0 });
+  // Tieto dva stĺpce patria zoznamu trás — úprava textov ich nesmie prepísať
+  delete row.published;
+  delete row.sort_order;
+  delete row.id;
+
+  const { data, error } = await adminClient().from('routes').update(row).eq('id', route.id).select('id');
+  if (error?.code === UNIQUE_VIOLATION && error.message.includes('slug')) return 'slug_taken';
+  if (error) throw new Error(`[routes] Trasu ${route.id} sa nepodarilo upraviť: ${error.message}`);
+  return data.length === 0 ? 'not_found' : 'ok';
 }

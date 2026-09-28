@@ -15,6 +15,11 @@ import { emptyRouteDraft, MAX_HIGHLIGHTS, type RouteDraft } from './route-draft'
 /** Pri zmene tvaru RouteDraft netreba verziu zvyšovať — restoreDraft neznáme polia zahodí. */
 export const DRAFT_STORAGE_KEY = 'sml-admin:nova-trasa';
 
+/** Rozpísaná úprava jednej trasy (krok D5) — každá trasa má vlastnú. */
+export function editDraftKey(routeId: string): string {
+  return `sml-admin:uprava:${routeId}`;
+}
+
 interface Stored {
   savedAt: number;
   draft: RouteDraft;
@@ -66,39 +71,42 @@ export function restoreDraft(raw: string | null): { savedAt: number; draft: Rout
   return { savedAt: parsed.savedAt, draft };
 }
 
-/** Oplatí sa koncept vôbec ukladať? Prázdny formulár by po návrate strašil hláškou o obnove. */
-export function hasContent(draft: RouteDraft): boolean {
-  const empty = JSON.stringify(emptyRouteDraft());
-  return JSON.stringify(draft) !== empty;
+/**
+ * Oplatí sa koncept vôbec ukladať? Formulár bez zmeny oproti východziemu
+ * stavu (prázdny pri novej trase, uložená verzia pri úprave) by po návrate
+ * strašil hláškou o obnove.
+ */
+export function hasContent(draft: RouteDraft, baseline: RouteDraft = emptyRouteDraft()): boolean {
+  return JSON.stringify(draft) !== JSON.stringify(baseline);
 }
 
 // localStorage môže hodiť výnimku (súkromné okno v Safari, plná kvóta,
 // zakázané úložisko). Stratený koncept nesmie zhodiť formulár.
 
-export function loadDraft(): { savedAt: number; draft: RouteDraft } | null {
+export function loadDraft(key = DRAFT_STORAGE_KEY): { savedAt: number; draft: RouteDraft } | null {
   try {
-    return restoreDraft(window.localStorage.getItem(DRAFT_STORAGE_KEY));
+    return restoreDraft(window.localStorage.getItem(key));
   } catch {
     return null;
   }
 }
 
-export function saveDraft(draft: RouteDraft): void {
+export function saveDraft(draft: RouteDraft, key = DRAFT_STORAGE_KEY, baseline?: RouteDraft): void {
   try {
-    if (!hasContent(draft)) {
-      window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    if (!hasContent(draft, baseline)) {
+      window.localStorage.removeItem(key);
       return;
     }
     const stored: Stored = { savedAt: Date.now(), draft };
-    window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(stored));
+    window.localStorage.setItem(key, JSON.stringify(stored));
   } catch {
     // Nevadí — formulár funguje ďalej, len bez zálohy
   }
 }
 
-export function clearDraft(): void {
+export function clearDraft(key = DRAFT_STORAGE_KEY): void {
   try {
-    window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    window.localStorage.removeItem(key);
   } catch {
     // Pozri saveDraft
   }

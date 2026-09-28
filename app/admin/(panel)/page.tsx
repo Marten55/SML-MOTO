@@ -12,15 +12,16 @@ const dateFormat = new Intl.DateTimeFormat('sk-SK', {
 export default async function AdminHomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ ulozena?: string }>;
+  searchParams: Promise<{ ulozena?: string; upravena?: string }>;
 }) {
   // getRoutesForAdmin() si prihlásenie overí sama — Data Access Layer
   const routes = await getRoutesForAdmin();
   const published = routes.filter((r) => r.published).length;
   // Po uložení novej trasy. Hláška sa ukáže len pre trasu, ktorá naozaj
   // existuje — nie hocijaký text z adresy
-  const { ulozena } = await searchParams;
+  const { ulozena, upravena } = await searchParams;
   const justSaved = routes.find((r) => r.slug === ulozena);
+  const justEdited = routes.find((r) => r.slug === upravena);
 
   return (
     <>
@@ -43,6 +44,12 @@ export default async function AdminHomePage({
         <p role="status" className="mt-6 rounded-sm border-l-4 border-accent bg-surface px-5 py-4 text-sm text-ink-2">
           Trasa <strong className="font-medium text-ink">{justSaved.title}</strong> je uložená ako
           skrytá. Zákazníci ju zatiaľ nevidia.
+        </p>
+      )}
+      {justEdited && (
+        <p role="status" className="mt-6 rounded-sm border-l-4 border-accent bg-surface px-5 py-4 text-sm text-ink-2">
+          Zmeny trasy <strong className="font-medium text-ink">{justEdited.title}</strong> sú uložené.
+          {justEdited.published && ' Zákazníci ich vidia hneď.'}
         </p>
       )}
 
@@ -84,12 +91,20 @@ export default async function AdminHomePage({
                     <span className="ml-2 font-mono text-xs text-warn">ukážka</span>
                   )}
                   {!route.problem && (
-                    <Link
-                      href={`/admin/nahlad/${route.id}`}
-                      className="mt-1 mr-3 inline-block text-xs text-ink-3 hover:text-accent"
-                    >
-                      Náhľad
-                    </Link>
+                    <>
+                      <Link
+                        href={`/admin/upravit/${route.id}`}
+                        className="mt-1 mr-3 inline-block text-xs text-ink-3 hover:text-accent"
+                      >
+                        Upraviť
+                      </Link>
+                      <Link
+                        href={`/admin/nahlad/${route.id}`}
+                        className="mt-1 mr-3 inline-block text-xs text-ink-3 hover:text-accent"
+                      >
+                        Náhľad
+                      </Link>
+                    </>
                   )}
                   {route.published && (
                     // Katalóg je v nemčine (hlavný trh), slovenčina je pre Miroslava

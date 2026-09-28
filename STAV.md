@@ -10,7 +10,7 @@ tu je len to, kde práca stojí a čo ju blokuje.
 | Jadro | rozbor GPX/KML/CSV, kontroly, zloženie balíčka (`lib/route-builder/`) | ✅ v `main` |
 | **A** | Supabase, prihlásenie do `/admin`, trasy z databázy | ✅ v `main`, beží na sml.admtechnics.sk (21. 9.) |
 | B | obrazovka nahratia a náhľadu trasy (`/admin/nova-trasa`) | ✅ v `main` (21. 9.) |
-| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | 🟡 D1–D4 v `main` + náhľad trasy, ďalej D5 |
+| D | zverejnenie trasy do katalógu — rozdelené na D1–D5 nižšie | ✅ D1–D4 + náhľad v `main`, D5 na vetve |
 | C | RoadBook z Word šablóny (`docx-templates`) | ⬜ čaká na `.docx` šablónu od klienta |
 
 Poradie je A → B → D → C: zverejnenie potrebuje databázu z A a RoadBook
@@ -26,7 +26,49 @@ Každá časť ide na vlastnú vetvu a dá sa nasadiť sama, bez rozbitia náhľ
 | D2 | formulár s údajmi, ktoré GPX nemá: názov a popis ×4 jazyky, highlights, výbava, Silver/Gold, cena, krajina, obtiažnosť, kľukatosť, sezóna, bod na počasie. Kontrola cez `routeSchema`, zatiaľ bez uloženia | ✅ v `main`, nasadené na náhľad (28. 9.) |
 | D3 | uloženie hotovej trasy ako skrytej: prehliadač nahrá zdroj rovno do úložiska (signed upload URL — Server Action unesie len 1 MB, export má až 25 MB), server rozbor zopakuje, uloží GPX a riadok s `published = false`. Rozpísaný formulár v `localStorage` | ✅ v `main`, nasadené na náhľad (28. 9.) |
 | D4 | zverejniť / stiahnuť z predaja v zozname trás + `revalidatePath` pre katalóg, detail, úvodnú stránku (mapa trás) **aj plánovač** | ✅ v `main`, nasadené na náhľad (28. 9.) |
-| D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ⬜ potrebuje D3 |
+| D5 | úprava existujúcej trasy tým istým formulárom, výmena súborov | ✅ vetva `feature/admin-d5-uprava` (28. 9.) |
+
+## Krok D5 — čo je hotové
+
+- **`/admin/upravit/<id>`** (odkaz „Upraviť" v zozname trás) — ten istý
+  formulár ako nová trasa, predvyplnený z databázy (`routeToDraft`).
+  Server: `updateRoute` v `app/admin/(panel)/nova-trasa/actions.ts`.
+- **Bez nového exportu** sa menia len údaje z formulára; stopa, dĺžka,
+  stúpanie a súbory ostávajú (`geometryFromRoute`). Bod na počasie sa dá
+  len premenovať — na iný bod treba nový export.
+- **S novým exportom** server spočíta trasu nanovo a vymení GPX balíček.
+  Roadbook, POV video a poster (Gold) ostávajú.
+- **Rozhodnutie — adresa (28. 9.):** zverejnenej trase sa nemení nikdy
+  (odkazy z Googlu, zdieľaní, e-mailov by viedli na 404; presmerovania by
+  stáli deň práce a trvalú údržbu). Skrytej len po zaškrtnutí „Zmeniť
+  adresu podľa názvu" — názov vo formulári je slovenský titulok a bez
+  toho by ju zmenila hocijaká úprava.
+- **Poradie pri výmene súborov:** nové súbory pod **novými menami**
+  (`furka-track.gpx` ↔ `furka-track-2.gpx`, zdroj s dávkou v mene) →
+  zápis do databázy → až potom zmazanie starých. Keď čokoľvek zlyhá pred
+  zápisom, zmažú sa len nové súbory; trasa ďalej funguje so starými
+  a nikto nestiahne polovičný balíček.
+- **Lístok** má druh `new` / `replace`; na výmenu súborov len pre trasu,
+  ktorá existuje, a len pre tú, ktorej ID je v lístku.
+- **Rozpísaná úprava** v localStorage pod kľúčom trasy; obnoví sa len keď
+  je novšia než posledná zmena v databáze.
+- **Opravené pri skúške:** po výmene stopy ostávalo meno bodu počasia
+  z bodu, ktorý v novej stope už nebol.
+- **Overené na produkčnom builde** s dočasnou trasou: úprava textov
+  (adresa, stopa, súbory, video, príznak ukážky ostali); premenovanie
+  skrytej + nový export (nová adresa, 23,9 km, nové súbory, starý zdroj
+  zmazaný); zverejnenie → úprava s novým exportom (adresa zamknutá, bez
+  zaškrtávacieho poľa, súbory `-2`, predošlé zmazané, web zmenu ukázal
+  od prvej požiadavky); obnova a „Zahodiť zmeny". Konzola bez chýb.
+  Testovacia trasa aj súbory potom zmazané.
+- **Testy:** 129 (13 nových) — okrem iného každá z 9 trás v `data/routes.json`
+  sa dá otvoriť v úprave a uložiť bez zmeny údajov.
+
+**Neoverené / otvorené:**
+- Súbeh dvoch úprav tej istej trasy (dve karty) — vyhrá posledná, bez
+  varovania. Pri jednom adminovi zanedbateľné.
+- Pri výmene súborov zákazník, ktorý v tej istej minúte klikne na stiahnutie,
+  môže dostať odkaz na práve zmazaný starý súbor (odkaz platí 60 s).
 
 ## Krok D4 — čo je hotové
 
