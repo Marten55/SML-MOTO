@@ -13,7 +13,7 @@ import {
   type SetStateAction,
 } from 'react';
 
-import { clearDraft, loadDraft, saveDraft } from '@/lib/draft-storage';
+import { clearDraft, DRAFT_STORAGE_KEY, editDraftKey, loadDraft, saveDraft } from '@/lib/draft-storage';
 import {
   buildRoutePackage,
   MAX_FILE_BYTES,
@@ -22,9 +22,18 @@ import {
   type RoutePackage,
   type RouteStats,
 } from '@/lib/route-builder';
-import { checkDraft, emptyRouteDraft, routeGeometry, type FieldErrors, type RouteDraft } from '@/lib/route-draft';
+import {
+  checkDraft,
+  emptyRouteDraft,
+  geometryFromRoute,
+  routeGeometry,
+  routeToDraft,
+  type FieldErrors,
+  type RouteDraft,
+} from '@/lib/route-draft';
+import type { Route } from '@/lib/routes';
 import { slugify } from '@/lib/slug';
-import { prepareRouteUpload, saveRoute } from './actions';
+import { prepareRouteUpload, saveRoute, updateRoute } from './actions';
 import { RouteDetailsForm } from './route-details-form';
 
 /*
@@ -39,6 +48,14 @@ import { RouteDetailsForm } from './route-details-form';
  * zopakuje sám — prehliadaču sa pri zápise do databázy veriť nedá
  * (postup v lib/route-upload.ts).
  */
+
+/** Úprava existujúcej trasy (krok D5). Bez nej formulár vyrába novú trasu. */
+export interface EditTarget {
+  route: Route;
+  published: boolean;
+  /** Posledná zmena v databáze (ms) — starší rozpísaný koncept sa neobnoví. */
+  updatedAt: number | null;
+}
 
 type SaveState =
   | { phase: 'idle' }
@@ -67,15 +84,15 @@ const subscribeNever = () => () => {};
  * je na zlomok sekundy vidieť len kostru — v administrácii bez vyhľadávačov
  * to nevadí.
  */
-export function RouteBuilderForm() {
+export function RouteBuilderForm({ edit }: { edit?: EditTarget }) {
   const inBrowser = useSyncExternalStore(subscribeNever, () => true, () => false);
   if (!inBrowser) {
     return <div className="mt-8 h-96 animate-pulse rounded-sm border border-line bg-surface-2" />;
   }
-  return <RouteBuilder />;
+  return <RouteBuilder edit={edit} />;
 }
 
-function RouteBuilder() {
+function RouteBuilder({ edit }: { edit?: EditTarget }) {
   const idPrefix = useId();
   const nameId = `${idPrefix}-name`;
   const rootRef = useRef<HTMLDivElement>(null);
@@ -84,8 +101,21 @@ function RouteBuilder() {
   // odstránení súboru), vyplnené texty by sa nestratili.
   // Rozpísaný koncept z localStorage (bez neho prázdny formulár). Číta sa len
   // raz, pri prvom vykreslení — to prebehne až v prehliadači (RouteBuilderForm).
-  const [stored] = useState(loadDraft);
-  const [draft, setDraftState] = useState<RouteDraft>(() => stored?.draft ?? emptyRouteDraft());
+  //
+  // Pri úprave je východzí stav uložená trasa. Rozpísaný koncept sa obnoví,
+  // len keď je novší než posledná zmena v databáze — inak by prepísal zmeny
+  // uložené medzitým (napr. z iného počítača).
+  const storageKey = edit ? editDraftKey(edit.route.id) : DRAFT_STORAGE_KEY;
+  const [baseline] = useState<RouteDraft>(() => (edit ? routeToDraft(edit.route) : emptyRouteDraft()));
+  const [stored] = useState(() => {
+    const s = loadDraft(storageKey);
+    return s && (!edit?.updatedAt || s.savedAt > edit.updatedAt) ? s : null;
+  });
+  const [draft, setDraftState] = useState<RouteDraft>(() => stored?.draft ?? baseline);
+  // Bez nového exportu platia pri úprave údaje zo stopy uloženej trasy
+  const [storedGeometry] = useState(() => (edit ? geometryFromRoute(edit.route) : null));
+  // Adresa skrytej trasy sa zmení len na výslovnú žiadosť (pozri updateRoute)
+  const [renameSlug, setRenameSlug] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [inputs, setInputs] = useState<InputFile[]>([]);
   const [readErrors, setReadErrors] = useState<string[]>([]);
@@ -105,7 +135,7 @@ function RouteBuilder() {
 
   // Záloha konceptu pri každej zmene. Effect je tu na správnom mieste:
   // zapisuje stav Reactu do vonkajšieho systému (localStorage), nič nečíta späť.
-  useEffect(() => saveDraft(draft), [draft]);
+  useEffect(() => saveDraft(draft, storageKey, baseline), [draft, storageKey, baseline]);
 
   // Rozbor sa robí nanovo aj pri zmene názvu (ide do GPX). useDeferredValue
   // zabezpečí, že písanie do poľa nezamrzne, kým sa balíček prepočítava.
@@ -117,7 +147,7 @@ function RouteBuilder() {
         : buildRoutePackage(inputs, { name: deferredName.trim() || FALLBACK_NAME }),
     [inputs, deferredName],
   );
-  const geometry = useMemo(() => (pkg ? routeGeometry(pkg) : null), [pkg]);
+  const geometry = useMemo(() => (pkg ? routeGeometry(pkg) : storedGeometry), [pkg, storedGeometry]);
 
   // Kontrola beží pri každej zmene (pár desiatok polí, zlomok milisekundy),
   // ale chyby sa ukážu až po prvom kliknutí na „Uložiť". Potom sa
@@ -149,10 +179,19 @@ function RouteBuilder() {
     };
 
     try {
+      // Úprava bez nového exportu: nič sa nenahráva, len údaje z formulára
+      if (edit && inputs.length === 0) {
+        setSave({ phase: 'saving' });
+        const saved = await updateRoute(edit.route.id, null, draft, renameSlug);
+        if (!saved.ok) return failed(saved.message, saved.errors);
+        return finish(saved.slug);
+      }
+
       setSave({ phase: 'uploading' });
       const prepared = await prepareRouteUpload(
         inputs.map((f) => f.name),
         draft.name,
+        edit?.route.id,
       );
       if (!prepared.ok) return failed(prepared.message, prepared.errors);
 
@@ -168,15 +207,20 @@ function RouteBuilder() {
       }
 
       setSave({ phase: 'saving' });
-      const saved = await saveRoute(prepared.ticket, draft);
+      const saved = edit
+        ? await updateRoute(edit.route.id, prepared.ticket, draft, renameSlug)
+        : await saveRoute(prepared.ticket, draft);
       if (!saved.ok) return failed(saved.message, saved.errors);
-
-      clearDraft();
-      router.push(`/admin?ulozena=${encodeURIComponent(saved.slug)}`);
+      finish(saved.slug);
     } catch {
       // Výpadok siete alebo spadnutý server — koncept ostáva v localStorage
       failed('Spojenie zlyhalo. Nič sa nestratilo, skús to znova.');
     }
+  }
+
+  function finish(savedSlug: string) {
+    clearDraft(storageKey);
+    router.push(`/admin?${edit ? 'upravena' : 'ulozena'}=${encodeURIComponent(savedSlug)}`);
   }
 
   async function addFiles(list: FileList | null) {
@@ -209,17 +253,21 @@ function RouteBuilder() {
     setInputs((current) => current.filter((f) => f.name !== fileName));
   }
 
-  const slug = slugify(deferredName) || 'trasa';
+  // Adresa, ktorú trasa po uložení bude mať (rovnaké pravidlo ako updateRoute)
+  const slug =
+    edit && (edit.published || !renameSlug) ? edit.route.slug : slugify(deferredName) || 'trasa';
 
   return (
     <div ref={rootRef} className="mt-8 flex flex-col gap-8">
       {restoredAt !== null && (
         <RestoredNotice
           savedAt={restoredAt}
-          hasFiles={inputs.length > 0}
+          // Pri úprave má trasa súbory uložené — výzva nahrať ich znova by mýlila
+          hasFiles={inputs.length > 0 || edit !== undefined}
+          discardLabel={edit ? 'Zahodiť zmeny' : 'Začať odznova'}
           onDiscard={() => {
-            clearDraft();
-            setDraft(emptyRouteDraft());
+            clearDraft(storageKey);
+            setDraft(baseline);
             setShowErrors(false);
             setRestoredAt(null);
           }}
@@ -249,11 +297,31 @@ function RouteBuilder() {
           <span id={`${nameId}-note`} className="text-sm text-crit">
             {errors.name}
           </span>
+        ) : edit ? (
+          <span id={`${nameId}-note`} className="text-sm text-ink-3">
+            Uloží sa do GPX súborov, keď nahráš nový export. Adresa stránky:{' '}
+            <span className="font-mono">/trasy/{slug}</span>
+            {edit.published && ' — trasa je zverejnená, zmena adresy by pokazila odkazy na ňu'}.
+          </span>
         ) : (
           <span id={`${nameId}-note`} className="text-sm text-ink-3">
             Uloží sa do GPX súborov — navigácia ho ukáže v zozname trás. Vznikne z neho aj
             adresa stránky.
           </span>
+        )}
+        {edit && !edit.published && (
+          <label className="flex items-center gap-2 text-sm text-ink-2">
+            <input
+              type="checkbox"
+              checked={renameSlug}
+              onChange={(e) => {
+                setServerErrors({});
+                setRenameSlug(e.target.checked);
+              }}
+              className="accent-[var(--accent)]"
+            />
+            Zmeniť adresu podľa názvu (trasa je skrytá, nikto na ňu zatiaľ neodkazuje)
+          </label>
         )}
       </div>
 
@@ -272,8 +340,14 @@ function RouteBuilder() {
           dragging ? 'border-accent bg-accent-soft' : 'border-line-strong bg-surface'
         }`}
       >
-        <p className="font-display text-xl font-semibold">Sem pretiahni export zo Swisstopo</p>
-        <p className="mt-1 text-sm text-ink-3">GPX, KML alebo CSV · viac súborov naraz · najviac 25 MB</p>
+        <p className="font-display text-xl font-semibold">
+          {edit ? 'Nový export zo Swisstopo — len keď meníš trasu' : 'Sem pretiahni export zo Swisstopo'}
+        </p>
+        <p className="mt-1 text-sm text-ink-3">
+          {edit
+            ? 'Bez nového súboru ostáva stopa aj súbory na stiahnutie tak, ako sú.'
+            : 'GPX, KML alebo CSV · viac súborov naraz · najviac 25 MB'}
+        </p>
         <label className="mt-5 inline-block cursor-pointer rounded-sm bg-accent px-5 py-3 font-display text-sm font-semibold tracking-wider text-ground uppercase focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
           Vybrať súbory
           <input
@@ -330,6 +404,20 @@ function RouteBuilder() {
         onSave={handleSave}
         saving={saving}
         status={<SaveStatus state={save} fileCount={inputs.length} />}
+        slug={slug}
+        submit={
+          edit
+            ? {
+                label: 'Uložiť zmeny',
+                note: edit.published
+                  ? 'Trasa je zverejnená — zmeny uvidia zákazníci hneď po uložení.'
+                  : 'Trasa ostáva skrytá, kým ju nezverejníš v zozname trás.',
+              }
+            : {
+                label: 'Uložiť ako skrytú trasu',
+                note: 'Uloží sa aj s nahratými súbormi. V katalógu sa neukáže, kým ju nezverejníš v zozname trás.',
+              }
+        }
         idPrefix={idPrefix}
       />
     </div>
@@ -343,11 +431,13 @@ const timeFormat = new Intl.DateTimeFormat('sk-SK', { dateStyle: 'short', timeSt
 function RestoredNotice({
   savedAt,
   hasFiles,
+  discardLabel,
   onDiscard,
   onDismiss,
 }: {
   savedAt: number;
   hasFiles: boolean;
+  discardLabel: string;
   onDiscard: () => void;
   onDismiss: () => void;
 }) {
@@ -373,7 +463,7 @@ function RestoredNotice({
           onClick={onDiscard}
           className="rounded-sm border border-line px-4 py-2 text-sm hover:border-crit hover:text-crit"
         >
-          Začať odznova
+          {discardLabel}
         </button>
       </div>
     </div>

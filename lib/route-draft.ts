@@ -351,9 +351,10 @@ export function checkDraft(draft: unknown, geometry: RouteGeometry | null): Draf
  */
 export function assembleRoute(
   fields: RouteFields,
-  server: { id: string; assets: RouteAssets },
+  server: { id: string; assets: RouteAssets; isExample?: boolean },
 ): { route: Route } | { error: string } {
-  const result = routeSchema.safeParse({ ...fields, ...server, isExample: false });
+  // Úprava ukážkovej trasy ju nesmie potichu vydávať za skutočnú (krok D5)
+  const result = routeSchema.safeParse({ ...fields, ...server, isExample: server.isExample ?? false });
   if (!result.success) return { error: z.prettifyError(result.error) };
   return { route: result.data };
 }
@@ -384,4 +385,51 @@ export function routeFromSources(
   if (!pkg.files) return { ok: false, errors: { [GEOMETRY_ERROR]: 'Balíček sa nepodarilo zostaviť.' } };
 
   return { ok: true, fields: check.fields, files: pkg.files };
+}
+
+// ── Úprava existujúcej trasy (krok D5) ─────────────────────────────────────
+
+/** Uložená trasa → stav formulára. Opak checkDraft(): čísla späť na text. */
+export function routeToDraft(route: Route): RouteDraft {
+  const copy = (t: Route['title']) => ({ sk: t.sk, de: t.de, en: t.en, fr: t.fr });
+  return {
+    // Názov trasy sa neukladá zvlášť — v GPX je slovenský titulok, ten je najbližší
+    name: route.title.sk,
+    tier: route.tier,
+    priceChf: String(route.priceChf),
+    country: route.country,
+    region: route.region,
+    difficulty: route.difficulty,
+    curviness: String(route.curviness),
+    seasonFrom: String(route.seasonFrom),
+    seasonTo: String(route.seasonTo),
+    durationHours: route.durationHours,
+    avgTempC: String(route.avgTempC),
+    passable: route.passable,
+    title: copy(route.title),
+    summary: copy(route.summary),
+    highlights: route.highlights.length > 0 ? route.highlights.map(copy) : emptyRouteDraft().highlights,
+    gear: copy(route.gear),
+    weatherKey: pointKey(route.weatherPoint),
+    weatherName: route.weatherPoint.name,
+  };
+}
+
+/**
+ * Údaje zo stopy, keď Miroslav pri úprave nenahrá nový export: berú sa
+ * z uloženej trasy. Bod na počasie sa dá len premenovať — na iný bod treba
+ * stopu, a tá sa bez nového súboru nečíta (ukážkové GPX ani nemajú výšky).
+ */
+export function geometryFromRoute(route: Route): RouteGeometry {
+  const point = latLng(route.weatherPoint);
+  return {
+    distanceKm: route.distanceKm,
+    ascentM: route.ascentM,
+    start: route.start,
+    finish: route.finish,
+    via: route.via,
+    weatherOptions: [
+      { key: pointKey(point), label: `Súčasný bod (${route.weatherPoint.name})`, point, suggestedName: route.weatherPoint.name },
+    ],
+  };
 }

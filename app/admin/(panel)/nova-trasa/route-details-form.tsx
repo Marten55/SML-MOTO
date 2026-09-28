@@ -14,7 +14,6 @@ import {
   type RouteGeometry,
 } from '@/lib/route-draft';
 import type { Route } from '@/lib/routes';
-import { slugify } from '@/lib/slug';
 
 /*
  * Údaje do katalógu — to, čo GPX nevie: cena, texty v štyroch jazykoch,
@@ -75,6 +74,10 @@ interface Props {
   saving: boolean;
   /** Priebeh alebo chyba uloženia od rodiča. */
   status: ReactNode;
+  /** Adresa po uložení — pri úprave zverejnenej trasy zamknutá, nie z názvu. */
+  slug: string;
+  /** Text tlačidla a poznámka pod ním (nová trasa vs. úprava). */
+  submit: { label: string; note: string };
   idPrefix: string;
 }
 
@@ -87,6 +90,8 @@ export function RouteDetailsForm({
   onSave,
   saving,
   status,
+  slug,
+  submit,
   idPrefix,
 }: Props) {
   const fid = (path: string) => `${idPrefix}-${path.replaceAll('.', '-')}`;
@@ -112,8 +117,11 @@ export function RouteDetailsForm({
     setDraft((d) => {
       const previous = weatherOptions.find((o) => o.key === d.weatherKey);
       const next = weatherOptions.find((o) => o.key === key);
-      // Meno bodu sa prepíše len vtedy, keď ho Miroslav neupravoval sám
-      const custom = d.weatherName.trim() !== '' && d.weatherName !== previous?.suggestedName;
+      // Meno bodu sa prepíše len vtedy, keď ho Miroslav neupravoval sám.
+      // Keď predchádzajúci bod v trase už nie je (nový export pri úprave),
+      // meno patrilo miestu, ktoré zmizlo — vtedy sa prepíše tiež.
+      const vanished = d.weatherKey !== '' && previous === undefined;
+      const custom = !vanished && d.weatherName.trim() !== '' && d.weatherName !== previous?.suggestedName;
       return { ...d, weatherKey: key, weatherName: custom ? d.weatherName : (next?.suggestedName ?? '') };
     });
   }
@@ -129,8 +137,6 @@ export function RouteDetailsForm({
   function setHighlight(index: number, value: Localized) {
     setDraft((d) => ({ ...d, highlights: d.highlights.map((h, i) => (i === index ? value : h)) }));
   }
-
-  const slug = slugify(draft.name);
 
   return (
     <form
@@ -448,12 +454,9 @@ export function RouteDetailsForm({
             disabled={saving}
             className="self-start rounded-sm bg-accent px-6 py-3 font-display text-sm font-semibold tracking-wider text-ground uppercase disabled:cursor-wait disabled:opacity-60"
           >
-            {saving ? 'Ukladám…' : 'Uložiť ako skrytú trasu'}
+            {saving ? 'Ukladám…' : submit.label}
           </button>
-          <p className="max-w-[62ch] text-sm text-ink-3">
-            Uloží sa aj s nahratými súbormi. V katalógu sa neukáže, kým ju nezverejníš v zozname
-            trás.
-          </p>
+          <p className="max-w-[62ch] text-sm text-ink-3">{submit.note}</p>
         </div>
         {result && <CheckResult result={result} />}
         {status}

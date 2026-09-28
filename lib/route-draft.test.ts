@@ -7,11 +7,14 @@ import {
   emptyRouteDraft,
   GEOMETRY_ERROR,
   MAX_HIGHLIGHTS,
+  geometryFromRoute,
   routeFromSources,
+  routeToDraft,
   routeGeometry,
   type RouteDraft,
   type RouteGeometry,
 } from './route-draft';
+import routesJson from '../data/routes.json';
 import { routeSchema } from './route-schema';
 import { MAX_WAYPOINTS } from './routes';
 
@@ -271,5 +274,33 @@ describe('uloženie na serveri (krok D3)', () => {
     expect(routeFromSources([{ name: '01-x.gpx', content: '<nie-gpx' }], filledDraft()).ok).toBe(false);
     expect(routeFromSources(source, null).ok).toBe(false);
     expect(routeFromSources(source, { name: 42 }).ok).toBe(false);
+  });
+});
+
+describe('úprava existujúcej trasy (krok D5)', () => {
+  const routes = (routesJson as unknown[]).map((r) => routeSchema.parse(r));
+
+  it.each(routes.map((r) => [r.slug, r] as const))(
+    '%s sa dá otvoriť v úprave a bez zmeny uložiť s tými istými údajmi',
+    (_slug, route) => {
+      const result = checkDraft(routeToDraft(route), geometryFromRoute(route));
+      if (!result.ok) throw new Error(JSON.stringify(result.errors));
+      // Adresu pri úprave určuje server (zamknutá), z názvu sa neberie —
+      // porovnáva sa všetko okrem nej a okrem toho, čo formulár nevypĺňa
+      expect({ ...result.fields, slug: route.slug }).toEqual({
+        ...route,
+        id: undefined,
+        assets: undefined,
+        isExample: undefined,
+      });
+    },
+  );
+
+  it('ukážková trasa ostane po úprave ukážkou', () => {
+    const route = routes[0];
+    const result = checkDraft(routeToDraft(route), geometryFromRoute(route));
+    if (!result.ok) throw new Error('kontrola neprešla');
+    const assembled = assembleRoute(result.fields, { id: route.id, assets: route.assets, isExample: true });
+    expect('route' in assembled && assembled.route.isExample).toBe(true);
   });
 });

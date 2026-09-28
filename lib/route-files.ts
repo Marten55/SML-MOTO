@@ -116,3 +116,15 @@ export async function removeFiles(paths: string[]): Promise<void> {
   const { error } = await adminClient().storage.from(ROUTE_FILES_BUCKET).remove(paths);
   if (error) console.error(`[route-files] upratanie ${paths.join(', ')}: ${error.message}`);
 }
+
+/** Cesty všetkých zdrojových exportov trasy — pri výmene sa staré zmažú. */
+export async function listSources(routeId: string): Promise<string[]> {
+  const { data, error } = await adminClient()
+    .storage.from(ROUTE_FILES_BUCKET)
+    .list(`${routeId}/source`, { limit: 100 });
+  if (error) {
+    console.error(`[route-files] zoznam zdrojov ${routeId}: ${error.message}`);
+    return [];
+  }
+  return data.map((f) => `${routeId}/source/${f.name}`);
+}
