@@ -3,7 +3,7 @@ import { cache } from 'react';
 
 import routesJson from '@/data/routes.json';
 import { requireAdmin } from './admin-session';
-import { routeSchema, rowToRoute, type RouteRow } from './route-schema';
+import { routeSchema, routeToRow, rowToRoute, type RouteRow } from './route-schema';
 import type { Route } from './routes';
 import { adminClient, isSupabaseConfigured, publicClient } from './supabase';
 
@@ -139,4 +139,45 @@ export async function getRoutesForAdmin(): Promise<AdminRouteItem[]> {
       problem: 'error' in result ? result.error : null,
     };
   });
+}
+
+// ── Zápis z administrácie (krok D3) ────────────────────────────────────────
+
+/** Postgres: porušená podmienka unique (slug alebo ID už existuje). */
+const UNIQUE_VIOLATION = '23505';
+
+/** Je adresa trasy obsadená? Aj skrytou trasou — slug je jedinečný v celej tabuľke. */
+export async function isSlugTaken(slug: string): Promise<boolean> {
+  await requireAdmin();
+  const { data, error } = await adminClient().from('routes').select('id').eq('slug', slug).maybeSingle();
+  if (error) throw new Error(`[routes] Kontrola adresy ${slug} zlyhala: ${error.message}`);
+  return data !== null;
+}
+
+/**
+ * Uloží novú trasu ako skrytú (published = false). Zverejní ju až Miroslav
+ * v zozname trás (krok D4). Nová trasa ide na koniec katalógu.
+ *
+ * 'slug_taken' namiesto výnimky: kontrola pred nahratím súborov a zápis nie
+ * sú jedna operácia, takže adresu mohol medzitým obsadiť niekto iný (druhá
+ * karta prehliadača). Rozhodne databáza, nie predchádzajúca kontrola.
+ */
+export async function insertHiddenRoute(route: Route): Promise<'ok' | 'slug_taken'> {
+  await requireAdmin();
+  const db = adminClient();
+
+  const { data: last, error: orderError } = await db
+    .from('routes')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (orderError) throw new Error(`[routes] Poradie trás sa nepodarilo zistiť: ${orderError.message}`);
+
+  const row = routeToRow(route, { published: false, sortOrder: (last?.sort_order ?? 0) + 1 });
+  const { error } = await db.from('routes').insert(row);
+
+  if (error?.code === UNIQUE_VIOLATION && error.message.includes('slug')) return 'slug_taken';
+  if (error) throw new Error(`[routes] Trasu ${route.id} sa nepodarilo uložiť: ${error.message}`);
+  return 'ok';
 }

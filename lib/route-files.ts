@@ -45,3 +45,74 @@ export async function signedDownloadUrl(routeId: string, filename: string): Prom
   }
   return data.signedUrl;
 }
+
+// ── Nahratie novej trasy (krok D3) ─────────────────────────────────────────
+//
+// Volať LEN za requireAdmin() a s cestami z overeného lístka (lib/route-upload.ts).
+
+/**
+ * Jednorazové adresy, na ktoré prehliadač nahrá zdrojový export. Každá platí
+ * len pre svoju cestu a len na jedno nahratie — overené proti Supabase 28. 9.
+ * Prehliadač pri tom nepotrebuje žiadny náš kľúč.
+ */
+export async function signedSourceUploads(paths: string[]): Promise<string[] | null> {
+  const bucket = adminClient().storage.from(ROUTE_FILES_BUCKET);
+  const urls: string[] = [];
+  for (const path of paths) {
+    const { data, error } = await bucket.createSignedUploadUrl(path);
+    if (error || !data) {
+      console.error(`[route-files] adresa na nahratie ${path}: ${error?.message ?? 'bez odkazu'}`);
+      return null;
+    }
+    urls.push(data.signedUrl);
+  }
+  return urls;
+}
+
+/** Stiahne nahraté zdroje ako text. null, keď niektorý chýba (prehliadač ho nenahral). */
+export async function downloadSources(paths: string[]): Promise<{ path: string; content: string }[] | null> {
+  const bucket = adminClient().storage.from(ROUTE_FILES_BUCKET);
+  const files: { path: string; content: string }[] = [];
+  for (const path of paths) {
+    const { data, error } = await bucket.download(path);
+    if (error || !data) {
+      console.error(`[route-files] zdroj ${path}: ${error?.message ?? 'prázdny'}`);
+      return null;
+    }
+    files.push({ path, content: await data.text() });
+  }
+  return files;
+}
+
+/** Uloží vygenerované GPX balíčka pod menami, ktoré dostane zákazník. */
+export async function uploadPackageFiles(
+  routeId: string,
+  files: { filename: string; content: string }[],
+): Promise<boolean> {
+  const bucket = adminClient().storage.from(ROUTE_FILES_BUCKET);
+  for (const { filename, content } of files) {
+    const path = routeFilePath(routeId, filename);
+    if (!path) {
+      console.error(`[route-files] nebezpečná cesta: ${routeId} / ${filename}`);
+      return false;
+    }
+    const { error } = await bucket.upload(path, new Blob([content], { type: 'application/gpx+xml' }), {
+      contentType: 'application/gpx+xml',
+    });
+    if (error) {
+      console.error(`[route-files] ${path}: ${error.message}`);
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Zmaže súbory trasy, ktorá sa neuložila — inak by v úložisku ostali navždy
+ * a nikto by o nich nevedel. Chyba mazania uloženie nezastaví, len sa zapíše.
+ */
+export async function removeFiles(paths: string[]): Promise<void> {
+  if (paths.length === 0) return;
+  const { error } = await adminClient().storage.from(ROUTE_FILES_BUCKET).remove(paths);
+  if (error) console.error(`[route-files] upratanie ${paths.join(', ')}: ${error.message}`);
+}

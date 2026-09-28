@@ -7,6 +7,7 @@ import {
   emptyRouteDraft,
   GEOMETRY_ERROR,
   MAX_HIGHLIGHTS,
+  routeFromSources,
   routeGeometry,
   type RouteDraft,
   type RouteGeometry,
@@ -238,5 +239,37 @@ describe('chyby pri poliach', () => {
     for (const junk of [null, 'text', 42, [], { name: 7 }]) {
       expect(checkDraft(junk, geometry).ok).toBe(false);
     }
+  });
+});
+
+describe('uloženie na serveri (krok D3)', () => {
+  const source = [{ name: '01-furka.gpx', content: gpx(furkaTrack()) }];
+
+  it('zo zdroja a formulára poskladá tie isté údaje ako náhľad v prehliadači', () => {
+    const result = routeFromSources(source, filledDraft());
+    if (!result.ok) throw new Error(JSON.stringify(result.errors));
+    expect(result.fields).toEqual(fieldsOf(filledDraft()));
+    expect(result.files.master).toContain('<name>Furka · Grimsel · Susten</name>');
+    expect(result.files.poi).toContain('Furkapass');
+  });
+
+  it('dĺžku počíta zo súboru — údaj podstrčený vo formulári sa ignoruje', () => {
+    const result = routeFromSources(source, { ...filledDraft(), distanceKm: 999, ascentM: 1 });
+    if (!result.ok) throw new Error(JSON.stringify(result.errors));
+    expect(result.fields.distanceKm).toBe(geometry.distanceKm);
+    expect(result.fields.ascentM).toBe(geometry.ascentM);
+  });
+
+  it('keď nahratý súbor nie je tá trasa, podľa ktorej sa vyberal bod počasia, odmietne', () => {
+    const other = furkaTrack().map((p) => ({ ...p, lat: p.lat + 1 }));
+    const result = routeFromSources([{ name: '01-ina.gpx', content: gpx(other) }], filledDraft());
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.weatherKey).toBeDefined();
+  });
+
+  it('pokazený zdroj alebo podvrhnutý formulár vráti chyby, nespadne', () => {
+    expect(routeFromSources([{ name: '01-x.gpx', content: '<nie-gpx' }], filledDraft()).ok).toBe(false);
+    expect(routeFromSources(source, null).ok).toBe(false);
+    expect(routeFromSources(source, { name: 42 }).ok).toBe(false);
   });
 });

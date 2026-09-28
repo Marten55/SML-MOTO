@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { RoutePackage } from './route-builder';
+import { buildRoutePackage, type InputFile, type RoutePackage } from './route-builder';
 import { simplifyToCount } from './route-builder/geo';
 import { routeSchema } from './route-schema';
 import { MAX_WAYPOINTS, type GeoPoint, type Route, type RouteAssets } from './routes';
@@ -356,4 +356,32 @@ export function assembleRoute(
   const result = routeSchema.safeParse({ ...fields, ...server, isExample: false });
   if (!result.success) return { error: z.prettifyError(result.error) };
   return { route: result.data };
+}
+
+/** Súbory balíčka, ktoré server uloží k trase. */
+export type PackageFiles = NonNullable<RoutePackage['files']>;
+
+/**
+ * Server (krok D3): nahraté zdroje + formulár → údaje trasy a súbory balíčka.
+ *
+ * Tá istá cesta ako náhľad v prehliadači (buildRoutePackage → routeGeometry
+ * → checkDraft), len nad súbormi, ktoré server stiahol z úložiska sám.
+ * Dĺžka, stúpanie a body sa tak vždy počítajú z toho, čo si zákazník kúpi.
+ */
+export function routeFromSources(
+  inputs: InputFile[],
+  draft: unknown,
+): { ok: true; fields: RouteFields; files: PackageFiles } | { ok: false; errors: FieldErrors } {
+  // Názov ide do GPX ešte pred kontrolou formulára; zlý názov checkDraft
+  // aj tak odmietne, takže sa z neho nič neuloží
+  const rawName = (draft as { name?: unknown } | null)?.name;
+  const name = typeof rawName === 'string' ? rawName.trim() : '';
+
+  const pkg = buildRoutePackage(inputs, { name: name || 'Nová trasa' });
+  const check = checkDraft(draft, routeGeometry(pkg));
+  if (!check.ok) return check;
+  // routeGeometry vracia null pre balíček bez súborov, takže sem sa bez nich nedostane
+  if (!pkg.files) return { ok: false, errors: { [GEOMETRY_ERROR]: 'Balíček sa nepodarilo zostaviť.' } };
+
+  return { ok: true, fields: check.fields, files: pkg.files };
 }
