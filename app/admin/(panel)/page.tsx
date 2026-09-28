@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { getRoutesForAdmin } from '@/lib/routes-db';
+import { PublishToggle } from './publish-toggle';
 
 const dateFormat = new Intl.DateTimeFormat('sk-SK', {
   dateStyle: 'short',
@@ -46,13 +47,14 @@ export default async function AdminHomePage({
       )}
 
       <div className="mt-6 overflow-x-auto">
-        <table className="w-full min-w-[640px] border-collapse text-sm">
+        <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-line-strong text-left font-display text-xs font-semibold tracking-[0.14em] text-ink-3 uppercase">
               <th className="py-2 pr-4">Trasa</th>
               <th className="py-2 pr-4">Vrstva</th>
               <th className="py-2 pr-4 text-right">Cena</th>
               <th className="py-2 pr-4">Stav</th>
+              <th className="py-2 pr-4">Predaj</th>
               <th className="py-2">Upravená</th>
             </tr>
           </thead>
@@ -81,6 +83,20 @@ export default async function AdminHomePage({
                   {route.isExample && (
                     <span className="ml-2 font-mono text-xs text-warn">ukážka</span>
                   )}
+                  {route.published && (
+                    // Katalóg je v nemčine (hlavný trh), slovenčina je pre Miroslava
+                    <a
+                      href={`/sk/trasy/${route.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 block text-xs text-ink-3 hover:text-accent"
+                    >
+                      Na webe ↗
+                    </a>
+                  )}
+                </td>
+                <td className="py-3 pr-4">
+                  <PublishToggle id={route.id} published={route.published} title={route.title} />
                 </td>
                 <td className="py-3 font-mono text-xs text-ink-3 tabular-nums">
                   {route.updatedAt ? dateFormat.format(new Date(route.updatedAt)) : '—'}
