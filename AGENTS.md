@@ -171,6 +171,12 @@ premennej treba nasadiť znova.
   aj bez webhooku a bez Resend — `/odomknute` si platbu overí cez `session_id`.
 - **Bez `OPENROUTESERVICE_KEY` plánovač vráti 503.** Náhľad beží ako
   produkcia, takže demo server OSRM sa nepoužije.
+- **Vetvy sa na Verceli nenasadzujú, len `main`** (`vercel.json`). Premenné
+  sú len v prostredí Production a build bez Supabase zámerne padá. Kľúče
+  pre Preview nedávať: secret kľúč obchádza RLS a vetva by zapisovala do
+  databázy náhľadu. PR kontroluje GitHub Actions (`.github/workflows/ci.yml`):
+  lint, typy, testy. Vzor vetiev je `**`, nie `*` — hviezdička nezachytí
+  lomku v `feature/...`.
 
 ### Na čo pri hostingu pozor
 
