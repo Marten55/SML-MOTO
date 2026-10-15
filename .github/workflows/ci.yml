@@ -1,0 +1,26 @@
+# Kontrola každého PR bez tajných kľúčov.
+#
+# Preview nasadenia na Verceli sú vypnuté (vercel.json): build bez Supabase
+# zámerne padá (lib/routes-db.ts) a dať kľúče vetvám by znamenalo, že kód
+# z hocijakej vetvy zapisuje do databázy náhľadu pre klienta.
+# Build sa tu preto nespúšťa — ten overí až nasadenie z main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
