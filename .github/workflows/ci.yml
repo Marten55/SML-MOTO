@@ -1,6 +1,6 @@
 # Kontrola každého PR bez tajných kľúčov.
 #
-# Preview nasadenia na Verceli sú vypnuté (vercel.json): build bez Supabase
+# Preview nasadenia na Verceli sú vypnuté (vercel.json): build bez databázy
 # zámerne padá (lib/routes-db.ts) a dať kľúče vetvám by znamenalo, že kód
 # z hocijakej vetvy zapisuje do databázy náhľadu pre klienta.
 # Build sa tu preto nespúšťa — ten overí až nasadenie z main.

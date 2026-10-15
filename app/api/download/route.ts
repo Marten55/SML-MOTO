@@ -5,14 +5,14 @@ import { NextResponse } from 'next/server';
 import { isAccessConfigured, isDownloadKind, verifyAccessToken } from '@/lib/access';
 import { signedDownloadUrl } from '@/lib/route-files';
 import { getPurchasedRoute } from '@/lib/routes-db';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isStorageConfigured } from '@/lib/storage';
 
 /**
  * Chránené stiahnutie. Súbory zámerne NIE SÚ v public/ — čokoľvek tam leží
  * je dostupné bez overenia, takže by sa platený produkt dal stiahnuť zadarmo.
  *
- * Súbory ležia v súkromnom úložisku Supabase (lib/route-files.ts). Lokálne bez
- * Supabase sa číta z content/gpx/ — tam sú len ukážkové trasy z gitu.
+ * Súbory ležia v súkromnom úložisku R2 (lib/route-files.ts). Lokálne bez
+ * úložiska sa číta z content/gpx/ — tam sú len ukážkové trasy z gitu.
  */
 const GPX_DIR = path.join(process.cwd(), 'content', 'gpx');
 
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'file_not_available' }, { status: 404 });
   }
 
-  if (isSupabaseConfigured()) {
+  if (isStorageConfigured()) {
     const url = await signedDownloadUrl(route.id, filename);
     if (!url) {
       return NextResponse.json({ error: 'file_missing' }, { status: 404 });
@@ -63,8 +63,13 @@ export async function GET(request: Request) {
     });
   }
 
-  // Bez Supabase sem príde len lokálny vývoj — na ostrom webe getPurchasedRoute
-  // bez databázy spadne skôr, než by sa dostal sem.
+  // Bez úložiska sem patrí len lokálny vývoj. Na ostrom webe by zákazník po
+  // zaplatení dostal file_missing a v logu by to vyzeralo ako chýbajúci súbor,
+  // nie ako chýbajúce nastavenie — radšej povedať pravú príčinu.
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[download] R2_* nie je nastavené — súbory trás nie je odkiaľ vydať');
+    return NextResponse.json({ error: 'downloads_not_configured' }, { status: 503 });
+  }
 
   // Meno súboru pochádza z našich dát, nie od používateľa, ale radšej sa uistím,
   // že sa nikto nedostane mimo priečinka cez ../

@@ -12,20 +12,10 @@
  */
 import { readFileSync } from 'node:fs';
 
-import { createClient } from '@supabase/supabase-js';
-
 import { routeSchema, routeToRow } from '../lib/route-schema.ts';
-import { supabaseUrlProblem } from '../lib/supabase-url.ts';
+import { connectDatabase, upsertRoutes } from './connections.mts';
 
-process.loadEnvFile('.env.local');
-
-const url = process.env.SUPABASE_URL;
-const secretKey = process.env.SUPABASE_SECRET_KEY;
-const urlProblem = supabaseUrlProblem(url);
-if (urlProblem || !url || !secretKey) {
-  console.error(urlProblem ?? 'V .env.local chýba SUPABASE_SECRET_KEY.');
-  process.exit(1);
-}
+const sql = connectDatabase();
 
 const source = JSON.parse(readFileSync('data/routes.json', 'utf8')) as unknown[];
 
@@ -38,11 +28,10 @@ const rows = source.map((raw, index) =>
   }),
 );
 
-const supabase = createClient(url, secretKey, { auth: { persistSession: false } });
-const { error } = await supabase.from('routes').upsert(rows, { onConflict: 'id' });
-
-if (error) {
-  console.error('Zápis zlyhal:', error.message);
+try {
+  await upsertRoutes(sql, rows);
+} catch (error) {
+  console.error('Zápis zlyhal:', error instanceof Error ? error.message : error);
   process.exit(1);
 }
 

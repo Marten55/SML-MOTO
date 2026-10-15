@@ -10,10 +10,13 @@
     "test": "vitest run",
     "admin:heslo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/hash-admin-password.mts",
     "db:seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-routes.mts",
-    "db:subory": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/upload-route-files.mts"
+    "db:subory": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/upload-route-files.mts",
+    "db:presun": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/move-from-supabase.mts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.116.0",
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "@neondatabase/serverless": "^1.2.0",
     "fast-xml-parser": "^5.11.1",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",

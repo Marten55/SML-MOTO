@@ -196,13 +196,14 @@ function RouteBuilder({ edit }: { edit?: EditTarget }) {
       if (!prepared.ok) return failed(prepared.message, prepared.errors);
 
       // Rovno do úložiska, nie cez náš server — Server Action unesie len 1 MB.
-      // Tvar požiadavky je ten istý, aký posiela uploadToSignedUrl
-      // z @supabase/storage-js; celú knižnicu kvôli jednému PUT netreba.
+      // Podpísaná adresa R2 (S3) čaká súbor priamo v tele požiadavky, nie
+      // formulár. Blob bez typu = žiadna hlavička Content-Type, ktorú by
+      // podpis nepoznal. Bucket musí mať CORS pre PUT z našej domény (README).
       for (const [i, file] of inputs.entries()) {
-        const body = new FormData();
-        body.append('cacheControl', '3600');
-        body.append('', new Blob([file.content]), file.name);
-        const response = await fetch(prepared.uploadUrls[i], { method: 'PUT', body });
+        const response = await fetch(prepared.uploadUrls[i], {
+          method: 'PUT',
+          body: new Blob([file.content]),
+        });
         if (!response.ok) return failed(`Súbor ${file.name} sa nepodarilo nahrať. Skús to znova.`);
       }
 

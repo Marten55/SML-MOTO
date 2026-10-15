@@ -56,18 +56,10 @@ create trigger routes_set_updated_at
   before update on public.routes
   for each row execute function public.set_updated_at();
 
--- Oddelenie podľa oprávnení: verejný kľúč (publishable) vidí len zverejnené
--- trasy a nezapíše nič. Zapisuje iba server so secret kľúčom, ktorý RLS obchádza.
-alter table public.routes enable row level security;
-
-create policy "Zverejnené trasy vidí každý"
-  on public.routes for select
-  to anon, authenticated
-  using (published);
-
--- RLS by zápis zamietlo aj tak — toto je druhá vrstva, keby niekto omylom
--- pridal príliš voľnú policy.
-revoke insert, update, delete, truncate on public.routes from anon, authenticated;
+-- Pôvodne (Supabase) tu boli pravidlá RLS pre verejný kľúč. Na Neone k databáze
+-- nikto okrem nášho servera nepristupuje — žiadne verejné API, žiadny kľúč
+-- v prehliadači — takže RLS nemá koho obmedzovať. Že verejný web vidí len
+-- zverejnené trasy, stráži lib/routes-db.ts (getAllRoutes).
 
 -- ---------------------------------------------------------------------------
 -- Pokusy o prihlásenie do administrácie
@@ -87,7 +79,3 @@ create index admin_login_attempts_ip_time
 
 create index admin_login_attempts_time
   on public.admin_login_attempts (attempted_at desc);
-
--- Žiadna policy: tabuľku číta a zapisuje len server so secret kľúčom.
-alter table public.admin_login_attempts enable row level security;
-revoke all on public.admin_login_attempts from anon, authenticated;

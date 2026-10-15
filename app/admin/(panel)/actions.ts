@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 
 import { requireAdmin } from '@/lib/admin-session';
 import { setRoutePublished } from '@/lib/routes-db';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isDatabaseConfigured } from '@/lib/db';
 
 /*
  * Zverejnenie a stiahnutie trasy z predaja (krok D4). Verejná POST adresa
@@ -18,8 +18,8 @@ export interface PublishState {
 
 export async function togglePublished(_prev: PublishState, formData: FormData): Promise<PublishState> {
   await requireAdmin();
-  // Lokálne bez Supabase sa trasy čítajú z data/routes.json — tam niet čo meniť
-  if (!isSupabaseConfigured()) return { error: 'Zverejňovanie potrebuje Supabase.' };
+  // Lokálne bez databázy sa trasy čítajú z data/routes.json — tam niet čo meniť
+  if (!isDatabaseConfigured()) return { error: 'Zverejňovanie potrebuje databázu (DATABASE_URL).' };
 
   const id = formData.get('id');
   const target = formData.get('published');

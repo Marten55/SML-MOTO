@@ -33,7 +33,8 @@ import {
 import type { RouteAssets } from '@/lib/routes';
 import { getRouteForAdmin, insertHiddenRoute, isSlugTaken, updateRouteContent } from '@/lib/routes-db';
 import { slugify } from '@/lib/slug';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isDatabaseConfigured } from '@/lib/db';
+import { isStorageConfigured } from '@/lib/storage';
 
 /*
  * Uloženie novej trasy (krok D3) a úprava existujúcej (krok D5). Postup
@@ -50,8 +51,8 @@ const TICKET_INVALID = 'Nahratie vypršalo alebo je neplatné. Klikni na uložen
 const SERVER_ERRORS = 'Server našiel v údajoch chyby. Obnov stránku a skús znova.';
 
 function notConfigured(): Failure | null {
-  if (isSupabaseConfigured()) return null;
-  return { ok: false, message: 'Ukladanie potrebuje Supabase — pozri SUPABASE_* v .env.example.' };
+  if (isDatabaseConfigured() && isStorageConfigured()) return null;
+  return { ok: false, message: 'Ukladanie potrebuje databázu a úložisko — pozri DATABASE_URL a R2_* v .env.example.' };
 }
 
 function ticketSecret(): string {
