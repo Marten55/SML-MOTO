@@ -1,61 +1,41 @@
 /**
- * Pripraví súkromné úložisko na súbory trás a nahrá doň ukážkové súbory
+ * Overí súkromné úložisko na súbory trás a nahrá doň ukážkové súbory
  * z content/gpx/ podľa data/routes.json:
  *
  *   npm run db:subory
  *
- * Dá sa pustiť opakovane — bucket vytvorí len raz a súbory prepíše rovnakými.
- * Na rozdiel od db:seed nesiahne na tabuľku routes, takže je bezpečný
- * aj po spustení ostrej prevádzky.
+ * Bucket `route-files` sa NEVYTVÁRA tu, ale ručne v Cloudflare → R2 (README).
+ * Kľúč, ktorý má aplikácia, smie len čítať a zapisovať súbory — kľúč na
+ * zakladanie bucketov by na serveri bol zbytočne silný.
+ *
+ * Dá sa pustiť opakovane — súbory prepíše rovnakými. Nesiahne na tabuľku
+ * routes, takže je bezpečný aj po spustení ostrej prevádzky.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { createClient } from '@supabase/supabase-js';
+import { HeadBucketCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 
 import { ROUTE_FILES_BUCKET, routeFilePath } from '../lib/route-file-path.ts';
 import { routeSchema } from '../lib/route-schema.ts';
-import { supabaseUrlProblem } from '../lib/supabase-url.ts';
+import { connectStorage } from './connections.mts';
 
-process.loadEnvFile('.env.local');
-
-const url = process.env.SUPABASE_URL;
-const secretKey = process.env.SUPABASE_SECRET_KEY;
-const urlProblem = supabaseUrlProblem(url);
-if (urlProblem || !url || !secretKey) {
-  console.error(urlProblem ?? 'V .env.local chýba SUPABASE_SECRET_KEY.');
-  process.exit(1);
-}
-
-const supabase = createClient(url, secretKey, { auth: { persistSession: false } });
+const storage = connectStorage();
 
 // --- 1. Bucket --------------------------------------------------------------
 
-const { data: bucket } = await supabase.storage.getBucket(ROUTE_FILES_BUCKET);
-
-if (bucket) {
-  // Verejný bucket = platené trasy na stiahnutie bez zaplatenia. Radšej skončiť
-  // nahlas, než doň potichu nahrávať.
-  if (bucket.public) {
-    console.error(
-      `Bucket ${ROUTE_FILES_BUCKET} je VEREJNÝ. Prepni ho v Supabase → Storage na súkromný a spusti znova.`,
-    );
-    process.exit(1);
-  }
-  console.log(`Bucket ${ROUTE_FILES_BUCKET} už existuje (súkromný).`);
-} else {
-  const { error } = await supabase.storage.createBucket(ROUTE_FILES_BUCKET, {
-    public: false,
-    // Zdrojový export do 25 MB (MAX_FILE_BYTES v lib/route-builder/parse.ts)
-    // pôjde od kroku D3 tiež sem, plus rezerva
-    fileSizeLimit: '30MB',
-  });
-  if (error) {
-    console.error(`Bucket sa nepodarilo vytvoriť: ${error.message}`);
-    process.exit(1);
-  }
-  console.log(`Bucket ${ROUTE_FILES_BUCKET} vytvorený (súkromný).`);
+try {
+  await storage.send(new HeadBucketCommand({ Bucket: ROUTE_FILES_BUCKET }));
+} catch (error) {
+  console.error(
+    `Bucket ${ROUTE_FILES_BUCKET} nie je dostupný (${(error as Error).name}). ` +
+      'Vytvor ho v Cloudflare → R2 a skontroluj, že API token má prístup práve k nemu.',
+  );
+  process.exit(1);
 }
+// Či je bucket verejný, sa cez S3 API zistiť nedá — to stráži README
+// a nastavenie v Cloudflare (Public access: Disabled).
+console.log(`Bucket ${ROUTE_FILES_BUCKET} je dostupný.`);
 
 // --- 2. Ukážkové súbory -------------------------------------------------------
 
@@ -92,12 +72,17 @@ for (const route of routes) {
       continue;
     }
 
-    const { error } = await supabase.storage.from(ROUTE_FILES_BUCKET).upload(key, readFileSync(local), {
-      upsert: true,
-      contentType: CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? 'application/octet-stream',
-    });
-    if (error) {
-      console.error(`${key}: ${error.message}`);
+    try {
+      await storage.send(
+        new PutObjectCommand({
+          Bucket: ROUTE_FILES_BUCKET,
+          Key: key,
+          Body: readFileSync(local),
+          ContentType: CONTENT_TYPES[path.extname(filename).toLowerCase()] ?? 'application/octet-stream',
+        }),
+      );
+    } catch (error) {
+      console.error(`${key}: ${(error as Error).message}`);
       process.exit(1);
     }
     uploaded++;

@@ -9,7 +9,7 @@
  * - súbory jednej trasy sa dajú zmazať naraz ako priečinok.
  */
 
-/** Súkromný bucket v Supabase Storage. Bez overeného tokenu sa k nemu nikto nedostane. */
+/** Súkromný bucket v Cloudflare R2. Bez overeného tokenu sa k nemu nikto nedostane. */
 export const ROUTE_FILES_BUCKET = 'route-files';
 
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;

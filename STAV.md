@@ -1,7 +1,25 @@
 # Stav práce — nástroj na výrobu trás (administrácia)
 
-Posledná aktualizácia: 28. 9. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
+Posledná aktualizácia: 15. 10. 2026. Technické pravidlá projektu sú v `AGENTS.md`,
 tu je len to, kde práca stojí a čo ju blokuje.
+
+## Presun zo Supabase na Neon + R2 (15. 10. 2026) — vetva `feature/neon-r2`
+
+Dôvod: bezplatný Supabase pustí 2 projekty na účet (Jobík, intranet), Pro nie.
+SML Moto ako jediný nepoužíva Supabase Auth, takže sa presúval najlacnejšie.
+
+- **Databáza:** Neon (Postgres), ovládač `@neondatabase/serverless` (`lib/db.ts`).
+  Schéma `db/migrations/` je pôvodná bez RLS — oprávnenia stráži kód (AGENTS.md).
+- **Súbory:** Cloudflare R2 cez AWS SDK (`lib/storage.ts`, `lib/route-files.ts`).
+  Prehliadač nahráva export priamo do R2 (PUT na podpísanú adresu, 15 min).
+- **Overené:** lint, typy, 128 testov; všetky SQL dotazy (migrácia, seed 2×,
+  `to_jsonb` → `rowToRoute`, kolízia slugu, úprava, limit prihlásení) na
+  skutočnom Postgrese (PGlite).
+- **Neoverené — chýbajú účty:** živé spojenie s Neonom, podpísané odkazy R2
+  (stiahnutie, nahratie z prehliadača vrátane CORS), `npm run db:presun`.
+  Pred zlúčením: nastaviť podľa AGENTS.md → „prvé nastavenie", `db:presun`,
+  lokálne `npm run build && npm start`, kúpiť trasu testovacou kartou,
+  stiahnuť, v administrácii nahrať novú trasu.
 
 ## Kroky
 

@@ -13,8 +13,9 @@ Slovak, English, German and French.
 
 ## Stack
 
-Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Supabase
-(PostgreSQL, Storage) · Stripe Checkout · Leaflet · Zod · Vitest · Vercel
+Next.js 16 (App Router, Server Actions) · React 19 · TypeScript · Neon
+(PostgreSQL) · Cloudflare R2 (S3-compatible storage) · Stripe Checkout ·
+Leaflet · Zod · Vitest · Vercel
 
 ## How a purchase works
 
@@ -23,7 +24,7 @@ sequenceDiagram
     participant C as Customer
     participant W as Next.js app
     participant S as Stripe
-    participant DB as Supabase
+    participant DB as R2 storage
     C->>W: Buy route
     W->>S: Create Checkout session (price from DB, never from the request)
     S-->>C: Payment page
@@ -31,7 +32,7 @@ sequenceDiagram
     W->>C: E-mail with a signed access link
     C->>W: /api/download?token=…
     W->>W: Verify HMAC signature
-    W->>DB: Create signed Storage URL (valid 60 s)
+    W->>DB: Create presigned URL (valid 60 s)
     W-->>C: 303 redirect to the file
 ```
 
@@ -48,14 +49,16 @@ Because old links live in customers' inboxes, the token format must never
 change — a test guards it (`lib/signed-token.test.ts`).
 
 **Files are private and served by redirect.** Route files live in a private
-Supabase Storage bucket, never in `public/`. `/api/download` verifies the
+Cloudflare R2 bucket, never in `public/`. `/api/download` verifies the
 token and redirects to a signed URL valid for one minute. Streaming the file
 through the function would hit Vercel's 4.5 MB response limit.
 
-**Database access is split.** The public site uses the publishable key and
-Row Level Security only shows published routes. The secret key is used only
-behind admin checks or with a route ID taken from a verified token, so a
-route withdrawn from sale stays downloadable for people who bought it.
+**Database access goes through one data layer.** Only the server talks to
+Postgres (Neon's HTTP driver — no connection pool to exhaust on serverless).
+Public pages read through `getAllRoutes()`, which only returns published
+routes; everything else either checks the admin session itself or takes a
+route ID from a verified token, so a route withdrawn from sale stays
+downloadable for people who bought it.
 
 **Admin without a user table.** One admin, one password stored as a scrypt
 hash, a signed session cookie for 12 hours. Login attempts are limited in the

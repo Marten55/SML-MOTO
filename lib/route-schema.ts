@@ -67,7 +67,7 @@ export const routeSchema = z.object({
   isExample: z.boolean().optional(),
 }) satisfies z.ZodType<Route>;
 
-/** Riadok tabuľky public.routes tak, ako ho vráti Supabase. */
+/** Riadok tabuľky public.routes ako JSON (to_jsonb v lib/routes-db.ts). */
 export interface RouteRow {
   id: string;
   slug: string;

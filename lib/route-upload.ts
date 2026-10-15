@@ -28,8 +28,9 @@ import { slugify } from './slug';
 export const MAX_SOURCE_FILES = 10;
 
 /**
- * Podpísaná adresa na nahratie platí v Supabase 2 hodiny a nedá sa skrátiť.
- * Lístok platí kratšie: nahratie aj uloženie idú hneď po sebe jedným kliknutím.
+ * Podpísaná adresa na nahratie platí 15 minút (UPLOAD_URL_SECONDS
+ * v lib/route-files.ts), lístok 30: nahratie aj uloženie idú hneď po sebe
+ * jedným kliknutím, takže lístok musí prežiť nahratie, nie naopak.
  */
 const TICKET_SECONDS = 30 * 60;
 

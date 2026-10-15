@@ -10,7 +10,7 @@ import {
   createAdminToken,
   isValidAdminToken,
 } from './admin-token';
-import { adminClient, isSupabaseConfigured } from './supabase';
+import { errorMessage, isDatabaseConfigured, sql } from './db';
 
 /**
  * Data Access Layer pre administráciu. Každá stránka AJ každá Server Action
@@ -64,7 +64,7 @@ export async function clientIp(): Promise<string> {
 
 // ── Limit pokusov ──────────────────────────────────────────────────────────
 // V databáze, lebo na Verceli beží viac inštancií naraz. Pamäť slúži len pri
-// lokálnom vývoji bez Supabase.
+// lokálnom vývoji bez databázy.
 //
 // Poradie je dôležité: pokus sa zapíše ako neúspešný UŽ PRED overením hesla
 // a až potom sa počíta. Pôvodne to bolo naopak (spočítaj → over → zapíš)
@@ -88,7 +88,7 @@ export interface LoginAttempt {
 export async function beginLoginAttempt(ip: string): Promise<LoginAttempt> {
   const since = Date.now() - LOGIN_LIMITS.windowMinutes * 60_000;
 
-  if (!isSupabaseConfigured()) {
+  if (!isDatabaseConfigured()) {
     const attempt: MemoryAttempt = { id: memoryAttempts.length + 1, ip, succeeded: false, at: Date.now() };
     memoryAttempts.push(attempt);
     const failures = memoryAttempts.filter((a) => !a.succeeded && a.at > since);
@@ -102,51 +102,46 @@ export async function beginLoginAttempt(ip: string): Promise<LoginAttempt> {
     };
   }
 
-  const inserted = await adminClient()
-    .from('admin_login_attempts')
-    .insert({ ip, succeeded: false })
-    .select('id')
-    .single();
-
-  // Keď databáza neodpovie, radšej nepustíme nikoho, než by limit nefungoval
-  if (inserted.error) {
-    console.error('[admin] Pokus o prihlásenie sa nezapísal', inserted.error);
+  let id: number;
+  try {
+    const [row] = await sql()`
+      insert into public.admin_login_attempts (ip, succeeded) values (${ip}, false) returning id`;
+    // bigint príde z ovládača ako text; na number je bezpečný, toľko pokusov nebude
+    id = Number(row.id);
+  } catch (error) {
+    // Keď databáza neodpovie, radšej nepustíme nikoho, než by limit nefungoval
+    console.error('[admin] Pokus o prihlásenie sa nezapísal', errorMessage(error));
     return { id: null, blocked: true };
   }
 
-  const sinceIso = new Date(since).toISOString();
-  const failures = () =>
-    adminClient()
-      .from('admin_login_attempts')
-      .select('id', { count: 'exact', head: true })
-      .eq('succeeded', false)
-      .gte('attempted_at', sinceIso);
-
-  const [byIp, all] = await Promise.all([failures().eq('ip', ip), failures()]);
-
-  if (byIp.error || all.error || byIp.count === null || all.count === null) {
-    console.error('[admin] Limit pokusov sa nedá overiť', byIp.error ?? all.error);
-    return { id: inserted.data.id, blocked: true };
+  // Oba počty jedným dotazom — filter spočíta z tých istých riadkov len tie z IP
+  try {
+    const [counts] = await sql()`
+      select count(*) filter (where ip = ${ip}) as by_ip, count(*) as total
+      from public.admin_login_attempts
+      where not succeeded and attempted_at >= ${new Date(since).toISOString()}`;
+    return {
+      id,
+      blocked: isLoginBlocked({ ip: Number(counts.by_ip) - 1, global: Number(counts.total) - 1 }),
+    };
+  } catch (error) {
+    console.error('[admin] Limit pokusov sa nedá overiť', errorMessage(error));
+    return { id, blocked: true };
   }
-
-  return {
-    id: inserted.data.id,
-    blocked: isLoginBlocked({ ip: byIp.count - 1, global: all.count - 1 }),
-  };
 }
 
 export async function markLoginSucceeded(attempt: LoginAttempt): Promise<void> {
   if (attempt.id === null) return;
 
-  if (!isSupabaseConfigured()) {
+  if (!isDatabaseConfigured()) {
     const found = memoryAttempts.find((a) => a.id === attempt.id);
     if (found) found.succeeded = true;
     return;
   }
 
-  const { error } = await adminClient()
-    .from('admin_login_attempts')
-    .update({ succeeded: true })
-    .eq('id', attempt.id);
-  if (error) console.error('[admin] Úspešné prihlásenie sa nezapísalo', error);
+  try {
+    await sql()`update public.admin_login_attempts set succeeded = true where id = ${attempt.id}`;
+  } catch (error) {
+    console.error('[admin] Úspešné prihlásenie sa nezapísalo', errorMessage(error));
+  }
 }

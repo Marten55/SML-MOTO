@@ -39,7 +39,7 @@ Prechodný stav, kým nie je nová aplikácia nasadená:
 | Čo | Kde | Beží na |
 |---|---|---|
 | Starý statický web | `index.html`, `style.css`, `cookies.js`, `Videa/`, `Ikony/`, `vlajky/` | GitHub Pages — [živý](https://marten55.github.io/SML-MOTO/) |
-| Nová aplikácia | `app/`, `lib/`, `components/`, `content/`, `data/`, `supabase/` | náhľad pre klienta na [sml.admtechnics.sk](https://sml.admtechnics.sk) (Vercel), ostrá doména zatiaľ nie |
+| Nová aplikácia | `app/`, `lib/`, `components/`, `content/`, `data/`, `db/` | náhľad pre klienta na [sml.admtechnics.sk](https://sml.admtechnics.sk) (Vercel), ostrá doména zatiaľ nie |
 
 Pages servírujú `index.html` z koreňa a o zvyšok sa nestarajú. `.nojekyll`
 je tam preto, aby sa Jekyll nepokúšal spracovať zdrojáky a Pages nespadli
@@ -59,29 +59,43 @@ podvrhnúť. Platí trvalo: trasu si človek kupuje týždne pred dovolenkou a n
 ceste ju otvára opakovane, takže expirácia by vyrábala len reklamácie.
 **Formát tokenu sa nesmie meniť** — stráži to `lib/signed-token.test.ts`.
 
-Trasy sú v **Supabase** (tabuľka `routes`, schéma v `supabase/migrations/`).
+Trasy sú v **Neone** — čistý Postgres (tabuľka `routes`, schéma v `db/migrations/`).
+Do 15. 10. 2026 boli v Supabase; presunuté, lebo bezplatný Supabase pustí len
+2 projekty na účet a tie patria Jobíku a intranetu. Pro neprichádza do úvahy.
 Čítanie je v `lib/routes-db.ts` (len server), typy a výpočty v `lib/routes.ts`
 (ten importujú aj komponenty v prehliadači). `data/routes.json` je seed
-(`npm run db:seed`) a lokálna záloha, keď Supabase nie je nastavený — na
+(`npm run db:seed`) a lokálna záloha, keď `DATABASE_URL` nie je nastavený — na
 ostrom webe záloha zámerne neplatí. Odkaz do Google Maps sa generuje z tých
 istých dát. Zoznam zastávok sa orezáva na 8 — Google Maps URL viac neunesie
 a odkaz by sa ticho zlomil.
 
 ### Databáza: kto čo smie
 
-| Klient | Kľúč | Čo vidí | Kto ho smie použiť |
-|---|---|---|---|
-| `publicClient()` | publishable | len `published = true`, zapisovať nemôže (RLS) | verejný web |
-| `adminClient()` | secret | všetko, RLS obchádza | kód za `requireAdmin()` a `getPurchasedRoute()` s ID z overeného tokenu |
+Jedno spojenie (`sql()` z `lib/db.ts`) s plnými právami, **žiadne RLS**.
+K databáze nepristupuje nič okrem nášho servera, takže oprávnenia stráži kód:
+
+| Funkcia (`lib/routes-db.ts`) | Čo vidí | Kto ju smie volať |
+|---|---|---|
+| `getAllRoutes()`, `getRouteBySlug()` | len `published = true` | verejný web |
+| `getPurchasedRoute()` | aj skryté | len s ID z overeného tokenu alebo zaplatenej session |
+| ostatné | všetko, aj zápis | samy volajú `requireAdmin()` |
+
+**Nový verejný dotaz na trasy patrí do `getAllRoutes()`**, nie vedľa neho —
+databáza skrytú trasu nezastaví, keď zabudneš na `where published`.
+
+Ovládač `@neondatabase/serverless` posiela každý dotaz ako HTTP požiadavku —
+na Verceli sa tak nehromadia otvorené spojenia. Parametre píš vždy cez
+``sql()`...${hodnota}...` `` alebo `sql().query(text, [hodnoty])`, nikdy
+skladaním textu.
 
 Trasa stiahnutá z predaja sa kupujúcim stále dá stiahnuť — preto
 `/api/download`, webhook aj `/odomknute` čítajú cez `getPurchasedRoute()`.
 
-**Súbory trás** (GPX, roadbook) sú v Supabase Storage, v súkromnom buckete
+**Súbory trás** (GPX, roadbook) sú v **Cloudflare R2**, v súkromnom buckete
 `route-files`, cesta `<id trasy>/<meno súboru>` (`lib/route-file-path.ts`).
-Bucket nemá žiadne pravidlá pre verejný kľúč, takže ho vidí len `adminClient()`.
-**Nikdy ho neprepínaj na verejný** — `npm run db:subory` by v takom prípade
-skončil s chybou.
+Von sa dostanú len cez podpísaný odkaz na 60 s (`lib/route-files.ts`).
+**Nikdy nezapínaj Public access** (ani r2.dev, ani vlastnú doménu) — platené
+GPX by boli na stiahnutie zadarmo a cez API sa to overiť nedá.
 
 ### Administrácia (`/admin`)
 
@@ -118,19 +132,37 @@ npm run dev
 ```
 
 Bez kľúčov web beží normálne — checkout vráti 503 a rozhranie na to reaguje
-hláškou „platby nie sú nastavené". To je zámer, nie chyba. Bez Supabase
+hláškou „platby nie sú nastavené". To je zámer, nie chyba. Bez `DATABASE_URL`
 číta trasy z `data/routes.json` (len lokálne).
 
-**Databáza, prvé nastavenie** (raz na projekt Supabase):
+**Databáza a úložisko, prvé nastavenie** (raz na projekt):
 
-1. Spusti SQL zo `supabase/migrations/` v poradí podľa dátumu
-   (Supabase → SQL Editor, alebo `npx supabase db push`).
-2. Doplň `SUPABASE_*` do `.env.local` a spusti `npm run db:seed`.
-3. `npm run db:subory` — vytvorí súkromný bucket na súbory trás a nahrá
-   ukážkové GPX. Bez neho stiahnutie po zaplatení vráti `file_missing`.
-4. `npm run admin:heslo` → oba riadky `ADMIN_*` do `.env.local`.
-5. To isté (okrem seedu) do premenných na Verceli, typ Secret. Bez nich
+1. **Neon** (neon.tech, bezplatný plán, región Frankfurt `aws-eu-central-1`):
+   nový projekt → SQL Editor → spusti SQL z `db/migrations/` v poradí podľa
+   dátumu. Connection string (Pooled) → `DATABASE_URL` do `.env.local`.
+2. **Cloudflare R2**: vytvor bucket `route-files` (Location: Europe),
+   Public access nechaj **Disabled**. API token „Object Read & Write" len na
+   tento bucket → `R2_*` do `.env.local`.
+3. **CORS na buckete** (R2 → route-files → Settings → CORS policy) — bez neho
+   prehliadač v administrácii nenahrá export trasy:
+   ```json
+   [{ "AllowedOrigins": ["https://sml.admtechnics.sk", "http://localhost:3000"],
+      "AllowedMethods": ["PUT"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3600 }]
+   ```
+   Po spustení ostrej domény ju pridaj do `AllowedOrigins`.
+4. Nová prázdna databáza: `npm run db:seed` a `npm run db:subory` (ukážkové
+   GPX; bez nich stiahnutie po zaplatení vráti `file_missing`).
+   **Presun zo Supabase:** namiesto toho `npm run db:presun` (skopíruje
+   trasy aj súbory, Supabase len číta), potom `SUPABASE_*` zmaž.
+5. `npm run admin:heslo` → oba riadky `ADMIN_*` do `.env.local`.
+6. To isté (okrem seedu) do premenných na Verceli, typ Secret. Bez nich
    build na Verceli zlyhá — zámerne.
+
+**Neon na bezplatnom pláne** po pár minútach nečinnosti vypne výpočtový
+výkon a pri ďalšom dotaze ho sám zapne — prvá požiadavka trvá o chvíľu dlhšie,
+ale nič sa neuspí natrvalo ako pri Supabase. Zálohy: bezplatný plán vie
+vrátiť databázu len o krátky čas späť; pred ostrým spustením treba vlastnú
+zálohu (pg_dump).
 
 ## Nasadenie
 
@@ -172,9 +204,9 @@ premennej treba nasadiť znova.
 - **Bez `OPENROUTESERVICE_KEY` plánovač vráti 503.** Náhľad beží ako
   produkcia, takže demo server OSRM sa nepoužije.
 - **Vetvy sa na Verceli nenasadzujú, len `main`** (`vercel.json`). Premenné
-  sú len v prostredí Production a build bez Supabase zámerne padá. Kľúče
-  pre Preview nedávať: secret kľúč obchádza RLS a vetva by zapisovala do
-  databázy náhľadu. PR kontroluje GitHub Actions (`.github/workflows/ci.yml`):
+  sú len v prostredí Production a build bez databázy zámerne padá. Kľúče
+  pre Preview nedávať: `DATABASE_URL` má plné práva a vetva by zapisovala
+  do databázy náhľadu. PR kontroluje GitHub Actions (`.github/workflows/ci.yml`):
   lint, typy, testy. Vzor vetiev je `**`, nie `*` — hviezdička nezachytí
   lomku v `feature/...`.
 
@@ -187,9 +219,9 @@ premennej treba nasadiť znova.
 - **Git LFS na Verceli nezapínať.** V LFS sú len hero videá starého webu
   (`Videa/`, spolu ~870 MB) a nová aplikácia ich nepoužíva. Každý build by
   ich stiahol a minul bezplatný LFS limit GitHubu (1 GB mesačne).
-- **Súbory trás nie sú na serveri, ale v Supabase Storage.** Na disk Vercelu
+- **Súbory trás nie sú na serveri, ale v Cloudflare R2.** Na disk Vercelu
   sa za behu zapisovať nedá a do gitu smú len `example-*`. `content/gpx/`
-  sa na serveri nepoužíva — je to len záloha pre lokálny vývoj bez Supabase.
+  sa na serveri nepoužíva — je to len záloha pre lokálny vývoj bez R2.
 - **Stiahnutie nejde cez funkciu Vercelu.** Tá unesie najviac 4,5 MB
   odpovede, preto `/api/download` presmeruje na podpísaný odkaz. Nemeň to
   na čítanie súboru a jeho posielanie ďalej — pri väčšom roadbooku by to spadlo.
